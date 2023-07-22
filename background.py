@@ -11,12 +11,18 @@ class Hexagon:
     def draw(self,x,y):
         self.x = x
         self.y = y
-        l1 = pg.draw.line(screen,WHITE, [self.x+self.r/2,y], [self.x+self.r/2+self.r, self.y],self.w)
-        l2 = pg.draw.line(screen,WHITE,[self.x+self.r/2+self.r,self.y],[self.x+self.r/2+self.r+self.r/2, sqrt(3)/2*self.r+self.y],self.w)
-        l3 = pg.draw.line(screen,WHITE,[self.x+self.r/2+self.r+self.r/2, sqrt(3)/2*self.r+self.y],[self.x+self.r/2+self.r, 2*sqrt(3)/2*self.r+self.y],self.w)
-        l4 = pg.draw.line(screen,WHITE,[self.x+self.r/2+self.r, 2*sqrt(3)/2*self.r+self.y],[self.x+self.r/2, 2*sqrt(3)/2*self.r+self.y],self.w)
-        l5 = pg.draw.line(screen,WHITE,[self.x+self.r/2, 2*sqrt(3)/2*self.r+self.y],[self.x+self.r/2-self.r/2, sqrt(3)/2*self.r+self.y],self.w)
-        l6 = pg.draw.line(screen,WHITE,[self.x+self.r/2-self.r/2, sqrt(3)/2*self.r+self.y],[self.x+self.r/2,self.y],self.w)
+        l1 = pg.draw.line(screen,WHITE, [self.x+self.r/2,y],
+                          [self.x+self.r/2+self.r, self.y],self.w)
+        l2 = pg.draw.line(screen,WHITE,[self.x+self.r/2+self.r,self.y],
+                          [self.x+self.r/2+self.r+self.r/2, sqrt(3)/2*self.r+self.y],self.w)
+        l3 = pg.draw.line(screen,WHITE,[self.x+self.r/2+self.r+self.r/2, sqrt(3)/2*self.r+self.y],
+                          [self.x+self.r/2+self.r, 2*sqrt(3)/2*self.r+self.y],self.w)
+        l4 = pg.draw.line(screen,WHITE,[self.x+self.r/2+self.r, 2*sqrt(3)/2*self.r+self.y],
+                          [self.x+self.r/2, 2*sqrt(3)/2*self.r+self.y],self.w)
+        l5 = pg.draw.line(screen,WHITE,[self.x+self.r/2, 2*sqrt(3)/2*self.r+self.y],
+                          [self.x+self.r/2-self.r/2, sqrt(3)/2*self.r+self.y],self.w)
+        l6 = pg.draw.line(screen,WHITE,[self.x+self.r/2-self.r/2, sqrt(3)/2*self.r+self.y],
+                          [self.x+self.r/2,self.y],self.w)
 
 
     
