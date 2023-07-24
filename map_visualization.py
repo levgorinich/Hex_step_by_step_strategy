@@ -8,46 +8,56 @@ screen = pygame.display.set_mode(window_size)
 pygame.display.set_caption("Drawing Polygons on a Sprite")
 clock = pygame.time.Clock()
 
+# diagonal size of hexagon = 2a , where a is the radius of hexagon, or it's side length
+hex_width = 30* sqrt(3)
+hex_height = hex_width*sqrt(3)/2
+
+
 class Hexagon(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y, color = (70,70,120), width = 70, height = 70):
+    def __init__(self, pos_x, pos_y, color = (70,70,120), width = hex_width, height =hex_height ):
         super().__init__()
         self.image = pygame.Surface((width, height), pygame.SRCALPHA)  # Create a blank surface with transparency
-        # pygame.draw.polygon(self.image, color, vertices)
-
         self.rect = self.image.get_rect(center=(pos_x, pos_y))
-
-        self.rect.x = pos_x
-        self.rect.y = pos_y
-        # self.rect.center = (pos_x, pos_y)
         self.points = []
-        self.image.fill((0, 0, 0, 0))
+
+        # calculating points for hexagon
         v = 0
         for i in range(6):
-            self.points.append((cos(v)*((self.rect.width//2)-2)+ self.rect.width/2,
-                                sin(v)*((self.rect.height//2)-2)+ self.rect.height/2))
+            self.points.append((cos(v)*((width//2)-1)+ width/2,
+                                sin(v)*((width//2)-1)+ width/2-(width-height)/2))
             v += (pi*2)/6
+
         pygame.draw.polygon( self.image, (30,70,50),self.points )
-
-        print(self.points)
-
         self.mask = pygame.mask.from_surface(self.image)
 
     def update(self):
         pass
 
-        # Define the color and vertices for the polygon
-polygon_color = (255, 0, 0)  # Red color (R=255, G=0, B=0)
-polygon_vertices = [(0, 0), (50, 100), (100, 0)]  # Triangle vertices
 
-# Define the initial position of the sprite
-sprite_position = (200, 200)
+
+
+def generate_map(cols, rows):
+    """generating hexagon grid with given number of columns and rows"""
+
+    hexes = pygame.sprite.Group()
+    current_x = hex_width/2
+    current_y = hex_height/2
+
+    for col in range(cols):
+        # each uneven column is moved down by hex_width/2
+        if col %2 ==0:
+            current_y+= hex_height/2
+        for row in range(rows):
+            hex = Hexagon(current_x, current_y)
+            current_y += hex_height
+            hexes.add(hex)
+        current_x += hex_width*3/4
+        current_y= hex_height/2
+    return hexes
 
 # Create the polygon sprite object
-hex = Hexagon(50,50,)
+hexes = generate_map(25,25)
 
-# Create a sprite group
-hexes = pygame.sprite.Group()
-hexes.add(hex)
 
 running = True
 while running:
@@ -61,11 +71,14 @@ while running:
             print(mouse_x, mouse_y)
 
             for sprite in hexes:
+                # if it is a collision with a rectangle we will check if we have a collision with a mask
                 if sprite.rect.collidepoint(mouse_x, mouse_y):
+                    print("rectangle clicked")
                     local_x = mouse_x - sprite.rect.x
                     local_y = mouse_y - sprite.rect.y
                     if sprite.mask.get_at((local_x, local_y)):
                         print("Clicked")
+                        break
 
     hexes.update()
 
