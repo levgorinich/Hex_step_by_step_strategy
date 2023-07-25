@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from noise.perlin_noise import Perlin
+from some_russian_gay_m.noise import Perlin
 
 
 octaves = 4
