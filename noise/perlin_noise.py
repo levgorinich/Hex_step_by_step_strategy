@@ -1,10 +1,13 @@
 import random
+import numpy as np
 import math
+import pprint
 
-class Perlin:
+pp = pprint.PrettyPrinter(indent=4)
+class Perlin1D:
     def __init__(self, ):
         self.gradients = []
-        self.points = []
+
 
 
 
@@ -55,4 +58,37 @@ class Perlin:
         return amt * (stop - start) + start
 
 
+class Perlin2D:
+    def __init__(self):
+        self.gradients = np.array([[self.chooseGradient()]])
+
+    def chooseGradient(self):
+        return random.choice([(1,1),(-1,1),(1,-1),(-1,-1)])
+    def calcStandartNoiseForPoint(self, point):
+        while point[1] >= len(self.gradients)-1:
+            row = np.array([[self.chooseGradient()]])
+            for _ in range(len(self.gradients[0])-1):
+                grad = self.chooseGradient()
+                row = np.append(row, np.array([[grad]]), axis=0)
+
+            self.gradients = np.append(self.gradients, row, axis=0)
+            print("Print after cycle", self.gradients)
+        pp.pprint(self.gradients)
+
+        while point[0] >= len(self.gradients[0])-1:
+            column = np.array([[self.chooseGradient()]])
+            for i in range(len(self.gradients)-1):
+                grad = self.chooseGradient()
+                column = np.append(column, np.array([[grad]]), axis=0)
+            self.gradients = np.append(self.gradients, column, axis=1)
+
+
+
+x = (10, 3)
+
+
+per = Perlin2D()
+per.calcStandartNoiseForPoint(x)
+print(per.gradients)
+print(per.gradients.shape)
 

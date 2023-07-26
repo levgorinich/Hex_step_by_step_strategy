@@ -1,13 +1,13 @@
 import matplotlib.pyplot as plt
-from some_russian_gay_m.noise import Perlin
+from some_russian_gay_m.noise.perlin_noise import Perlin1D
 
 
 octaves = 4
-persistance = 0.7
-lacanarity = 2
-Perlin = Perlin()
+persistance = 0.5
+lacanarity = 7
+Perlin = Perlin1D()
 values = [i/100 for i in range(600)]
-arr = [Perlin.calc_octaves(i, octaves, lacanarity, persistance)for i in values]
+arr = [Perlin.getValueAt(i, octaves, lacanarity, persistance)for i in values]
 
 
 
