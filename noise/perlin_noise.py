@@ -64,6 +64,9 @@ class Perlin2D:
 
     def chooseGradient(self):
         return random.choice([(1,1),(-1,1),(1,-1),(-1,-1)])
+    def getVector(self, point):
+
+        return self.gradients[point[1]][point[0]]
     def calcStandartNoiseForPoint(self, point):
         while point[1] >= len(self.gradients)-1:
             row = np.array([[self.chooseGradient()]])
@@ -72,8 +75,6 @@ class Perlin2D:
                 row = np.append(row, np.array([[grad]]), axis=0)
 
             self.gradients = np.append(self.gradients, row, axis=0)
-            print("Print after cycle", self.gradients)
-        pp.pprint(self.gradients)
 
         while point[0] >= len(self.gradients[0])-1:
             column = np.array([[self.chooseGradient()]])
@@ -82,13 +83,39 @@ class Perlin2D:
                 column = np.append(column, np.array([[grad]]), axis=0)
             self.gradients = np.append(self.gradients, column, axis=1)
 
+        vectTopLeft = self.getVector((math.floor(point[0]), math.floor(point[1])))
+        vectTopRight = self.getVector((math.ceil(point[0]), math.floor(point[1])))
+        vectBottomLeft = self.getVector((math.floor(point[0]), math.ceil(point[1])))
+        vectBottomRight = self.getVector((math.ceil(point[0]), math.ceil(point[1])))
 
 
-x = (10, 3)
+        x0y0 = (point[0] - math.floor(point[0]), point[1] - math.floor(point[1]))
+        x0y1 =  (point[0] - math.ceil(point[0]), point[1] - math.ceil(point[1]))
+        x1y0 = (point[0] - math.ceil(point[0]), point[1] - math.floor(point[1]))
+        x1y1 = (point[0] - math.floor(point[0]), point[1] - math.ceil(point[1]))
+
+        dotTopRight = np.dot(x0y1, vectTopRight)
+        dotTopLeft = np.dot(x0y0, vectTopLeft)
+        dotBottomRight = np.dot(x1y1, vectBottomRight)
+        dotBottomLeft = np.dot(x1y0, vectBottomLeft)
+
+        u = self.smooze(x0y0[0])
+        v = self.smooze(x0y0[1])
+
+        return self.__lepr(u, self.__lepr(v, dotBottomLeft, dotTopLeft),self.__lepr(v, dotBottomRight, dotTopRight))
 
 
-per = Perlin2D()
-per.calcStandartNoiseForPoint(x)
-print(per.gradients)
-print(per.gradients.shape)
+    def smooze(self, x):
+        """ Smoothes the noise
+        This function has first and second derivatives 0 in poins 1 and 0 """
+        return 6*x**5 - 15*x**4 + 10*x**3
+
+    def __lepr(self, start, stop, amt):
+        "Do the interpolation"
+        return amt * (stop - start) + start
+
+
+
+
+
 
