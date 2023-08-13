@@ -61,38 +61,63 @@ class Perlin1D:
 class Perlin2D:
     def __init__(self):
         self.gradients = np.array([[self.chooseGradient()]])
-
+        self.permutation = np.arange(256, dtype=int)
+        np.random.shuffle(self.permutation)
+        print(self.permutation)
     def chooseGradient(self):
         return random.choice([(1,1),(-1,1),(1,-1),(-1,-1)])
-    def getVector(self, point):
+    def getVector(self, value):
+        res = value % 4
+        if res==0:
+            return  (1,1)
+        if res == 1:
+            return (-1,1)
+        if res == 2:
+            return (1,-1)
+        return (-1,-1)
 
-        return self.gradients[point[1]][point[0]]
     def calcStandartNoiseForPoint(self, point):
-        while point[1] >= len(self.gradients)-1:
-            row = np.array([[self.chooseGradient()]])
-            for _ in range(len(self.gradients[0])-1):
-                grad = self.chooseGradient()
-                row = np.append(row, np.array([[grad]]), axis=0)
-
-            self.gradients = np.append(self.gradients, row, axis=0)
-
-        while point[0] >= len(self.gradients[0])-1:
-            column = np.array([[self.chooseGradient()]])
-            for i in range(len(self.gradients)-1):
-                grad = self.chooseGradient()
-                column = np.append(column, np.array([[grad]]), axis=0)
-            self.gradients = np.append(self.gradients, column, axis=1)
-
-        vectTopLeft = self.getVector((math.floor(point[0]), math.floor(point[1])))
-        vectTopRight = self.getVector((math.ceil(point[0]), math.floor(point[1])))
-        vectBottomLeft = self.getVector((math.floor(point[0]), math.ceil(point[1])))
-        vectBottomRight = self.getVector((math.ceil(point[0]), math.ceil(point[1])))
+        # while point[1] >= len(self.gradients)-1:
+        #     row = np.array([[self.chooseGradient()]])
+        #     for _ in range(len(self.gradients[0])-1):
+        #         grad = self.chooseGradient()
+        #         row = np.append(row, np.array([[grad]]), axis=1)
+        #     # print("Shapes", row.shape, self.gradients.shape)
+        #     # print("row ", row, "\n")
+        #     # print("Gradients", self.gradients,"\n")
+        #     self.gradients = np.append(self.gradients, row, axis=0)
+        #
+        # while point[0] >= len(self.gradients[0])-1:
+        #     column = np.array([[self.chooseGradient()]])
+        #     for i in range(len(self.gradients)-1):
+        #         grad = self.chooseGradient()
+        #         column = np.append(column, np.array([[grad]]), axis=0)
+        #     self.gradients = np.append(self.gradients, column, axis=1)
 
 
-        x0y0 = (point[0] - math.floor(point[0]), point[1] - math.floor(point[1]))
-        x0y1 =  (point[0] - math.ceil(point[0]), point[1] - math.ceil(point[1]))
-        x1y0 = (point[0] - math.ceil(point[0]), point[1] - math.floor(point[1]))
-        x1y1 = (point[0] - math.floor(point[0]), point[1] - math.ceil(point[1]))
+        xi = math.floor(point[0])
+        yi = math.floor(point[1])
+
+        X  = xi % 255
+        Y  = yi % 255
+
+        # print(self.permutation[X+1]+Y+1)
+        valueTopLeft = self.permutation[(self.permutation[X+1]+Y+1)%255]
+        valueTopRight = self.permutation[(self.permutation[X+1]+Y)%255]
+        valueBottomLeft = self.permutation[(self.permutation[X]+Y+1)%255]
+        valueBottomRight = self.permutation[(self.permutation[X]+Y)%255]
+
+
+        vectTopLeft = self.getVector(valueTopLeft)
+        vectTopRight = self.getVector((valueTopRight))
+        vectBottomLeft = self.getVector((valueBottomLeft))
+        vectBottomRight = self.getVector((valueBottomRight))
+
+
+        x0y0 = (point[0] - xi, point[1] - yi)
+        x0y1 =  (point[0] - xi, point[1] - yi+1)
+        x1y0 = (point[0] - xi+1, point[1] - yi)
+        x1y1 = (point[0] - xi+1, point[1] - yi+1)
 
         dotTopRight = np.dot(x0y1, vectTopRight)
         dotTopLeft = np.dot(x0y0, vectTopLeft)
@@ -102,7 +127,7 @@ class Perlin2D:
         u = self.smooze(x0y0[0])
         v = self.smooze(x0y0[1])
 
-        return self.__lepr(u, self.__lepr(v, dotBottomLeft, dotTopLeft),self.__lepr(v, dotBottomRight, dotTopRight))
+        return self.__lepr(v,self.__lepr(u, dotTopLeft, dotTopRight),self.__lepr(u, dotBottomLeft, dotBottomRight))
 
 
     def smooze(self, x):
@@ -115,7 +140,8 @@ class Perlin2D:
         return amt * (stop - start) + start
 
 
-
+Per = Perlin2D()
+print(Per.calcStandartNoiseForPoint((0,1)))
 
 
 

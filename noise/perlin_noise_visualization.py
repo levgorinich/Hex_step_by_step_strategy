@@ -10,9 +10,10 @@ octaves = 4
 persistance = 0.5
 lacanarity = 7
 Perlin = Perlin2D()
-values = np.zeros((100,100))
-for i in range(100):
-    for j in range(100):
+values = np.zeros((200,200))
+for i in range(200):
+    for j in range(200):
+        print(i,j)
         values[i][j] = Perlin.calcStandartNoiseForPoint((i/100,j/100))
 print(values)
 arr = [Perlin.calcStandartNoiseForPoint(i)for i in values]

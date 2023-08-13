@@ -7,7 +7,7 @@ from math import *
 pygame.init()
 window_size = (1280, 720)
 screen = pygame.display.set_mode(window_size)
-pygame.event.set_grab(True)
+# pygame.event.set_grab(True)
 pygame.display.set_caption("Drawing Polygons on a Sprite")
 clock = pygame.time.Clock()
 
@@ -56,7 +56,11 @@ class CameraGroup(pygame.sprite.Group):
         h = self.display_surface.get_size()[1] -(self.camera_borders['bottom'] + self.camera_borders['top'])
         self.camera_rect = pygame.Rect(l, r, w, h)
 
-        self.mouse_speed= 1
+        self.mouse_speed= 0.4
+
+        # camera control
+        self.mouse_pos_down = pygame.math.Vector2(0,0)
+        self.drag_flag = False
 
         # zoom
         self.zoom_scale = 1
@@ -64,13 +68,32 @@ class CameraGroup(pygame.sprite.Group):
         self.internal_surface = pygame.Surface(self.internal_surface_size, pygame.SRCALPHA)
         self.internal_rect = self.internal_surface.get_rect(center = (self.half_width, self.half_height))
         self.internal_surface_size_vector = pygame.math.Vector2(self.internal_surface_size)
-
-
+        self.internal_offset = pygame.math.Vector2(0,0)
+        self.internal_offset.x = self.internal_surface_size[0]//2 - self.half_width
+        self.internal_offset.y = self.internal_surface_size[1]//2 - self.half_height
 
 
 
     def mouse_zoom(self):
         pass
+    def drag_mouse_control(self, events_list):
+        # mouse_pos_down = (0,0)
+        for event in events_list:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                self.mouse_pos_down = pygame.math.Vector2(pygame.mouse.get_pos())
+                self.drag_flag = True
+                print("mouse pos down", self.mouse_pos_down)
+
+            if self.drag_flag:
+                mouse_pos_up = pygame.math.Vector2(pygame.mouse.get_pos())
+                print("after up", mouse_pos_up, self.mouse_pos_down)
+                distance_draged = mouse_pos_up.distance_to(self.mouse_pos_down)
+                if mouse_pos_up.distance_to(self.mouse_pos_down) > 5:
+                    print(mouse_pos_up - self.mouse_pos_down)
+                    self.offset+= (mouse_pos_up - self.mouse_pos_down) * self.mouse_speed
+                if event.type == pygame.MOUSEBUTTONUP:
+                    self.drag_flag = False
+                self.mouse_pos_down = mouse_pos_up
 
     def mouse_control(self):
         mouse = pygame.math.Vector2(pygame.mouse.get_pos())
@@ -115,12 +138,13 @@ class CameraGroup(pygame.sprite.Group):
                 mouse_offset_vector = mouse - pygame.math.Vector2(right_border, bottom_border)
                 pygame.mouse.set_pos((right_border, bottom_border))
         self.offset -= mouse_offset_vector *self.mouse_speed
-    def custom_draw(self, screen):
-        self.mouse_control()
+    def custom_draw(self, screen, events_list):
+        # self.mouse_control()
+        self.drag_mouse_control(events_list)
 
         self.internal_surface.fill('#71deee')
         for sprite in self.sprites():
-            offset_pos = sprite.rect.topleft + self.offset
+            offset_pos = sprite.rect.topleft + self.offset + self.internal_offset
             self.internal_surface.blit(sprite.image, offset_pos)
 
         scaled_surface = pygame.transform.scale(self.internal_surface, self.internal_surface_size_vector * self.zoom_scale)
@@ -167,7 +191,8 @@ hexes = generate_map(35,35)
 
 running = True
 while running:
-    for event in pygame.event.get():
+    events_list = pygame.event.get()
+    for event in events_list:
         if event.type == QUIT:
             running = False
 
@@ -197,7 +222,7 @@ while running:
     hexes.update()
 
     screen.fill((255, 255, 255))
-    hexes.custom_draw(screen)
+    hexes.custom_draw(screen, events_list)
     pygame.display.flip()
     clock.tick(60)
 
