@@ -27,9 +27,11 @@ class CameraGroup(pygame.sprite.Group):
 
         # zoom
         self.zoom_scale = 1
-        self.internal_surface_size= (2500, 2500)
+        self.internal_surface_size= (2000, 2000)
+
         self.internal_surface = pygame.Surface(self.internal_surface_size, pygame.SRCALPHA)
 
+        pygame.draw.rect(self.internal_surface,"yellow",(1,1,2300,2300),3)
         # creating internal surface centered with display surface
         self.internal_rect = self.internal_surface.get_rect(center = (self.half_width, self.half_height))
         self.internal_surface_size_vector = pygame.math.Vector2(self.internal_surface_size)
@@ -58,7 +60,19 @@ class CameraGroup(pygame.sprite.Group):
                 mouse_pos_up = pygame.math.Vector2(pygame.mouse.get_pos())
 
                 if mouse_pos_up.distance_to(self.mouse_pos_down) > 10:
+                    print(self.display_surface)
+                    print(self.internal_surface)
+                    print(self.internal_offset)
                     self.offset+= (mouse_pos_up - self.mouse_pos_down) * self.mouse_speed
+                    if self.offset.x < -self.internal_offset.x:
+                        self.offset.x= -self.internal_offset.x
+                    if self.offset.x > self.internal_surface.get_size()[0] - self.display_surface.get_size()[0] :
+                        self.offset.x = self.internal_surface.get_size()[0] - self.display_surface.get_size()[0]
+                    if self.offset.y < -self.internal_offset.y:
+                        self.offset.y=-self.internal_offset.y
+                    if self.offset.y > self.internal_surface.get_size()[1] - self.display_surface.get_size()[1] :
+                        self.offset.y = self.internal_surface.get_size()[1] - self.display_surface.get_size()[1]
+
                 if event.type == pygame.MOUSEBUTTONUP:
                     self.drag_flag = False
                 self.mouse_pos_down = mouse_pos_up
@@ -112,7 +126,6 @@ class CameraGroup(pygame.sprite.Group):
         self.screen_movement_with_mouse_dragging(events_list)
 
         self.internal_surface.fill('#71deee')
-
         for sprite in self.sprites():
             offset_pos = sprite.rect.topleft + self.offset + self.internal_offset
             self.internal_surface.blit(sprite.image, offset_pos)
