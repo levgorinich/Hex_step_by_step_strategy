@@ -1,8 +1,38 @@
+from math import sqrt
+
 import pygame
 
-class CameraGroup(pygame.sprite.Group):
+from some_russian_gay_m.Sprites import Hexagon
+class HexesGroup(pygame.sprite.Group):
     def __init__(self):
         super().__init__()
+        self.hexes_dict =Grid()
+
+    def add(self, *hexes, **kwargs):
+        for hex in hexes:
+            super().add(hex, **kwargs)  # Add sprite to the standard Group
+            self.hexes_dict[hex.grid_pos_x, hex.grid_pos_y] = hex  # Add sprite to the lookup dictionary
+
+
+class Grid(dict):
+    # """An extension of a basic dictionary with a fast, consistent lookup by value implementation."""
+    def __init__(self, default=None, *args, **kwargs):
+        super(Grid, self).__init__(*args, **kwargs)
+        self.default = default
+
+    def __getitem__(self, key):
+        return super(Grid, self).get(key, self.default)
+
+    def find(self, pos):
+        for key, value in self.items():
+            if value == pos:
+                return key
+        return None
+
+class CameraGroup(pygame.sprite.Group):
+    def __init__(self, hexes_group):
+        super().__init__()
+        self.hexes_group = hexes_group
         self.display_surface = pygame.display.get_surface()
 
 
@@ -60,9 +90,7 @@ class CameraGroup(pygame.sprite.Group):
                 mouse_pos_up = pygame.math.Vector2(pygame.mouse.get_pos())
 
                 if mouse_pos_up.distance_to(self.mouse_pos_down) > 10:
-                    print(self.display_surface)
-                    print(self.internal_surface)
-                    print(self.internal_offset)
+
                     self.offset+= (mouse_pos_up - self.mouse_pos_down) * self.mouse_speed
                     if self.offset.x < -self.internal_offset.x:
                         self.offset.x= -self.internal_offset.x
@@ -97,7 +125,7 @@ class CameraGroup(pygame.sprite.Group):
         elif mouse.y < top_border:
             if mouse.x < left_border:
                 mouse_offset_vector = mouse - pygame.math.Vector2(left_border, top_border)
-                print(mouse_offset_vector)
+
                 pygame.mouse.set_pos((left_border, top_border))
             if mouse.x > right_border:
                 mouse_offset_vector = mouse - pygame.math.Vector2(right_border, top_border)
@@ -126,7 +154,7 @@ class CameraGroup(pygame.sprite.Group):
         self.screen_movement_with_mouse_dragging(events_list)
 
         self.internal_surface.fill('#71deee')
-        for sprite in self.sprites():
+        for sprite in self.hexes_group.sprites():
             offset_pos = sprite.rect.topleft + self.offset + self.internal_offset
             self.internal_surface.blit(sprite.image, offset_pos)
 
@@ -135,5 +163,6 @@ class CameraGroup(pygame.sprite.Group):
 
 
         self.display_surface.blit(scaled_surface,scaled_rect)
+
 
 
