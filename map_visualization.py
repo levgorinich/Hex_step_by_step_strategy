@@ -1,10 +1,14 @@
+import sys
+
 import pygame
 from pygame.locals import *
 from math import *
+from some_russian_gay_m.Groups import CameraGroup
 
 pygame.init()
-window_size = (800, 600)
+window_size = (1280, 720)
 screen = pygame.display.set_mode(window_size)
+# pygame.event.set_grab(True)
 pygame.display.set_caption("Drawing Polygons on a Sprite")
 clock = pygame.time.Clock()
 
@@ -14,11 +18,14 @@ hex_height = hex_width*sqrt(3)/2
 
 
 class Hexagon(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y, color = (70,70,120), width = hex_width, height =hex_height ):
+    def __init__(self, pos_x, pos_y, coord_x, coord_y, color = (70,70,120), width = hex_width, height =hex_height ):
         super().__init__()
+        self.coord_x = coord_x
+        self.coord_y = coord_y
         self.image = pygame.Surface((width, height), pygame.SRCALPHA)  # Create a blank surface with transparency
         self.rect = self.image.get_rect(center=(pos_x, pos_y))
         self.points = []
+
 
         # calculating points for hexagon
         v = 0
@@ -34,21 +41,23 @@ class Hexagon(pygame.sprite.Sprite):
         pass
 
 
-
-
 def generate_map(cols, rows):
     """generating hexagon grid with given number of columns and rows"""
 
-    hexes = pygame.sprite.Group()
+    hexes = CameraGroup()
+
     current_x = hex_width/2
     current_y = hex_height/2
 
     for col in range(cols):
         # each uneven column is moved down by hex_width/2
-        if col %2 ==0:
+        if col %2 ==1:
             current_y+= hex_height/2
         for row in range(rows):
-            hex = Hexagon(current_x, current_y)
+            coord_x = row+col//2+col%2
+            coord_y = col
+
+            hex = Hexagon(current_x,current_y, coord_x,coord_y)
             current_y += hex_height
             hexes.add(hex)
         current_x += hex_width*3/4
@@ -59,32 +68,42 @@ def generate_map(cols, rows):
 hexes = generate_map(25,25)
 
 
+
+
+
+
+
+
 running = True
 while running:
-    for event in pygame.event.get():
+
+    events_list = pygame.event.get()
+
+    hexes.update()
+    screen.fill((255, 255, 255))
+    hexes.custom_draw(events_list)
+    pygame.display.flip()
+
+    for event in events_list:
         if event.type == QUIT:
             running = False
 
         if event.type == pygame.MOUSEBUTTONDOWN:
+
             # Get the mouse position
-            mouse_x, mouse_y = pygame.mouse.get_pos()
-            print(mouse_x, mouse_y)
+            mouse = pygame.math.Vector2(pygame.mouse.get_pos())
+
+            mouse -= hexes.offset
 
             for sprite in hexes:
                 # if it is a collision with a rectangle we will check if we have a collision with a mask
-                if sprite.rect.collidepoint(mouse_x, mouse_y):
-                    print("rectangle clicked")
-                    local_x = mouse_x - sprite.rect.x
-                    local_y = mouse_y - sprite.rect.y
+                if sprite.rect.collidepoint(mouse.x, mouse.y):
+                    local_x = mouse.x - sprite.rect.x
+                    local_y = mouse.y - sprite.rect.y
                     if sprite.mask.get_at((local_x, local_y)):
-                        print("Clicked")
+                        print("sprite", sprite.coord_x, sprite.coord_y)
                         break
 
-    hexes.update()
-
-    screen.fill((255, 255, 255))
-    hexes.draw(screen)
-    pygame.display.flip()
     clock.tick(60)
 
 pygame.quit()
