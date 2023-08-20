@@ -5,40 +5,32 @@ from pygame.locals import *
 from math import *
 from some_russian_gay_m.Groups import CameraGroup
 from some_russian_gay_m.Map import Map
-
+from some_russian_gay_m.Render import Render
+from mapMovement import MapMovementTracker
 pygame.init()
 window_size = (1280, 720)
 screen = pygame.display.set_mode(window_size)
 # pygame.event.set_grab(True)
 pygame.display.set_caption("Drawing Polygons on a Sprite")
 clock = pygame.time.Clock()
+internal_surface = pygame.Surface((2500, 2500))
 
 # diagonal size of hexagon = 2a , where a is the radius of hexagon, or it's side length
 
-
-
 game_map = Map(25,25)
-
-hexes = CameraGroup(game_map.hexes)
-
-
-
-
-
-
-
-
-
-
+tracker = MapMovementTracker(internal_surface.get_size(), pygame.display.get_surface().get_size())
+renderer = Render(map_movement_tracker=tracker, internal_surface=internal_surface)
 
 running = True
 while running:
 
     events_list = pygame.event.get()
 
-    hexes.update()
+    game_map.hexes.update()
     screen.fill((255, 255, 255))
-    hexes.custom_draw(events_list)
+    renderer.display_objects(game_map.hexes)
+    renderer.display(events_list)
+    # hexes.custom_draw(events_list)
     pygame.display.flip()
 
     for event in events_list:
@@ -50,9 +42,9 @@ while running:
             # Get the mouse position
             mouse = pygame.math.Vector2(pygame.mouse.get_pos())
 
-            mouse -= hexes.offset
+            mouse -= game_map.hexes.offset
 
-            for sprite in hexes:
+            for sprite in game_map.hexes:
                 # if it is a collision with a rectangle we will check if we have a collision with a mask
                 if sprite.rect.collidepoint(mouse.x, mouse.y):
                     local_x = mouse.x - sprite.rect.x
