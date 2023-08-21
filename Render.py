@@ -13,10 +13,13 @@ class Render:
         offset = self.map_movement_tracker.get_total_offset()
         for sprite in sprite_group.sprites():
             self.internal_surface.blit(sprite.image, offset + sprite.rect.topleft)
-    def display_units(self,sprite_group):
+    def display_units(self,sprite_group, hexes):
         offset = self.map_movement_tracker.get_total_offset()
+
         for sprite in sprite_group.sprites():
-            self.internal_surface.blit(sprite.image, offset + sprite.rect.topleft)
+            unit_hex = hexes[sprite.grid_pos_x, sprite.grid_pos_y]
+            unit_center=  (unit_hex.map_coord_x-sprite.width//2, unit_hex.map_coord_y-sprite.height//2)
+            self.internal_surface.blit(sprite.image, offset + unit_center)
     def pre_display(self, events_list):
 
         self.internal_surface.fill((0, 0, 0, 0))

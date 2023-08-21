@@ -22,6 +22,7 @@ tracker = MapMovementTracker(internal_surface.get_size(), pygame.display.get_sur
 renderer = Render(map_movement_tracker=tracker, internal_surface=internal_surface)
 
 
+unit_mover=False
 running = True
 while running:
 
@@ -31,7 +32,7 @@ while running:
     # screen.fill('#71deee')
     renderer.pre_display(events_list)
     renderer.display_objects(game_map.hexes)
-    renderer.display_units(game_map.units)
+    renderer.display_units(game_map.units, game_map.hexes.hexes_dict)
     renderer.display()
 
     # renderer.display_objects(game_map.hexes)
@@ -53,6 +54,14 @@ while running:
                     local_x = mouse.x - sprite.rect.x
                     local_y = mouse.y - sprite.rect.y
                     if sprite.mask.get_at((local_x, local_y)):
+                        if sprite.unit_on_hex:
+                            unit_mover = sprite.unit_on_hex
+                            sprite.unit_on_hex = False
+                        if unit_mover:
+                            sprite.unit_on_hex = unit_mover
+                            unit_mover.grid_pos_x = sprite.grid_pos_x
+                            unit_mover.grid_pos_y = sprite.grid_pos_y
+
                         print("sprite", sprite.grid_pos_x, sprite.grid_pos_y)
                         break
 

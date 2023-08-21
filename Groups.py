@@ -8,6 +8,7 @@ class HexesGroup(pygame.sprite.Group):
         super().__init__()
         self.hexes_dict =Grid()
 
+
     def add(self, *hexes, **kwargs):
         for hex in hexes:
             super().add(hex, **kwargs)  # Add sprite to the standard Group
