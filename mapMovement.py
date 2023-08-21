@@ -4,6 +4,7 @@ class MapMovementTracker(pygame.sprite.Group):
     def __init__(self, internal_surface_size, display_surface_size):
         super().__init__()
         self.internal_surface_size = internal_surface_size
+        self.internal_surface_size_vector = pygame.math.Vector2(internal_surface_size)
         self.display_surface_size = display_surface_size
 
 
@@ -34,8 +35,8 @@ class MapMovementTracker(pygame.sprite.Group):
 
 
         # creating internal surface centered with display surface
-        # self.internal_rect = self.internal_surface.get_rect(center = (self.half_width, self.half_height))
-        self.internal_surface_size_vector = pygame.math.Vector2(self.internal_surface_size)
+        # self.internal_rect = self.internal_surface_size.get_rect(center = (self.half_width, self.half_height))
+        self.internal_surface_size_size_vector = pygame.math.Vector2(self.internal_surface_size)
         self.internal_offset = pygame.math.Vector2(0,0)
         self.internal_offset.x = self.internal_surface_size[0]//2 - self.half_width
         self.internal_offset.y = self.internal_surface_size[1]//2 - self.half_height
@@ -61,12 +62,12 @@ class MapMovementTracker(pygame.sprite.Group):
                     self.offset+= (mouse_pos_up - self.mouse_pos_down) * self.mouse_speed
                     if self.offset.x < -self.internal_offset.x:
                         self.offset.x= -self.internal_offset.x
-                    if self.offset.x > self.internal_surface.get_size()[0] - self.display_surface.get_size()[0] :
-                        self.offset.x = self.internal_surface.get_size()[0] - self.display_surface.get_size()[0]
+                    if self.offset.x > self.internal_surface_size[0] - self.display_surface_size[0] :
+                        self.offset.x = self.internal_surface_size[0] - self.display_surface_size[0]
                     if self.offset.y < -self.internal_offset.y:
                         self.offset.y=-self.internal_offset.y
-                    if self.offset.y > self.internal_surface.get_size()[1] - self.display_surface.get_size()[1] :
-                        self.offset.y = self.internal_surface.get_size()[1] - self.display_surface.get_size()[1]
+                    if self.offset.y > self.internal_surface_size[1] - self.display_surface_size[1] :
+                        self.offset.y = self.internal_surface_size[1] - self.display_surface_size[1]
 
                 if event.type == pygame.MOUSEBUTTONUP:
                     self.drag_flag = False
@@ -117,8 +118,11 @@ class MapMovementTracker(pygame.sprite.Group):
             self.offset -= mouse_offset_vector *self.mouse_speed
 
 
-    def get_offset(self):
+    def get_total_offset(self):
         return self.offset+self.internal_offset
+    def get_dragging_offset(self):
+        return self.offset
     def get_internal_surface_scale(self):
-        return self.zoom_scale * self.internal_surface_size
+
+        return self.zoom_scale * self.internal_surface_size_size_vector
         

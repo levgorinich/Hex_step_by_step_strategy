@@ -42,7 +42,7 @@ while running:
             # Get the mouse position
             mouse = pygame.math.Vector2(pygame.mouse.get_pos())
 
-            mouse -= game_map.hexes.offset
+            mouse -= tracker.get_dragging_offset()
 
             for sprite in game_map.hexes:
                 # if it is a collision with a rectangle we will check if we have a collision with a mask
@@ -50,7 +50,7 @@ while running:
                     local_x = mouse.x - sprite.rect.x
                     local_y = mouse.y - sprite.rect.y
                     if sprite.mask.get_at((local_x, local_y)):
-                        print("sprite", sprite.coord_x, sprite.coord_y)
+                        print("sprite", sprite.map_coord_x, sprite.grid_pos_y)
                         break
 
     clock.tick(60)
