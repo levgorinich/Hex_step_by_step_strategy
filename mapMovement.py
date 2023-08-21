@@ -36,7 +36,7 @@ class MapMovementTracker(pygame.sprite.Group):
 
         # creating internal surface centered with display surface
         # self.internal_rect = self.internal_surface_size.get_rect(center = (self.half_width, self.half_height))
-        self.internal_surface_size_size_vector = pygame.math.Vector2(self.internal_surface_size)
+        self.internal_surface_size_vector = pygame.math.Vector2(self.internal_surface_size)
         self.internal_offset = pygame.math.Vector2(0,0)
         self.internal_offset.x = self.internal_surface_size[0]//2 - self.half_width
         self.internal_offset.y = self.internal_surface_size[1]//2 - self.half_height
@@ -124,5 +124,5 @@ class MapMovementTracker(pygame.sprite.Group):
         return self.offset
     def get_internal_surface_scale(self):
 
-        return self.zoom_scale * self.internal_surface_size_size_vector
+        return self.zoom_scale * self.internal_surface_size_vector
         
