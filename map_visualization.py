@@ -5,6 +5,7 @@ from pygame.locals import *
 from math import *
 # from some_russian_gay_m.Groups import CameraGroup
 from some_russian_gay_m.Map import Map
+from some_russian_gay_m.MouseClickHandler import MouseClickHandler
 from some_russian_gay_m.Render import Render
 from mapMovement import MapMovementTracker
 pygame.init()
@@ -20,7 +21,7 @@ internal_surface = pygame.Surface((2500, 2500),pygame.SRCALPHA)
 game_map = Map(25,25)
 tracker = MapMovementTracker(internal_surface.get_size(), pygame.display.get_surface().get_size())
 renderer = Render(map_movement_tracker=tracker, internal_surface=internal_surface)
-
+click_handler = MouseClickHandler(game_map, tracker)
 
 unit_mover=False
 running = True
@@ -44,26 +45,7 @@ while running:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
 
-            # Get the mouse position
-            mouse = pygame.math.Vector2(pygame.mouse.get_pos())
-
-            mouse -= tracker.get_dragging_offset()
-            for sprite in game_map.hexes:
-
-                if sprite.rect.collidepoint(mouse.x, mouse.y):
-                    local_x = mouse.x - sprite.rect.x
-                    local_y = mouse.y - sprite.rect.y
-                    if sprite.mask.get_at((local_x, local_y)):
-                        if sprite.unit_on_hex:
-                            unit_mover = sprite.unit_on_hex
-                            sprite.unit_on_hex = False
-                        if unit_mover:
-                            sprite.unit_on_hex = unit_mover
-                            unit_mover.grid_pos_x = sprite.grid_pos_x
-                            unit_mover.grid_pos_y = sprite.grid_pos_y
-
-                        print("sprite", sprite.grid_pos_x, sprite.grid_pos_y)
-                        break
+            click_handler.handle_click(event)
 
     clock.tick(60)
 

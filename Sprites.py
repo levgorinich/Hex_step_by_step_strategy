@@ -35,6 +35,8 @@ class Hexagon(pygame.sprite.Sprite):
     def remove_unit(self):
         self.unit_on_hex = False
 
+    def __str__(self):
+        return f"Hexagon {self.grid_pos_x}, {self.grid_pos_y}"
     def update(self):
         pass
 
