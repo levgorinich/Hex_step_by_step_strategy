@@ -44,7 +44,7 @@ while running:
             running = False
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-
+this is test
             click_handler.handle_click(event)
 
     clock.tick(60)
