@@ -24,9 +24,11 @@ class MouseClickHandler:
             sprite_clicked = self.check_if_hex_is_clicked(event)
             if sprite_clicked and self.unit_selected :
                 self.selected_sprite.remove_unit()
-                self.unit_selected = None
-                sprite_clicked.add_unit(self.unit_selected)
+                self.unit_selected.grid_pos_x = sprite_clicked.grid_pos_x
+                self.unit_selected.grid_pos_y = sprite_clicked.grid_pos_y
 
+                sprite_clicked.add_unit(self.unit_selected)
+                self.unit_selected = None
 
     def check_if_hex_is_clicked(self, event):
         mouse = pygame.math.Vector2(event.pos)
