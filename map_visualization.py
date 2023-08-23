@@ -9,7 +9,7 @@ from some_russian_gay_m.MouseClickHandler import MouseClickHandler
 from some_russian_gay_m.Render import Render
 from mapMovement import MapMovementTracker
 pygame.init()
-window_size = (1280, 720)
+window_size = (1250, 720)
 screen = pygame.display.set_mode(window_size)
 # pygame.event.set_grab(True)
 pygame.display.set_caption("Drawing Polygons on a Sprite")
@@ -20,7 +20,7 @@ internal_surface = pygame.Surface((2500, 2500),pygame.SRCALPHA)
 
 game_map = Map(25,25)
 tracker = MapMovementTracker(internal_surface.get_size(), pygame.display.get_surface().get_size())
-renderer = Render(map_movement_tracker=tracker, internal_surface=internal_surface)
+renderer = Render(map_movement_tracker=tracker)
 click_handler = MouseClickHandler(game_map, tracker)
 
 unit_mover=False
@@ -44,7 +44,6 @@ while running:
             running = False
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-this is test
             click_handler.handle_click(event)
 
     clock.tick(60)

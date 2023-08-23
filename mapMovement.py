@@ -10,8 +10,8 @@ class MapMovementTracker(pygame.sprite.Group):
 
 
         self.offset = pygame.math.Vector2(0,0)
-        self.half_width = self.display_surface_size[0] // 2
-        self.half_height = self.display_surface_size[1] // 2
+        self.display_surface_half_width = self.display_surface_size[0] // 2
+        self.display_surface_half_height = self.display_surface_size[1] // 2
 
         # moving camera with mouse
         self.camera_borders = {'left':10, 'right':10, 'top':10, 'bottom':10}
@@ -31,23 +31,20 @@ class MapMovementTracker(pygame.sprite.Group):
         # zoom
         self.zoom_scale = 1
 
-
-
-
-        # creating internal surface centered with display surface
-        # self.internal_rect = self.internal_surface_size.get_rect(center = (self.half_width, self.half_height))
         self.internal_surface_size_vector = pygame.math.Vector2(self.internal_surface_size)
         self.internal_offset = pygame.math.Vector2(0,0)
-        self.internal_offset.x = self.internal_surface_size[0]//2 - self.half_width
-        self.internal_offset.y = self.internal_surface_size[1]//2 - self.half_height
+        self.internal_offset.x = self.internal_surface_size[0]//2 - self.display_surface_half_width
+        self.internal_offset.y = self.internal_surface_size[1]//2 - self.display_surface_half_height
     def screen_movement_with_mouse_dragging(self, events_list):
 
         for event in events_list:
             # controlling zoom
             if event.type == pygame.MOUSEWHEEL:
-                if (self.zoom_scale < 1.75 and event.y >0) or (self.zoom_scale>0.65 and event.y < 0):
-                    self.zoom_scale += event.y * 0.03
-
+                self.zoom_scale += event.y * 0.03
+                if self.zoom_scale > 1.0 and event.y >0:
+                    self.zoom_scale =1.0
+                if self.zoom_scale<0.75 and event.y < 0:
+                    self.zoom_scale = 0.75
             if event.type == pygame.MOUSEBUTTONDOWN:
 
                 self.mouse_pos_down = pygame.math.Vector2(pygame.mouse.get_pos())
@@ -58,6 +55,7 @@ class MapMovementTracker(pygame.sprite.Group):
                 mouse_pos_up = pygame.math.Vector2(pygame.mouse.get_pos())
 
                 if mouse_pos_up.distance_to(self.mouse_pos_down) > 10:
+
 
                     self.offset+= (mouse_pos_up - self.mouse_pos_down) * self.mouse_speed
                     if self.offset.x < -self.internal_offset.x:
@@ -122,7 +120,15 @@ class MapMovementTracker(pygame.sprite.Group):
         return self.offset+self.internal_offset
     def get_dragging_offset(self):
         return self.offset
+    def get_internal_offset(self):
+        zoom_scale = self.get_zoom()
+        internal_offset = pygame.math.Vector2(0,0)
+        internal_offset.x = self.internal_surface_size[0]//2 - self.display_surface_half_width*(1/zoom_scale)
+        internal_offset.y = self.internal_surface_size[1]//2 - self.display_surface_half_height*(1/zoom_scale)
+        return internal_offset
     def get_internal_surface_scale(self):
 
         return self.zoom_scale * self.internal_surface_size_vector
+    def get_zoom(self):
+        return self.zoom_scale
         

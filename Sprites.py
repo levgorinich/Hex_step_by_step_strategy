@@ -29,6 +29,15 @@ class Hexagon(pygame.sprite.Sprite):
 
         self.unit_on_hex = False
 
+    # def resize_mask(self, zoom=1):
+    #     map_coord_x = int(self.map_coord_x * zoom)
+    #     map_coord_y = int(self.map_coord_y * zoom)
+    #     # self.imgage = pygame.transform.scale(self.image, (int(self.image.get_width() * zoom), int(self.image.get_height() * zoom)))
+    #     self.rect= self.imgage.get_rect(center=(map_coord_x, map_coord_y))
+    #     print(self.rect)
+
+
+
     def add_unit(self, unit):
         self.unit_on_hex = unit
 

@@ -33,7 +33,7 @@ class Map:
             for row in range(self.rows):
                 grid_pos_x = row+col//2+col%2
                 grid_pos_y = col
-                print(current_y,current_x)
+                # print(current_y,current_x)
                 hex = Hexagon( grid_pos_x, grid_pos_y,current_x, current_y)
                 current_y += self.hex_height
                 hexes.add(hex)

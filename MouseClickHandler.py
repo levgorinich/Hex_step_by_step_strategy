@@ -31,12 +31,21 @@ class MouseClickHandler:
     def check_if_hex_is_clicked(self, event):
         mouse = pygame.math.Vector2(event.pos)
 
-        mouse -= self.tracker.get_dragging_offset()
-        for sprite in self.game_map.hexes:
+        zoom=self.tracker.get_zoom()
+        mouse *= 1 / zoom
 
-                if sprite.rect.collidepoint(mouse.x, mouse.y):
-                    local_x = mouse.x - sprite.rect.x
-                    local_y = mouse.y - sprite.rect.y
+
+        mouse += self.tracker.get_internal_offset()
+        mouse = pygame.math.Vector2(int(mouse.x), int(mouse.y))
+        print(mouse, "real  mouse pos")
+
+        for sprite in self.game_map.hexes:
+                offset = self.tracker.get_total_offset()
+                new_rec = pygame.Rect(offset.x + sprite.rect.x, offset.y + sprite.rect.y, sprite.rect.width, sprite.rect.height)
+                if new_rec.collidepoint(mouse.x, mouse.y):
+                    local_x = int(mouse.x) - new_rec.x
+                    local_y = int(mouse.y) - new_rec.y
+
                     if sprite.mask.get_at((local_x, local_y)):
                         print(sprite)
 
