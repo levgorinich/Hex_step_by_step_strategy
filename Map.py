@@ -3,7 +3,7 @@ import pygame
 from math import *
 
 from some_russian_gay_m.Groups import HexesGroup, Grid
-from some_russian_gay_m.Sprites import Hexagon, Unit
+from some_russian_gay_m.Sprites import *
 
 class Map:
 
@@ -44,9 +44,15 @@ class Map:
 
     def create_units(self):
         Units = pygame.sprite.Group()
-        unit = Unit(15,2)
+        unit = TriangularUnit(15,2)
         Units.add(unit)
+        unit_2 = SquareUnit(20,2)
+        Units.add(unit_2)
+        unit_3 = CircleUnit(10,2)
+        Units.add(unit_3)
         self.hexes.hexes_dict[15,2].add_unit(unit)
+        self.hexes.hexes_dict[20,2].add_unit(unit_2)
+        self.hexes.hexes_dict[10,2].add_unit(unit_3)
         return Units
 
 
