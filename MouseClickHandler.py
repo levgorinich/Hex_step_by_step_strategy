@@ -30,20 +30,17 @@ class MouseClickHandler:
 
         mouse -= self.tracker.get_dragging_offset()
         if event.button == 1:
-            sprite_clicked = self.check_if_hex_is_clicked(event)
-            if sprite_clicked:
+            if sprite_clicked := self.check_if_hex_is_clicked(event):
                 self.selected_sprite = sprite_clicked
                 if self.selected_sprite.unit_on_hex:
                     self.unit_selected = self.selected_sprite.unit_on_hex
 
         if event.button == 3:
             sprite_clicked = self.check_if_hex_is_clicked(event)
-            if sprite_clicked and self.unit_selected :
-                if sprite_clicked.unit_on_hex:
-
-
+            if self.check_if_hex_is_clicked(event) and self.unit_selected :
+                if defending_unit := sprite_clicked.unit_on_hex:
                     atacking_unit = self.unit_selected.race
-                    defending_unit = sprite_clicked.unit_on_hex.race
+                    # defending_unit = sprite_clicked.unit_on_hex.race
 
                     match(defending_unit - atacking_unit):
                         case 1|-2:

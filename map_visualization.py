@@ -1,46 +1,36 @@
 import sys
-
 import pygame
 from pygame.locals import *
-from math import *
-# from some_russian_gay_m.Groups import CameraGroup
 from some_russian_gay_m.Map import Map
 from some_russian_gay_m.MouseClickHandler import MouseClickHandler
 from some_russian_gay_m.Render import Render
 from mapMovement import MapMovementTracker
 from some_russian_gay_m.User_interface import UI
+
+
 pygame.init()
+clock = pygame.time.Clock()
+
+#creating window
 window_size = (1280, 720)
 screen = pygame.display.set_mode(window_size)
+internal_surface_size = (2500,2500)
 
-# pygame.event.set_grab(True)
-pygame.display.set_caption("Drawing Polygons on a Sprite")
-clock = pygame.time.Clock()
-internal_surface = pygame.Surface((2500, 2500),pygame.SRCALPHA)
-
-# diagonal size of hexagon = 2a , where a is the radius of hexagon, or it's side length
-
+# creating main game classes
 game_map = Map(25,25)
-
 user_interface = UI(window_size, game_map)
-tracker = MapMovementTracker(internal_surface.get_size(), pygame.display.get_surface().get_size(), )
-renderer = Render(map_movement_tracker=tracker, user_interface=user_interface)
+tracker = MapMovementTracker(internal_surface_size, pygame.display.get_surface().get_size(), )
+renderer = Render(internal_surface_size, map_movement_tracker=tracker, user_interface=user_interface)
 click_handler = MouseClickHandler(game_map, user_interface, tracker)
 
-unit_mover=False
+# main loop
 running = True
 while running:
 
     events_list = pygame.event.get()
-
     game_map.hexes.update()
-    # screen.fill('#71deee')
-    renderer.pre_display(events_list)
-    renderer.display_objects(game_map.hexes)
-    renderer.display_units(game_map.units, game_map.hexes.hexes_dict)
-    renderer.display()
 
-    # renderer.display_objects(game_map.hexes)
+    renderer.display(events_list, game_map)
     pygame.display.flip()
 
     for event in events_list:
