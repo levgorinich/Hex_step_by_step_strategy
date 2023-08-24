@@ -1,14 +1,30 @@
 import pygame
 
 class MouseClickHandler:
-    def __init__(self, game_map, tracker):
+    def __init__(self, game_map, User_interface, tracker):
+        self.user_interface = User_interface
         self.game_map = game_map
         self.selected_sprite = None
         self.unit_selected = None
         self.tracker = tracker
+        self.was_clicked = False
         pass
 
+
+
     def handle_click(self, event):
+
+
+        self.was_clicked =False
+        self.check_UI_click()
+
+        # need to decide what ot do if I click with the right button on a ui, i can move unit behind ui
+        if not self.was_clicked:
+            self.check_hex_click(event)
+    def check_UI_click(self):
+        self.was_clicked = self.user_interface.check_click(self.game_map)
+
+    def check_hex_click(self, event):
 
         mouse = pygame.math.Vector2(pygame.mouse.get_pos())
 
@@ -64,16 +80,17 @@ class MouseClickHandler:
         print(mouse, "real  mouse pos")
 
         for sprite in self.game_map.hexes:
-                offset = self.tracker.get_total_offset()
-                new_rec = pygame.Rect(offset.x + sprite.rect.x, offset.y + sprite.rect.y, sprite.rect.width, sprite.rect.height)
-                if new_rec.collidepoint(mouse.x, mouse.y):
-                    local_x = int(mouse.x) - new_rec.x
-                    local_y = int(mouse.y) - new_rec.y
+            offset = self.tracker.get_total_offset()
+            new_rec = pygame.Rect(offset.x + sprite.rect.x, offset.y + sprite.rect.y, sprite.rect.width, sprite.rect.height)
+            if new_rec.collidepoint(mouse.x, mouse.y):
+                local_x = int(mouse.x) - new_rec.x
+                local_y = int(mouse.y) - new_rec.y
 
-                    if sprite.mask.get_at((local_x, local_y)):
-                        print(sprite)
+                if sprite.mask.get_at((local_x, local_y)):
+                    print(sprite)
 
-                        return sprite
+                    return sprite
         return None
+
 
 

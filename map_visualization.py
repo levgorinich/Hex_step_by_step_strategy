@@ -8,9 +8,11 @@ from some_russian_gay_m.Map import Map
 from some_russian_gay_m.MouseClickHandler import MouseClickHandler
 from some_russian_gay_m.Render import Render
 from mapMovement import MapMovementTracker
+from some_russian_gay_m.User_interface import UI
 pygame.init()
-window_size = (1250, 720)
+window_size = (1280, 720)
 screen = pygame.display.set_mode(window_size)
+
 # pygame.event.set_grab(True)
 pygame.display.set_caption("Drawing Polygons on a Sprite")
 clock = pygame.time.Clock()
@@ -19,9 +21,11 @@ internal_surface = pygame.Surface((2500, 2500),pygame.SRCALPHA)
 # diagonal size of hexagon = 2a , where a is the radius of hexagon, or it's side length
 
 game_map = Map(25,25)
-tracker = MapMovementTracker(internal_surface.get_size(), pygame.display.get_surface().get_size())
-renderer = Render(map_movement_tracker=tracker)
-click_handler = MouseClickHandler(game_map, tracker)
+
+user_interface = UI(window_size, game_map)
+tracker = MapMovementTracker(internal_surface.get_size(), pygame.display.get_surface().get_size(), )
+renderer = Render(map_movement_tracker=tracker, user_interface=user_interface)
+click_handler = MouseClickHandler(game_map, user_interface, tracker)
 
 unit_mover=False
 running = True
