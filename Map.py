@@ -31,24 +31,24 @@ class Map:
             if col %2 ==1:
                 current_y+= self.hex_height/2
             for row in range(self.rows):
-                grid_pos_x = row+col//2+col%2
-                grid_pos_y = col
+                grid_pos =  col, row
+
                 # print(current_y,current_x)
-                hex = Hexagon( grid_pos_x, grid_pos_y,current_x, current_y)
+                hex = Hexagon( grid_pos,(current_x, current_y))
                 current_y += self.hex_height
                 hexes.add(hex)
-                self.hexes_grid[grid_pos_x,grid_pos_y] = hex
+                self.hexes_grid[grid_pos] = hex
             current_x += self.hex_width*3/4
             current_y= self.hex_height/2
         return hexes
 
     def create_units(self):
         Units = pygame.sprite.Group()
-        unit = TriangularUnit(15,2)
+        unit = TriangularUnit((15,2))
         Units.add(unit)
-        unit_2 = SquareUnit(20,2)
+        unit_2 = SquareUnit((20,2))
         Units.add(unit_2)
-        unit_3 = CircleUnit(10,2)
+        unit_3 = CircleUnit((10,2))
         Units.add(unit_3)
         self.hexes.hexes_dict[15,2].add_unit(unit)
         self.hexes.hexes_dict[20,2].add_unit(unit_2)
