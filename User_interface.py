@@ -9,9 +9,6 @@ class UI:
         self.display_buttons(self.UI_surface)
 
 
-
-
-
     def add_buttons(self, ):
         buttons = []
         display_size = pygame.display.get_surface().get_size()

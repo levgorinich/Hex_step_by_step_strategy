@@ -22,8 +22,8 @@ class Button:
         if self.rect.collidepoint(mouse_pos):
             if pygame.mouse.get_pressed()[0]:
                 spawn_point =(1,1)
-                unit = TriangularUnit(spawn_point[0], spawn_point[1])
-                hex = game_map.hexes_grid[spawn_point[0], spawn_point[1]]
+                unit = TriangularUnit(spawn_point)
+                hex = game_map.hexes_grid[spawn_point]
                 if not hex.unit_on_hex:
                     hex.add_unit(unit)
                     game_map.units.add(unit)

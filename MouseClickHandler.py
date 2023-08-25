@@ -11,9 +11,7 @@ class MouseClickHandler:
         pass
 
 
-
     def handle_click(self, event):
-
 
         self.was_clicked =False
         self.check_UI_click()
@@ -39,14 +37,14 @@ class MouseClickHandler:
             sprite_clicked = self.check_if_hex_is_clicked(event)
             if self.check_if_hex_is_clicked(event) and self.unit_selected :
                 if defending_unit := sprite_clicked.unit_on_hex:
-                    atacking_unit = self.unit_selected.race
+                    atacking_unit = self.unit_selected
                     # defending_unit = sprite_clicked.unit_on_hex.race
 
-                    match(defending_unit - atacking_unit):
+                    match(defending_unit.race - atacking_unit.race):
                         case 1|-2:
                             sprite_clicked.kill_unit()
-                            self.unit_selected.grid_pos_x = sprite_clicked.grid_pos_x
-                            self.unit_selected.grid_pos_y = sprite_clicked.grid_pos_y
+                            self.unit_selected.grid_pos = sprite_clicked.grid_pos
+
 
                             sprite_clicked.add_unit(self.unit_selected)
                             self.unit_selected = None
@@ -56,10 +54,7 @@ class MouseClickHandler:
                 else:
                     print("no unit")
                     self.selected_sprite.remove_unit()
-
-                    self.unit_selected.grid_pos_x = sprite_clicked.grid_pos_x
-                    self.unit_selected.grid_pos_y = sprite_clicked.grid_pos_y
-
+                    self.unit_selected.grid_pos = sprite_clicked.grid_pos
                     sprite_clicked.add_unit(self.unit_selected)
                     self.unit_selected = None
 

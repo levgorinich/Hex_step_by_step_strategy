@@ -12,7 +12,7 @@ class HexesGroup(pygame.sprite.Group):
     def add(self, *hexes, **kwargs):
         for hex in hexes:
             super().add(hex, **kwargs)  # Add sprite to the standard Group
-            self.hexes_dict[hex.grid_pos_x, hex.grid_pos_y] = hex  # Add sprite to the lookup dictionary
+            self.hexes_dict[hex.grid_pos] = hex  # Add sprite to the lookup dictionary
 
 
 class Grid(dict):

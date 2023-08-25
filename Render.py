@@ -20,8 +20,10 @@ class Render:
         offset = self.map_movement_tracker.get_total_offset()
 
         for sprite in sprite_group.sprites():
-            unit_hex = hexes[sprite.grid_pos_x, sprite.grid_pos_y]
-            unit_center=  (unit_hex.map_coord_x-sprite.width//2, unit_hex.map_coord_y-sprite.height//2)
+            unit_hex = hexes[sprite.grid_pos]
+            # print(unit_hex, unit_hex.map_coord)
+            unit_center=  (unit_hex.map_coord[0]-sprite.width//2, unit_hex.map_coord[1]-sprite.height//2)
+            # print(unit_center)
             self.internal_surface.blit(sprite.image, offset + unit_center)
     def pre_display(self, events_list):
 

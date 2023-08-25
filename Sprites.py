@@ -5,14 +5,13 @@ hex_side = 15 * sqrt(3)
 hex_width = 2 * hex_side
 hex_height = hex_side * sqrt(3)
 class Hexagon(pygame.sprite.Sprite):
-    def __init__(self, grid_pos_x, grid_pos_y, map_coord_x, map_coord_y, color = (70,70,120), width = hex_width, height =hex_height ):
+    def __init__(self, grid_pos, map_coord, color = (70,70,120), width = hex_width, height =hex_height ):
         super().__init__()
-        self.grid_pos_x = grid_pos_x
-        self.grid_pos_y = grid_pos_y
-        self.map_coord_x = map_coord_x
-        self.map_coord_y = map_coord_y
+        self.grid_pos = grid_pos
+        self.map_coord = map_coord
         self.image = pygame.Surface((width, height), pygame.SRCALPHA)  # Create a blank surface with transparency
-        self.rect = self.image.get_rect(center=(map_coord_x, map_coord_y))
+        print(self.map_coord)
+        self.rect = self.image.get_rect(center=(self.map_coord[0], self.map_coord[1]))
         self.points = []
 
 
@@ -28,14 +27,6 @@ class Hexagon(pygame.sprite.Sprite):
 
         self.unit_on_hex = False
 
-    # def resize_mask(self, zoom=1):
-    #     map_coord_x = int(self.map_coord_x * zoom)
-    #     map_coord_y = int(self.map_coord_y * zoom)
-    #     # self.imgage = pygame.transform.scale(self.image, (int(self.image.get_width() * zoom), int(self.image.get_height() * zoom)))
-    #     self.rect= self.imgage.get_rect(center=(map_coord_x, map_coord_y))
-    #     print(self.rect)
-
-
 
     def add_unit(self, unit):
         self.unit_on_hex = unit
@@ -48,15 +39,14 @@ class Hexagon(pygame.sprite.Sprite):
         self.remove_unit()
 
     def __str__(self):
-        return f"Hexagon {self.grid_pos_x}, {self.grid_pos_y}"
+        return f"Hexagon {self.grid_pos[0]}, {self.grid_pos[1]}"
     def update(self):
         pass
 
 class MapObject(pygame.sprite.Sprite):
-    def __init__(self, grid_pos_x, grid_pos_y, ):
+    def __init__(self, grid_pos ):
         super().__init__()
-        self.grid_pos_x = grid_pos_x
-        self.grid_pos_y = grid_pos_y
+        self.grid_pos = grid_pos
         self.width = 20
         self.height = 20
         self.name = "map object"
@@ -64,13 +54,18 @@ class MapObject(pygame.sprite.Sprite):
         # self.surf.fill((125,125,125))
         self.image = self.surf
 
-        map_coords = self.calculate_coordinate_by_hex_position((self.grid_pos_x, self.grid_pos_y))
-        self.map_coord_x = map_coords[0]
-        self.map_coord_y = map_coords[1]
-        self.rect = self.image.get_rect(center=(self.map_coord_y, self.map_coord_x))
+        map_coords = self.calculate_coordinate_by_hex_position(self.grid_pos)
+        self.map_coord = map_coords
+
+        self.rect = self.image.get_rect(center=map_coords)
 
     def __str__(self):
-        return f"{self.name} {self.grid_pos_x}, {self.grid_pos_y}"
+        return f"{self.name} {self.grid_pos[0]}, {self.grid_pos[1]}"
+
+    def offset_to_cube_coords(self, x, y):
+        q = y
+        r = x - (y - (y&1)) / 2
+        return(q, r, -q-r)
 
     def calculate_coordinate_by_hex_position(self, hex_position,):
         map_coord_x = hex_side + hex_side * hex_position[0]
@@ -82,18 +77,18 @@ class MapObject(pygame.sprite.Sprite):
         return (map_coord_x, map_coord_y)
 
 class Unit(MapObject):
-    def __init__(self, grid_pos_x, grid_pos_y):
-        super().__init__(grid_pos_x, grid_pos_y)
+    def __init__(self, grid_pos):
+        super().__init__(grid_pos)
         self.name = "unit"
 
     def move(self, move_on_hex_grid):
-        self.grid_pos_x += move_on_hex_grid[0]
-        self.grid_pos_y += move_on_hex_grid[1]
-        self.map_coord_x, self.map_coord_y = self.calculate_coordinate_by_hex_position((self.grid_pos_x, self.grid_pos_y))
+        self.grid_pos += move_on_hex_grid
+
+        self.map_coord = self.calculate_coordinate_by_hex_position(self.grid_pos)
 
 class TriangularUnit(Unit):
-    def __init__(self, grid_pos_x, grid_pos_y):
-        super().__init__(grid_pos_x, grid_pos_y)
+    def __init__(self, grid_pos):
+        super().__init__(grid_pos)
         print("I am here")
         self.name = "triangular unit"
         self.race = 1
@@ -101,16 +96,16 @@ class TriangularUnit(Unit):
 
 
 class SquareUnit(Unit):
-    def __init__(self, grid_pos_x, grid_pos_y):
-        super().__init__(grid_pos_x, grid_pos_y)
+    def __init__(self, grid_pos):
+        super().__init__(grid_pos)
         self.name = "square unit"
         self.race = 2
         pygame.draw.rect(self.surf, (255,0,0), (0, 0, self.width, self.height))
 
 
 class CircleUnit(Unit):
-    def __init__(self, grid_pos_x, grid_pos_y):
-        super().__init__(grid_pos_x, grid_pos_y)
+    def __init__(self, grid_pos):
+        super().__init__(grid_pos)
         self.name = "circle unit"
         self.race = 3
         pygame.draw.circle(self.surf, (255,0,0), (self.width/2, self.height/2), 10)
