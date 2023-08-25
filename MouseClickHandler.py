@@ -38,19 +38,30 @@ class MouseClickHandler:
             if self.check_if_hex_is_clicked(event) and self.unit_selected :
                 if defending_unit := sprite_clicked.unit_on_hex:
                     atacking_unit = self.unit_selected
-                    # defending_unit = sprite_clicked.unit_on_hex.race
+                    
+                    if (defending_unit.health_bar.hp - atacking_unit.race <= 0 
+                        and atacking_unit.health_bar.hp - defending_unit.race <= 0):
+                        self.unit_selected.kill()
+                        sprite_clicked.kill_unit()
+                    elif (defending_unit.health_bar.hp - atacking_unit.race <= 0 
+                        and atacking_unit.health_bar.hp - defending_unit.race > 0):
+                        sprite_clicked.kill_unit()
+                        self.unit_selected.update(defending_unit.race)
+                        self.unit_selected.grid_pos = sprite_clicked.grid_pos
 
-                    match(defending_unit.race - atacking_unit.race):
-                        case 1|-2:
-                            sprite_clicked.kill_unit()
-                            self.unit_selected.grid_pos = sprite_clicked.grid_pos
+                        sprite_clicked.add_unit(self.unit_selected)
+                        self.unit_selected = None
+                        print(self.game_map.units)
 
+                    elif (defending_unit.health_bar.hp - atacking_unit.race > 0 
+                        and atacking_unit.health_bar.hp - defending_unit.race <= 0):
+                        defending_unit.update(atacking_unit.race)
+                        self.unit_selected.kill()
+                    
+                    else:
+                        defending_unit.update(atacking_unit.race)
+                        self.unit_selected.update(defending_unit.race)
 
-                            sprite_clicked.add_unit(self.unit_selected)
-                            self.unit_selected = None
-                            print(self.game_map.units)
-                        case _:
-                            pass
                 else:
                     print("no unit")
                     self.selected_sprite.remove_unit()

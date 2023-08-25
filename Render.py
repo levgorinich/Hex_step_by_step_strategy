@@ -1,6 +1,6 @@
 
 import pygame
-from some_russian_gay_m.Buttons import Button
+from Buttons import Button
 class Render:
     def __init__(self,internal_surface_size, map_movement_tracker, user_interface):
         self.map_movement_tracker = map_movement_tracker

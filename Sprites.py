@@ -1,5 +1,6 @@
 from math import cos, sin, pi, sqrt
 import pygame
+import Health_bar
 
 hex_side = 15 * sqrt(3)
 hex_width = 2 * hex_side
@@ -47,8 +48,8 @@ class MapObject(pygame.sprite.Sprite):
     def __init__(self, grid_pos ):
         super().__init__()
         self.grid_pos = grid_pos
-        self.width = 20
-        self.height = 20
+        self.width = 25
+        self.height = 25
         self.name = "map object"
         self.surf = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         # self.surf.fill((125,125,125))
@@ -92,7 +93,23 @@ class TriangularUnit(Unit):
         print("I am here")
         self.name = "triangular unit"
         self.race = 1
-        pygame.draw.polygon(self.surf, (255,0,0), [(0, 0), (self.width/2,self.height), (self.width-1, 0)])
+        self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        self.health_bar = Health_bar.Health_bar(0,0,self.width,self.height/4,3)
+        self.health_bar.draw(self.pict)
+        pygame.draw.polygon(self.pict, (255,0,0), [(0, self.height/4 + 2), (self.width/2,self.height), 
+                                                   (self.width-1, self.height/4+ 2)])
+        self.surf.blit(self.pict,(0,0))
+    def update(self,hp):
+        self.health_bar.hp -= hp
+        if self.health_bar.hp > 0:
+            self.health_bar.draw(self.pict)
+            pygame.draw.polygon(self.pict, (255,0,0), [(0, self.height/4 + 2), (self.width/2,self.height), 
+                                                    (self.width-1, self.height/4+ 2)])
+            self.surf.blit(self.pict,(0,0))
+        return self.health_bar.hp
+
+        
+
 
 
 class SquareUnit(Unit):
@@ -100,7 +117,20 @@ class SquareUnit(Unit):
         super().__init__(grid_pos)
         self.name = "square unit"
         self.race = 2
-        pygame.draw.rect(self.surf, (255,0,0), (0, 0, self.width, self.height))
+        self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        self.health_bar = Health_bar.Health_bar(0,0,self.width,self.height/4,3)
+        self.health_bar.draw(self.pict)
+        pygame.draw.rect(self.pict, (255,0,0), (0, self.height/4 + 2, self.width, 
+                                                self.height - self.height/4 + 2))
+        self.surf.blit(self.pict,(0,0))
+    def update(self,hp):
+        self.health_bar.hp -= hp
+        if self.health_bar.hp > 0:
+            self.health_bar.draw(self.pict)
+            pygame.draw.rect(self.pict, (255,0,0), (0, self.height/4 + 2, self.width, 
+                                                self.height -self.height/4 + 2))
+            self.surf.blit(self.pict,(0,0))
+        return self.health_bar.hp
 
 
 class CircleUnit(Unit):
@@ -108,8 +138,20 @@ class CircleUnit(Unit):
         super().__init__(grid_pos)
         self.name = "circle unit"
         self.race = 3
-        pygame.draw.circle(self.surf, (255,0,0), (self.width/2, self.height/2), 10)
         self.image= self.surf
+        self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        self.health_bar = Health_bar.Health_bar(0,0,self.width,self.height/4,3)
+        self.health_bar.draw(self.pict)
+        pygame.draw.circle(self.surf, (255,0,0), (self.width/2, self.height/2), 10)
+        self.surf.blit(self.pict,(0,0))
+    def update(self,hp):
+        self.health_bar.hp -= hp
+        if self.health_bar.hp > 0:
+            self.health_bar.draw(self.pict)
+            pygame.draw.circle(self.surf, (255,0,0), (self.width/2, self.height/2), 10)
+            self.surf.blit(self.pict,(0,0))
+        return self.health_bar.hp
+
 
 
 

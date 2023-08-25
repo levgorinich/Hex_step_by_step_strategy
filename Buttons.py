@@ -2,8 +2,8 @@ from typing import NoReturn
 
 import pygame, sys
 
-from some_russian_gay_m.Map import Map
-from some_russian_gay_m.Sprites import *
+from Map import Map
+from Sprites import *
 
 class Button:
     def __init__(self, text, x,y , width, height):

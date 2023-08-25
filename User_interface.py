@@ -1,5 +1,5 @@
 import pygame
-from some_russian_gay_m.Buttons import Button
+from Buttons import Button
 
 class UI:
     def __init__(self, window_size, game_map):

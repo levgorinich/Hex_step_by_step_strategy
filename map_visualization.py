@@ -1,11 +1,11 @@
 import sys
 import pygame
 from pygame.locals import *
-from some_russian_gay_m.Map import Map
-from some_russian_gay_m.MouseClickHandler import MouseClickHandler
-from some_russian_gay_m.Render import Render
+from Map import Map
+from MouseClickHandler import MouseClickHandler
+from Render import Render
 from mapMovement import MapMovementTracker
-from some_russian_gay_m.User_interface import UI
+from User_interface import UI
 
 
 pygame.init()

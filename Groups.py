@@ -2,7 +2,7 @@ from math import sqrt
 
 import pygame
 
-from some_russian_gay_m.Sprites import Hexagon
+from Sprites import Hexagon
 class HexesGroup(pygame.sprite.Group):
     def __init__(self):
         super().__init__()
