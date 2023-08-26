@@ -37,7 +37,7 @@ class Map:
                 hex = Hexagon( grid_pos,(current_x, current_y))
                 current_y += self.hex_height
                 hexes.add(hex)
-                self.hexes_grid[grid_pos] = hex
+                # self.hexes_grid[grid_pos] = hex
             current_x += self.hex_width*3/4
             current_y= self.hex_height/2
         return hexes
@@ -54,7 +54,8 @@ class Map:
         Units.add(unit_5)
         unit_3 = CircleUnit((10,2))
         Units.add(unit_3)
-        self.hexes.hexes_dict[15,2].add_unit(unit)
+        # print(self.hexes.hexes_dict)
+        self.hexes.hexes_dict[(15,2)].add_unit(unit)
         self.hexes.hexes_dict[20,2].add_unit(unit_2)
         self.hexes.hexes_dict[10,2].add_unit(unit_3)
         self.hexes.hexes_dict[5,2].add_unit(unit_4)

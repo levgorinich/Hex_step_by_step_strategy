@@ -28,6 +28,10 @@ class Hexagon(pygame.sprite.Sprite):
 
         self.unit_on_hex = False
 
+    def offset_to_cube_coords(self, grid_pos):
+        q = grid_pos[1]
+        r = grid_pos[0] - (grid_pos[1] - (grid_pos[1]&1)) / 2
+        return(q, r, -q-r)
 
     def add_unit(self, unit):
         self.unit_on_hex = unit
