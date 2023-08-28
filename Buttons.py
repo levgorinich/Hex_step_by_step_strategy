@@ -30,9 +30,10 @@ class Button:
                     unit = SquareUnit(spawn_point)
                 elif self.text == "Circle":
                     unit = CircleUnit(spawn_point)
-                hex = game_map.hexes_grid[spawn_point]
-                if not hex.unit_on_hex:
-                    hex.add_unit(unit)
+                hexagon = game_map.hexes.hexes_dict[spawn_point]
+                print(hexagon)
+                if not hexagon.unit_on_hex:
+                    hexagon.add_unit(unit)
                     game_map.units.add(unit)
 
                 print("clicked")

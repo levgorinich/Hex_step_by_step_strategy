@@ -7,6 +7,7 @@ from Render import Render
 from mapMovement import MapMovementTracker
 from User_interface import UI
 
+
 #
 pygame.init()
 clock = pygame.time.Clock()
