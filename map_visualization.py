@@ -8,7 +8,6 @@ from mapMovement import MapMovementTracker
 from User_interface import UI
 
 
-i whant save
 #
 pygame.init()
 clock = pygame.time.Clock()

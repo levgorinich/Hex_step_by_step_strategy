@@ -34,25 +34,31 @@ class MouseClickHandler:
                     self.unit_selected = self.selected_sprite.unit_on_hex
 
         if event.button == 3:
+            print("am i here")
             sprite_clicked = self.check_if_hex_is_clicked(event)
             if self.check_if_hex_is_clicked(event) and self.unit_selected :
+
                 if defending_unit := sprite_clicked.unit_on_hex:
                     atacking_unit = self.unit_selected
-                    if atacking_unit.grid_pos != defending_unit.grid_pos:
 
+                    if atacking_unit.grid_pos != defending_unit.grid_pos:
+                        print("or here")
                         if (defending_unit.health_bar.hp - atacking_unit.attack <= 0
                             and atacking_unit.health_bar.hp - defending_unit.attack <= 0):
                             self.selected_sprite.kill_unit()
                             sprite_clicked.kill_unit()
+                            print("double death")
                         elif (defending_unit.health_bar.hp - atacking_unit.attack <= 0
                             and atacking_unit.health_bar.hp - defending_unit.attack > 0):
                             sprite_clicked.kill_unit()
+                            print("kill enemy")
                             self.unit_selected.update(defending_unit.attack)
 
                         if (defending_unit.health_bar.hp - atacking_unit.attack <= 0
                             and atacking_unit.health_bar.hp - defending_unit.attack <= 0):
                             self.selected_sprite.kill_unit()
                             sprite_clicked.kill_unit()
+                            print("another kill")
                         elif (defending_unit.health_bar.hp - atacking_unit.attack <= 0
                             and atacking_unit.health_bar.hp - defending_unit.attack > 0):
                             sprite_clicked.kill_unit()
@@ -63,23 +69,26 @@ class MouseClickHandler:
                             sprite_clicked.add_unit(self.unit_selected)
                             self.unit_selected = None
                             print(self.game_map.units)
+                            print("what is this")
 
 
                         elif (defending_unit.health_bar.hp - atacking_unit.attack > 0
                             and atacking_unit.health_bar.hp - defending_unit.attack <= 0):
                             defending_unit.update(atacking_unit.attack)
                             self.selected_sprite.kill_unit()
+                            print("waw anoter wariant")
                         
                         else:
                             defending_unit.update(atacking_unit.attack)
                             self.unit_selected.update(defending_unit.attack)
+                            print("last case")
 
 
                     else:
                             pass
 
                 else:
-                    print("no unit")
+                    # print("no unit")
                     self.selected_sprite.remove_unit()
                     self.unit_selected.grid_pos = sprite_clicked.grid_pos
                     sprite_clicked.add_unit(self.unit_selected)
@@ -96,7 +105,7 @@ class MouseClickHandler:
 
         mouse += self.tracker.get_internal_offset()
         mouse = pygame.math.Vector2(int(mouse.x), int(mouse.y))
-        print(mouse, "real  mouse pos")
+        # print(mouse, "real  mouse pos")
 
         for sprite in self.game_map.hexes:
             offset = self.tracker.get_total_offset()

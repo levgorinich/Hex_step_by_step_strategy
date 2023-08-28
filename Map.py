@@ -10,7 +10,7 @@ class Map:
     def __init__(self, rows, columns):
         self.rows = rows
         self.columns = columns
-        self.hexes_grid = Grid()
+
 
         self.hex_width = 30* sqrt(3)
         self.hex_height = self.hex_width*sqrt(3)/2
