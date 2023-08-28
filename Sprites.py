@@ -114,17 +114,16 @@ class MilitaryUnit(Unit):
         return self.health_bar.hp
 
 
-class TriangularUnit(Unit):
+class TriangularUnit(MilitaryUnit):
 
     def __init__(self, grid_pos):
         super().__init__(grid_pos)
         print("I am here")
         self.name = "triangular unit"
         self.attack = 1
-        pygame.draw.polygon(self.surf, (255, 0, 0), [(0, 0), (self.width / 2, self.height), (self.width - 1, 0)])
-        self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-        self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
-        self.health_bar.draw(self.pict)
+        # pygame.draw.polygon(self.surf, (255, 0, 0), [(0, 0), (self.width / 2, self.height), (self.width - 1, 0)])
+        # self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        # self.health_bar.draw(self.pict)
         pygame.draw.polygon(self.pict, (255, 0, 0), [(0, self.height / 4 + 2), (self.width / 2, self.height),
                                                      (self.width - 1, self.height / 4 + 2)])
         self.surf.blit(self.pict, (0, 0))
@@ -140,15 +139,15 @@ class TriangularUnit(Unit):
         return self.health_bar.hp
 
 
-class SquareUnit(Unit):
+class SquareUnit(MilitaryUnit):
     def __init__(self, grid_pos):
         super().__init__(grid_pos)
         self.name = "square unit"
         self.attack = 2
         pygame.draw.rect(self.surf, (255, 0, 0), (0, 0, self.width, self.height))
-        self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-        self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
-        self.health_bar.draw(self.pict)
+        # self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        # self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
+        # self.health_bar.draw(self.pict)
         pygame.draw.rect(self.pict, (255, 0, 0), (0, self.height / 4 + 2, self.width,
                                                   self.height - self.height / 4 + 2))
         self.surf.blit(self.pict, (0, 0))
@@ -163,16 +162,16 @@ class SquareUnit(Unit):
         return self.health_bar.hp
 
 
-class CircleUnit(Unit):
+class CircleUnit(MilitaryUnit):
     def __init__(self, grid_pos):
         super().__init__(grid_pos)
         self.name = "circle unit"
         self.attack = 3
         pygame.draw.circle(self.surf, (255, 0, 0), (self.width / 2, self.height / 2), 10)
         self.image = self.surf
-        self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-        self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
-        self.health_bar.draw(self.pict)
+        # self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        # self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
+        # self.health_bar.draw(self.pict)
         pygame.draw.circle(self.surf, (255, 0, 0), (self.width / 2, self.height / 2), 10)
         self.surf.blit(self.pict, (0, 0))
 
