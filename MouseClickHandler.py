@@ -5,10 +5,52 @@ class MouseClickHandler:
         self.user_interface = User_interface
         self.game_map = game_map
         self.selected_sprite = None
+        self.sprite_clicked = None
         self.unit_selected = None
         self.tracker = tracker
         self.was_clicked = False
         pass
+
+    def handle_fighting(self, atacking_unit, defending_unit):
+        if atacking_unit.grid_pos != defending_unit.grid_pos:
+            self.kill_all(atacking_unit, defending_unit)
+            self.kill_enemy(atacking_unit, defending_unit)
+            self.kill_yourself(atacking_unit, defending_unit)
+            self.kill_nothing(atacking_unit, defending_unit)
+        else:
+            pass
+
+    def kill_all(self, atacking_unit, defending_unit):
+        if (defending_unit.health_bar.hp - atacking_unit.attack <= 0
+            and atacking_unit.health_bar.hp - defending_unit.attack <= 0):
+            self.selected_sprite.kill_unit()
+            self.sprite_clicked.kill_unit()
+            print("double death")
+
+    def kill_enemy(self, atacking_unit, defending_unit):
+        if (defending_unit.health_bar.hp - atacking_unit.attack <= 0
+            and atacking_unit.health_bar.hp - defending_unit.attack > 0):
+            self.sprite_clicked.kill_unit()
+            self.unit_selected.update(defending_unit.attack)
+
+            self.unit_selected.grid_pos = self.sprite_clicked.grid_pos
+
+            self.sprite_clicked.add_unit(self.unit_selected)
+            self.unit_selected = None           
+
+    def kill_yourself(self, atacking_unit, defending_unit):
+        if (defending_unit.health_bar.hp - atacking_unit.attack > 0
+            and atacking_unit.health_bar.hp - defending_unit.attack <= 0):
+            defending_unit.update(atacking_unit.attack)
+            self.selected_sprite.kill_unit()    
+
+    def kill_nothing(self, atacking_unit, defending_unit):
+        if (defending_unit.health_bar.hp - atacking_unit.attack > 0
+            and atacking_unit.health_bar.hp - defending_unit.attack > 0):
+            defending_unit.update(atacking_unit.attack)
+            self.unit_selected.update(defending_unit.attack)
+            print("last case")
+
 
 
     def handle_click(self, event):
@@ -35,63 +77,20 @@ class MouseClickHandler:
 
         if event.button == 3:
             print("am i here")
-            sprite_clicked = self.check_if_hex_is_clicked(event)
+            self.sprite_clicked = self.check_if_hex_is_clicked(event)
             if self.check_if_hex_is_clicked(event) and self.unit_selected :
 
-                if defending_unit := sprite_clicked.unit_on_hex:
+                # if defending_unit := sprite_clicked.unit_on_hex:
+                if defending_unit := self.sprite_clicked.unit_on_hex:
                     atacking_unit = self.unit_selected
-
-                    if atacking_unit.grid_pos != defending_unit.grid_pos:
-                        print("or here")
-                        if (defending_unit.health_bar.hp - atacking_unit.attack <= 0
-                            and atacking_unit.health_bar.hp - defending_unit.attack <= 0):
-                            self.selected_sprite.kill_unit()
-                            sprite_clicked.kill_unit()
-                            print("double death")
-                        elif (defending_unit.health_bar.hp - atacking_unit.attack <= 0
-                            and atacking_unit.health_bar.hp - defending_unit.attack > 0):
-                            sprite_clicked.kill_unit()
-                            print("kill enemy")
-                            self.unit_selected.update(defending_unit.attack)
-
-                        if (defending_unit.health_bar.hp - atacking_unit.attack <= 0
-                            and atacking_unit.health_bar.hp - defending_unit.attack <= 0):
-                            self.selected_sprite.kill_unit()
-                            sprite_clicked.kill_unit()
-                            print("another kill")
-                        elif (defending_unit.health_bar.hp - atacking_unit.attack <= 0
-                            and atacking_unit.health_bar.hp - defending_unit.attack > 0):
-                            sprite_clicked.kill_unit()
-                            self.unit_selected.update(defending_unit.attack)
-
-                            self.unit_selected.grid_pos = sprite_clicked.grid_pos
-
-                            sprite_clicked.add_unit(self.unit_selected)
-                            self.unit_selected = None
-                            print(self.game_map.units)
-                            print("what is this")
-
-
-                        elif (defending_unit.health_bar.hp - atacking_unit.attack > 0
-                            and atacking_unit.health_bar.hp - defending_unit.attack <= 0):
-                            defending_unit.update(atacking_unit.attack)
-                            self.selected_sprite.kill_unit()
-                            print("waw anoter wariant")
-                        
-                        else:
-                            defending_unit.update(atacking_unit.attack)
-                            self.unit_selected.update(defending_unit.attack)
-                            print("last case")
-
-
-                    else:
-                            pass
+                    
+                    self.handle_fighting(atacking_unit,defending_unit)
 
                 else:
                     # print("no unit")
                     self.selected_sprite.remove_unit()
-                    self.unit_selected.grid_pos = sprite_clicked.grid_pos
-                    sprite_clicked.add_unit(self.unit_selected)
+                    self.unit_selected.grid_pos = self.sprite_clicked.grid_pos
+                    self.sprite_clicked.add_unit(self.unit_selected)
                     self.unit_selected = None
 
 
