@@ -96,10 +96,10 @@ class MouseClickHandler:
             and atacking_unit.health_bar.hp - defending_unit.attack > 0):
             self.sprite_clicked.kill_unit()
             self.unit_selected.update(defending_unit.attack)
-
             self.unit_selected.grid_pos = self.sprite_clicked.grid_pos
 
             self.sprite_clicked.add_unit(self.unit_selected)
+            self.selected_sprite.remove_unit()
             self.unit_selected = None
 
     def kill_yourself(self, atacking_unit, defending_unit):
