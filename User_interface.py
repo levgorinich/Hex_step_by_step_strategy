@@ -1,5 +1,5 @@
 import pygame
-from Buttons import Button
+from Buttons import *
 
 class UI:
     def __init__(self, window_size, game_map):
@@ -14,7 +14,7 @@ class UI:
         titles = ["Triangular","Square","Circle"]
         display_size = pygame.display.get_surface().get_size()
         for i in range(len(titles)):
-            button = Button(titles[i], display_size[0]-100, display_size[1]-100-100*i, 100, 100)
+            button = ButtonForUnitSpawner(titles[i], display_size[0]-100, display_size[1]-100-100*i, 100, 100,)
             buttons.append(button)
         return buttons
 
