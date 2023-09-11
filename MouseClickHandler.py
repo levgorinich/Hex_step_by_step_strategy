@@ -1,7 +1,7 @@
 import pygame
 from mover import Mover
 class MouseClickHandler:
-    def __init__(self,game_map,  User_interface, tracker):
+    def __init__(self,game_map,  User_interface, tracker, mover):
         self.user_interface = User_interface
         self.game_map = game_map
         self.selected_sprite = None
@@ -9,7 +9,9 @@ class MouseClickHandler:
         self.unit_selected = None
         self.tracker = tracker
         self.was_clicked = False
-        self.mover = Mover(self.game_map)
+        self.mover = mover
+        # self.mover = Mover(self.game_map)
+        self.actions  = set()
         pass
 
 
@@ -43,6 +45,8 @@ class MouseClickHandler:
                 starting_sprite = self.selected_sprite.grid_pos
                 ending_sprite = self.sprite_clicked.grid_pos
                 self.mover.move(starting_sprite, ending_sprite)
+                self.actions.add(str((starting_sprite, ending_sprite)))
+                # print(self.actions)
 
                 # if defending_unit := sprite_clicked.unit_on_hex:
                 # if defending_unit := self.sprite_clicked.unit_on_hex:

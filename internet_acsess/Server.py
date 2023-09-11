@@ -1,56 +1,107 @@
+import pickle
 import socket
 from _thread import *
-import sys
-from net_player import Player
-import pickle
+from  OnServer import Game
+import  time
 
-server = ""
-
+comands = {0: "empty", 1: "empty"}
+server =  "localhost" #"192.168.1.9"
 port = 5555
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+main_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+# disable Nagle algorithm
+main_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 try:
-    s.bind((server, port))
+    main_socket.bind((server, port))
 except socket.error as e:
     str(e)
 
-s.listen(2)
+# main_socket.setblocking(False)
+main_socket.listen()
 print("Waiting for a connection, Server Started")
 
-players = [Player(0, 0, 10, 10, (255, 0, 0)), Player(0, 0, 10, 10, (0, 255, 0))]
+connected = set()
+games = {}
+idCount = 0
 
 
-def threaded_client(conn, player):
-    conn.send(pickle.dumps((players[player])))
+def threaded_client(conn, p, gameID):
+    global idCount
+    conn.send(str.encode(str(p)))
+
+
+    reply = ""
     while True:
+        time.sleep(0.1)
         try:
-            data = pickle.loads(conn.recv(2048))
-            players[player] = data
-
-            if not data:
-                print("Disconected")
-                break
-            else:
-                if player == 0:
-                    reply = players[1]
+            data = conn.recv(4096).decode()
+            # print(data, "i recieved from client")
+            if gameID in games:
+                # print("I found the game")
+                game = games[gameID]
+                if not data:
+                    print("Lost connection")
+                    break
                 else:
-                    reply = players[0]
-                #
-                # print("Received: ", data)
-                # print("Sending: ", reply)
+                    # print("i got here ")
+                    # if data == "reset":
+                    #     # game.reset()
+                    # elif data != "get":
+                        # game.play(p, datao)
+                    if data != "set()":
+                        print(data)
+                        for key in comands:
+                            if key != p:
+                                comands[key] += data
+                    # print("Sending something")
+                    comands_to_send = comands[p]
+                    # print(comands_to_send)
+                    conn.send(str.encode(comands_to_send))
+                    comands[p] = "empty"
+                        # reply = "get message"
+                        # conn.send(str.encode(reply))
+            else:
+                break
+        except socket.error as e:
+            # print(e)
+            pass
 
-            conn.sendall(pickle.dumps(reply))
-        except:
-            break
+        # comands_to_send = comands[p]
+        # if len(comands_to_send) > 0:
+        #     conn.send(str.encode(comands_to_send))
+        #     comands[p] = ""
+
+
 
     print("Lost connection")
-    conn.close()
+
+    try:
+        del games[gameID]
+
+        print("closing game", gameID)
+        print(games)
+    except:
+        pass
+
+    idCount -=1
+
 
 
 current_player = 0
 while True:
-    conn, addr = s.accept()
+
+    # conn - new socket where newly connected client is redirected from main_socket
+    conn, addr = main_socket.accept()
+    conn.setblocking(False)
     print("Connected to: " + addr[0] + ":" + str(addr[1]))
-    start_new_thread(threaded_client, (conn, current_player))
-    current_player += 1
+    idCount +=1
+    p=0
+    gameID = (idCount-1)//2
+
+    if idCount %2 ==1:
+        games[gameID] = Game(gameID)
+        print("Created Game ID: ", gameID)
+    else:
+        p=1
+    start_new_thread(threaded_client, (conn, p, gameID))
