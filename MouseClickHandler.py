@@ -68,7 +68,7 @@ class MouseClickHandler:
         result = self.user_interface.check_click(self.game_map)
         if result:
             self.was_clicked = True
-            self.actions.add(result)
+
         else:
             self.was_clicked = False
 
@@ -80,8 +80,10 @@ class MouseClickHandler:
         if event.button == 1:
             if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
                 self.selected_sprite = selected_sprite_clicked
-                if self.selected_sprite.unit_on_hex:
+
+                if self.selected_sprite.unit_on_hex and self.selected_sprite.unit_on_hex.player_id == self.game_map.player_id:
                     self.unit_selected = self.selected_sprite.unit_on_hex
+
 
         if event.button == 3:
 
@@ -92,7 +94,8 @@ class MouseClickHandler:
                 starting_sprite = self.selected_sprite.grid_pos
                 ending_sprite = self.sprite_clicked.grid_pos
                 self.mover.move(starting_sprite, ending_sprite)
-                self.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
+                self.game_map.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
+                self.unit_selected = None
 
 
     def check_if_hex_is_clicked(self, event):

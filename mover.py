@@ -16,7 +16,16 @@ class Mover():
         if self.starting_sprite.unit_on_hex and self.ending_sprite.unit_on_hex:
             self.atacking_unit = self.starting_sprite.unit_on_hex
             self.defending_unit = self.ending_sprite.unit_on_hex
-            self.handle_fighting(self.atacking_unit, self.defending_unit)
+            print(self.atacking_unit.player_id, self.defending_unit.player_id)
+            if self.atacking_unit.player_id != self.defending_unit.player_id:
+                self.handle_fighting(self.atacking_unit, self.defending_unit)
+            else:
+                self.atacking_unit.grid_pos = hex_end
+                self.defending_unit.grid_pos = hex_start
+                self.starting_sprite.remove_unit()
+                self.ending_sprite.remove_unit()
+                self.starting_sprite.add_unit(self.defending_unit)
+                self.ending_sprite.add_unit(self.atacking_unit)
 
         elif unit := self.starting_sprite.unit_on_hex:
 

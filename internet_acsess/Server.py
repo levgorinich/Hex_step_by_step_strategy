@@ -4,7 +4,7 @@ from _thread import *
 from  OnServer import Game
 import  time
 
-comands = {0: "", 1: "", 2:""}
+comands = {0: "", 1: "",}
 server =  "localhost" #"192.168.1.9"
 port = 5555
 
@@ -36,32 +36,29 @@ def threaded_client(conn, p, gameID):
         time.sleep(0.1)
         try:
             data = conn.recv(4096).decode()
-            # print(data, "i recieved from client")
             if gameID in games:
-                # print("I found the game")
                 game = games[gameID]
                 if not data:
                     print("Lost connection")
                     break
                 else:
-
+                    print(comands)
                     if data != "no_moves":
                         print(data)
                         for key in comands:
                             if key != p:
                                 comands[key] += data
-                    # print("Sending something")
+
                     comands_to_send = comands[p]
                     if comands_to_send == "":
                         comands_to_send = "empty"
-                    # print(comands_to_send)
+
                     conn.send(str.encode(comands_to_send))
                     comands[p] = ""
 
             else:
                 break
         except socket.error as e:
-            # print(e)
             pass
 
     print("Lost connection")

@@ -4,18 +4,22 @@ from math import *
 
 from Groups import HexesGroup, Grid
 from Sprites import *
+from Spawner import Spawner
 
 class Map:
 
-    def __init__(self, rows, columns):
+    def __init__(self, rows, columns, player_id):
         self.rows = rows
         self.columns = columns
-
-
+        self.player_id = player_id
+        self.actions=set()
         self.hex_width = 30* sqrt(3)
         self.hex_height = self.hex_width*sqrt(3)/2
         self.hexes = self.create_tiles()
-        self.units = self.create_units()
+        self.units =  pygame.sprite.Group()
+        self.spawner = Spawner(self)
+        self.spawner.create_start_unit()
+
 
     def __str__(self):
         return f"map with {self.rows} rows and {self.columns} columns"
@@ -31,25 +35,10 @@ class Map:
                 hex = Hexagon( grid_pos)
                 hexes.add(hex)
         return hexes
-    def create_units(self):
-        Units = pygame.sprite.Group()
-        unit = TriangularUnit((15,2))
-        Units.add(unit)
-        unit_2 = SquareUnit((20,2))
-        Units.add(unit_2)
-        unit_4 = SquareUnit((5,2))
-        Units.add(unit_4)
-        unit_5 = SquareUnit((12,2))
-        Units.add(unit_5)
-        unit_3 = CircleUnit((10,2))
-        Units.add(unit_3)
-        # print(self.hexes.hexes_dict)
-        self.hexes.hexes_dict[(15,2)].add_unit(unit)
-        self.hexes.hexes_dict[20,2].add_unit(unit_2)
-        self.hexes.hexes_dict[10,2].add_unit(unit_3)
-        self.hexes.hexes_dict[5,2].add_unit(unit_4)
-        self.hexes.hexes_dict[12,2].add_unit(unit_5)
-        return Units
+
+
+
+
 
 
 # class UnitPlacer:

@@ -9,6 +9,8 @@ from mapMovement import MapMovementTracker
 from mover import Mover
 from network import Network
 from Spawner import Spawner
+from MoveParser import Parser
+
 pygame.font.init()
 width = 700
 height = 700
@@ -23,73 +25,51 @@ screen = pygame.display.set_mode(window_size)
 internal_surface_size = (2500, 2500)
 
 # creating main game classes
-game_map = Map(25, 25)
-mover = Mover(game_map)
-Spawner = Spawner(game_map)
-user_interface = UI(window_size, game_map)
-tracker = MapMovementTracker(internal_surface_size, window_size, )
-renderer = Render(internal_surface_size, map_movement_tracker=tracker, user_interface=user_interface)
-click_handler = MouseClickHandler(game_map, user_interface, tracker, mover)
 
-def parse_moves(move):
-    if move.startswith("spawn"):
-        move = move.replace("spawn", "")
-        idx = move.find("(")
-        type = move[:idx]
-        coords = move[idx+1:-1]
-        coords = coords.split(",")
-        coords = tuple(map(int, coords))
-        Spawner.spawn_unit(type, coords)
-    elif move.startswith("move"):
-        move = move.replace("move", "")
-        move = move.replace("(", "")
-        move = move.replace(")", "")
 
-        coords = move.split(",")
-        coords = list(map(int, coords))
-        mover.move((coords[0], coords[1]), (coords[2], coords[3]))
 
 def main():
     run = True
     clock = pygame.time.Clock()
     n = Network()
-    player = int(n.getP())
-    print("You are player", player)
+    player_id = int(n.getP())
+    print("You are player", player_id)
 
+    game_map = Map(25, 25, player_id)
+    mover = Mover(game_map)
+    spawner = Spawner(game_map)
+    move_parser = Parser(mover, spawner)
+    user_interface = UI(window_size, game_map)
+    tracker = MapMovementTracker(internal_surface_size, window_size, )
+    renderer = Render(internal_surface_size, map_movement_tracker=tracker, user_interface=user_interface)
+    click_handler = MouseClickHandler(game_map, user_interface, tracker, mover)
     while run:
         clock.tick(60)
 
 
         try:
-            # print("i have sended")
             moves =""
-            for move in click_handler.actions:
-                # move = str(move)
-                # move = move[1:-1]
-                # move = "<" + move + ">"
+            for move in game_map.actions:
                 moves += move
             if moves!="":
                 update = n.send(moves)
-            else: update = n.send("no_moves")
-            click_handler.actions = set()
+
+            else:
+                update = n.send("no_moves")
+
+            game_map.actions = set()
             if update != "empty":
+                print(update)
+                start, end = 0, 0
                 for idx, symbol in enumerate(update):
-                    start, end = 0, 0
+
                     if symbol == "<":
                         start = idx
                     if symbol == ">":
                         end = idx
-                        parse_moves(update[start+1:end])
-                #
-                # print(update)
-                # print(update[4], update[7], update[12], update[15])
-                # start = int(update[4]), int(update[7])
-                # end = int(update[12]), int(update[15])
-                # mover.move(start, end)
-            # print(update, "get form server")
+                        move_parser.parse_moves(update[start+1:end])
+                        start, end = 0, 0
 
-            # game = n.send("get")
-            # print(game)
         except Exception as e :
             print(e)
             run = False
@@ -113,15 +93,5 @@ def main():
 
     pygame.quit()
 
-
-
-
-
-
-
-
-
-
-
-
 main()
+

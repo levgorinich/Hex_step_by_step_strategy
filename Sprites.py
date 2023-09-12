@@ -97,8 +97,10 @@ class Unit(MapObject):
 
 
 class MilitaryUnit(Unit):
-    def __init__(self, grid_pos):
+    def __init__(self, grid_pos, player_id):
         super().__init__(grid_pos)
+        self.player_id = player_id
+
         self.hp = 10
         self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
@@ -116,9 +118,10 @@ class MilitaryUnit(Unit):
 
 class TriangularUnit(MilitaryUnit):
 
-    def __init__(self, grid_pos):
-        super().__init__(grid_pos)
-        print("I am here")
+    def __init__(self, grid_pos, player_id):
+
+        super().__init__(grid_pos, player_id)
+
         self.name = "triangular unit"
         self.attack = 1
         # pygame.draw.polygon(self.surf, (255, 0, 0), [(0, 0), (self.width / 2, self.height), (self.width - 1, 0)])
@@ -129,6 +132,8 @@ class TriangularUnit(MilitaryUnit):
         self.surf.blit(self.pict, (0, 0))
 
 
+    def __repr__(self):
+        return f"{self.name} {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
     def update(self, hp):
         self.health_bar.hp -= hp
         if self.health_bar.hp > 0:
@@ -140,8 +145,9 @@ class TriangularUnit(MilitaryUnit):
 
 
 class SquareUnit(MilitaryUnit):
-    def __init__(self, grid_pos):
-        super().__init__(grid_pos)
+    def __init__(self, grid_pos, player_id):
+
+        super().__init__(grid_pos, player_id)
         self.name = "square unit"
         self.attack = 2
         pygame.draw.rect(self.surf, (255, 0, 0), (0, 0, self.width, self.height))
@@ -152,6 +158,8 @@ class SquareUnit(MilitaryUnit):
                                                   self.height - self.height / 4 + 2))
         self.surf.blit(self.pict, (0, 0))
 
+    def __repr__(self):
+        return f"{self.name} {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
     def update(self, hp):
         self.health_bar.hp -= hp
         if self.health_bar.hp > 0:
@@ -163,8 +171,8 @@ class SquareUnit(MilitaryUnit):
 
 
 class CircleUnit(MilitaryUnit):
-    def __init__(self, grid_pos):
-        super().__init__(grid_pos)
+    def __init__(self, grid_pos, player_id):
+        super().__init__(grid_pos, player_id)
         self.name = "circle unit"
         self.attack = 3
         pygame.draw.circle(self.surf, (255, 0, 0), (self.width / 2, self.height / 2), 10)
@@ -175,6 +183,8 @@ class CircleUnit(MilitaryUnit):
         pygame.draw.circle(self.surf, (255, 0, 0), (self.width / 2, self.height / 2), 10)
         self.surf.blit(self.pict, (0, 0))
 
+    def __repr__(self):
+        return f"CircleUnit {self.grid_pos[0]}, {self.grid_pos[1]}, {player_id}"
     def update(self, hp):
         self.health_bar.hp -= hp
         if self.health_bar.hp > 0:

@@ -13,7 +13,7 @@ class UI:
 
 
     def spawn_function(self, spawner,type,coords):
-        spawner.spawn_unit(type,coords)
+        spawner.spawn_unit(type, coords)
         string = "<spawn"+type+"("+str(coords[0])+","+str(coords[1])+")>"
         return string
     def add_buttons(self, text):
