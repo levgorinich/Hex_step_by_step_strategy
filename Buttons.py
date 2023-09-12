@@ -42,8 +42,9 @@ class MenuButton(Button):
                 return True
 
 class ButtonForUnitSpawner(Button):
-    def __init__(self, text, x, y, width, height,action = empty_funciton, color=(0, 255, 0), font_size=24, font_name="Arial"):
+    def __init__(self, text, x, y, width, height, spawer, action = empty_funciton, color=(0, 255, 0), font_size=24, font_name="Arial"):
         super().__init__(text, x, y, width, height, action, color, font_size, font_name)
+        self.spawner = spawer
 
     def draw(self, display_surface: pygame.Surface) -> None:
         pygame.draw.rect(display_surface, self.color, self.rect)
@@ -55,18 +56,8 @@ class ButtonForUnitSpawner(Button):
         if self.rect.collidepoint(mouse_pos):
             if pygame.mouse.get_pressed()[0]:
                 spawn_point = (1, 1)
-                if self.text == "Triangular":
-                    unit = TriangularUnit(spawn_point)
-                elif self.text == "Square":
-                    unit = SquareUnit(spawn_point)
-                elif self.text == "Circle":
-                    unit = CircleUnit(spawn_point)
-                hexagon = game_map.hexes.hexes_dict[spawn_point]
-                print(hexagon)
-                if not hexagon.unit_on_hex:
-                    hexagon.add_unit(unit)
-                    game_map.units.add(unit)
+                result  = self.action(self.spawner, self.text, spawn_point)
 
-                print("clicked")
-                return True
+                print("result", result)
+                return result
         return False

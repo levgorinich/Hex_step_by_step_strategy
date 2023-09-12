@@ -7,6 +7,7 @@ from Render import Render
 from mapMovement import MapMovementTracker
 from User_interface import UI
 from Buttons import MenuButton
+from mover import Mover
 
 #
 pygame.init()
@@ -20,10 +21,12 @@ internal_surface_size = (2500, 2500)
 
 # creating main game classes
 game_map = Map(25, 25)
+
+mover = Mover(game_map)
 user_interface = UI(window_size, game_map)
 tracker = MapMovementTracker(internal_surface_size, window_size, )
 renderer = Render(internal_surface_size, map_movement_tracker=tracker, user_interface=user_interface)
-click_handler = MouseClickHandler(game_map, user_interface, tracker)
+click_handler = MouseClickHandler(game_map, user_interface, tracker, mover)
 
 
 # main loop

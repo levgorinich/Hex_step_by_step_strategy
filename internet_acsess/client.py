@@ -8,6 +8,7 @@ from User_interface import UI
 from mapMovement import MapMovementTracker
 from mover import Mover
 from network import Network
+from Spawner import Spawner
 pygame.font.init()
 width = 700
 height = 700
@@ -16,7 +17,7 @@ pygame.display.set_caption("Client")
 
 
 # creating window
-window_size = (1280, 720)
+window_size = (width, height)
 screen = pygame.display.set_mode(window_size)
 
 internal_surface_size = (2500, 2500)
@@ -24,11 +25,29 @@ internal_surface_size = (2500, 2500)
 # creating main game classes
 game_map = Map(25, 25)
 mover = Mover(game_map)
+Spawner = Spawner(game_map)
 user_interface = UI(window_size, game_map)
 tracker = MapMovementTracker(internal_surface_size, window_size, )
 renderer = Render(internal_surface_size, map_movement_tracker=tracker, user_interface=user_interface)
 click_handler = MouseClickHandler(game_map, user_interface, tracker, mover)
 
+def parse_moves(move):
+    if move.startswith("spawn"):
+        move = move.replace("spawn", "")
+        idx = move.find("(")
+        type = move[:idx]
+        coords = move[idx+1:-1]
+        coords = coords.split(",")
+        coords = tuple(map(int, coords))
+        Spawner.spawn_unit(type, coords)
+    elif move.startswith("move"):
+        move = move.replace("move", "")
+        move = move.replace("(", "")
+        move = move.replace(")", "")
+
+        coords = move.split(",")
+        coords = list(map(int, coords))
+        mover.move((coords[0], coords[1]), (coords[2], coords[3]))
 
 def main():
     run = True
@@ -43,14 +62,30 @@ def main():
 
         try:
             # print("i have sended")
-            update = n.send(str(click_handler.actions))
+            moves =""
+            for move in click_handler.actions:
+                # move = str(move)
+                # move = move[1:-1]
+                # move = "<" + move + ">"
+                moves += move
+            if moves!="":
+                update = n.send(moves)
+            else: update = n.send("no_moves")
             click_handler.actions = set()
             if update != "empty":
-                print(update)
-                print(update[9], update[12], update[17], update[20])
-                start = int(update[9]), int(update[12])
-                end = int(update[17]), int(update[20])
-                mover.move(start, end)
+                for idx, symbol in enumerate(update):
+                    start, end = 0, 0
+                    if symbol == "<":
+                        start = idx
+                    if symbol == ">":
+                        end = idx
+                        parse_moves(update[start+1:end])
+                #
+                # print(update)
+                # print(update[4], update[7], update[12], update[15])
+                # start = int(update[4]), int(update[7])
+                # end = int(update[12]), int(update[15])
+                # mover.move(start, end)
             # print(update, "get form server")
 
             # game = n.send("get")
