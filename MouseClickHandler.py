@@ -14,6 +14,47 @@ class MouseClickHandler:
         self.actions  = set()
         pass
 
+    def handle_fighting(self, atacking_unit, defending_unit):
+        if atacking_unit.grid_pos != defending_unit.grid_pos:
+            self.kill_all(atacking_unit, defending_unit)
+            self.kill_enemy(atacking_unit, defending_unit)
+            self.kill_yourself(atacking_unit, defending_unit)
+            self.kill_nothing(atacking_unit, defending_unit)
+        else:
+            pass
+
+    def kill_all(self, atacking_unit, defending_unit):
+        if (defending_unit.health_bar.hp - atacking_unit.attack <= 0
+            and atacking_unit.health_bar.hp - defending_unit.attack <= 0):
+            self.selected_sprite.kill_unit()
+            self.sprite_clicked.kill_unit()
+            print("double death")
+
+    def kill_enemy(self, atacking_unit, defending_unit):
+        if (defending_unit.health_bar.hp - atacking_unit.attack <= 0
+            and atacking_unit.health_bar.hp - defending_unit.attack > 0):
+            self.sprite_clicked.kill_unit()
+            self.unit_selected.update(defending_unit.attack)
+
+            self.unit_selected.grid_pos = self.sprite_clicked.grid_pos
+
+            self.sprite_clicked.add_unit(self.unit_selected)
+            self.unit_selected = None           
+
+    def kill_yourself(self, atacking_unit, defending_unit):
+        if (defending_unit.health_bar.hp - atacking_unit.attack > 0
+            and atacking_unit.health_bar.hp - defending_unit.attack <= 0):
+            defending_unit.update(atacking_unit.attack)
+            self.selected_sprite.kill_unit()    
+
+    def kill_nothing(self, atacking_unit, defending_unit):
+        if (defending_unit.health_bar.hp - atacking_unit.attack > 0
+            and atacking_unit.health_bar.hp - defending_unit.attack > 0):
+            defending_unit.update(atacking_unit.attack)
+            self.unit_selected.update(defending_unit.attack)
+            print("last case")
+
+
 
     def handle_click(self, event):
 
@@ -44,6 +85,7 @@ class MouseClickHandler:
 
         if event.button == 3:
 
+
             self.sprite_clicked = self.check_if_hex_is_clicked(event)
             if self.check_if_hex_is_clicked(event) and self.unit_selected :
 
@@ -51,6 +93,7 @@ class MouseClickHandler:
                 ending_sprite = self.sprite_clicked.grid_pos
                 self.mover.move(starting_sprite, ending_sprite)
                 self.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
+
 
     def check_if_hex_is_clicked(self, event):
         mouse = pygame.math.Vector2(event.pos)
