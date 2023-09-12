@@ -1,7 +1,7 @@
 import pygame
-
+from mover import Mover
 class MouseClickHandler:
-    def __init__(self, game_map, User_interface, tracker):
+    def __init__(self,game_map,  User_interface, tracker, mover):
         self.user_interface = User_interface
         self.game_map = game_map
         self.selected_sprite = None
@@ -9,6 +9,9 @@ class MouseClickHandler:
         self.unit_selected = None
         self.tracker = tracker
         self.was_clicked = False
+        self.mover = mover
+        # self.mover = Mover(self.game_map)
+        self.actions  = set()
         pass
 
     def handle_fighting(self, atacking_unit, defending_unit):
@@ -62,7 +65,12 @@ class MouseClickHandler:
         if not self.was_clicked:
             self.check_hex_click(event)
     def check_UI_click(self):
-        self.was_clicked = self.user_interface.check_click(self.game_map)
+        result = self.user_interface.check_click(self.game_map)
+        if result:
+            self.was_clicked = True
+            self.actions.add(result)
+        else:
+            self.was_clicked = False
 
     def check_hex_click(self, event):
 
@@ -76,23 +84,15 @@ class MouseClickHandler:
                     self.unit_selected = self.selected_sprite.unit_on_hex
 
         if event.button == 3:
-            print("am i here")
+
+
             self.sprite_clicked = self.check_if_hex_is_clicked(event)
             if self.check_if_hex_is_clicked(event) and self.unit_selected :
 
-                # if defending_unit := sprite_clicked.unit_on_hex:
-                if defending_unit := self.sprite_clicked.unit_on_hex:
-                    atacking_unit = self.unit_selected
-                    
-                    self.handle_fighting(atacking_unit,defending_unit)
-
-                else:
-                    # print("no unit")
-                    self.selected_sprite.remove_unit()
-                    self.unit_selected.grid_pos = self.sprite_clicked.grid_pos
-                    self.sprite_clicked.add_unit(self.unit_selected)
-                    self.unit_selected = None
-
+                starting_sprite = self.selected_sprite.grid_pos
+                ending_sprite = self.sprite_clicked.grid_pos
+                self.mover.move(starting_sprite, ending_sprite)
+                self.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
 
 
     def check_if_hex_is_clicked(self, event):
@@ -100,7 +100,6 @@ class MouseClickHandler:
 
         zoom=self.tracker.get_zoom()
         mouse *= 1 / zoom
-
 
         mouse += self.tracker.get_internal_offset()
         mouse = pygame.math.Vector2(int(mouse.x), int(mouse.y))
@@ -118,6 +117,3 @@ class MouseClickHandler:
 
                     return sprite
         return None
-
-
-

@@ -52,6 +52,17 @@ class Map:
         return Units
 
 
+# class UnitPlacer:
+#     def __init__(self, map):
+#         self.map = map
+#
+#     def place_unit_and_add_it_to_player(self, unit, player):
+#         self.map.hexes.hexes_dict[unit.grid_pos]
+#         player.
+
+
+
+
 
 
 
