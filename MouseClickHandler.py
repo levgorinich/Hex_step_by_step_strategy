@@ -91,7 +91,9 @@ class MouseClickHandler:
 
                 starting_sprite = self.selected_sprite.grid_pos
                 ending_sprite = self.sprite_clicked.grid_pos
-                self.mover.move(starting_sprite, ending_sprite)
+                for i in range(6):
+                    if ending_sprite == self.sprite_clicked.neighbors_hex(starting_sprite, i):
+                        self.mover.move(starting_sprite, ending_sprite)
                 self.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
 
 

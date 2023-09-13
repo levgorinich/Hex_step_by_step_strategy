@@ -83,7 +83,19 @@ class Hexagon(MapObject):
 
     def update(self):
         pass
-
+    
+    def neighbors_hex(self,grid_pos,direction):
+        direction_differences = [
+            ## even cols
+            [[+1,  0], [+1, -1], [ 0, -1], 
+             [-1, -1], [-1,  0], [ 0, +1]],
+            ## odd cols 
+            [[+1, +1], [+1,  0], [ 0, -1], 
+             [-1,  0], [-1, +1], [ 0, +1]],
+        ]
+        parity = grid_pos[0] & 1
+        diff = direction_differences[parity][direction]
+        return (grid_pos[0] + diff[0], grid_pos[1] + diff[1])
 
 class Unit(MapObject):
     def __init__(self, grid_pos):

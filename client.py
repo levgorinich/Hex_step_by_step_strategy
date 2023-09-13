@@ -7,7 +7,7 @@ from Render import Render
 from User_interface import UI
 from mapMovement import MapMovementTracker
 from mover import Mover
-from network import Network
+from internet_acsess.network import Network
 from Spawner import Spawner
 pygame.font.init()
 width = 700
