@@ -91,9 +91,17 @@ class MouseClickHandler:
 
                 starting_sprite = self.selected_sprite.grid_pos
                 ending_sprite = self.sprite_clicked.grid_pos
-                for i in range(6):
-                    if ending_sprite == self.sprite_clicked.neighbors_hex(starting_sprite, i):
-                        self.mover.move(starting_sprite, ending_sprite)
+                diff = (ending_sprite[0]-starting_sprite[0],ending_sprite[1]-starting_sprite[1])
+
+                # check on even or odd
+                if starting_sprite[0]%2 == 0:
+                    offset = 1
+                else:
+                    offset = -1
+                
+                # set the mobility
+                if self.sprite_clicked.neighbors_hex(diff,offset,2) == 1:
+                    self.mover.move(starting_sprite, ending_sprite)
                 self.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
 
 

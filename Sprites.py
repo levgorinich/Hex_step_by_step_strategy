@@ -28,6 +28,12 @@ class MapObject(pygame.sprite.Sprite):
         q = grid_pos[1]
         r = grid_pos[0] - (grid_pos[1] - (grid_pos[1] & 1)) / 2
         return q, r, -q - r
+    ## correct version. [col,row] in this order
+    def offset_to_cube_coords1(self, grid_pos,offset):
+    
+        q = grid_pos[0]
+        r = grid_pos[1] - (grid_pos[0] - offset*(grid_pos[0] & 1)) / 2
+        return q, r, -q - r
 
     def calculate_coordinate_by_hex_position(self, hex_position, ):
         map_coord_x = hex_width * (0.5 + 0.75 * hex_position[0])
@@ -84,18 +90,27 @@ class Hexagon(MapObject):
     def update(self):
         pass
     
-    def neighbors_hex(self,grid_pos,direction):
-        direction_differences = [
-            ## even cols
-            [[+1,  0], [+1, -1], [ 0, -1], 
-             [-1, -1], [-1,  0], [ 0, +1]],
-            ## odd cols 
-            [[+1, +1], [+1,  0], [ 0, -1], 
-             [-1,  0], [-1, +1], [ 0, +1]],
-        ]
-        parity = grid_pos[0] & 1
-        diff = direction_differences[parity][direction]
-        return (grid_pos[0] + diff[0], grid_pos[1] + diff[1])
+    def neighbors_hex(self,grid_pos, offset,mobility):
+        q,r,s = self.offset_to_cube_coords1(grid_pos,offset)
+        if -mobility <= q and q <= mobility:
+            if - mobility <= r and r <= mobility:
+                if - mobility <= s and s <= mobility:
+                    if q + r + s == 0: 
+                        print(q," ",r," ",s)
+                        return 1
+        # direction_differences = [
+        #     ## even cols
+        #     [[+1,  0], [+1, -1], [ 0, -1], 
+        #      [-1, -1], [-1,  0], [ 0, +1]],
+        #     ## odd cols 
+        #     [[+1, +1], [+1,  0], [ 0, -1], 
+        #      [-1,  0], [-1, +1], [ 0, +1]],
+        # ]
+        # parity = grid_pos[0] & 1
+        # diff = direction_differences[parity][direction]
+        # return (grid_pos[0] + diff[0], grid_pos[1] + diff[1])
+        # axial_add(center, Hex(q, r))
+    
 
 class Unit(MapObject):
     def __init__(self, grid_pos):
@@ -113,6 +128,7 @@ class MilitaryUnit(Unit):
         super().__init__(grid_pos)
         self.hp = 10
         self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        # self.mobility = 
         self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
         self.health_bar.draw(self.pict)
 
