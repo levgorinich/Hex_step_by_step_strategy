@@ -100,7 +100,7 @@ class MouseClickHandler:
                     offset = -1
                 
                 # set the mobility
-                if self.sprite_clicked.neighbors_hex(diff,offset,2) == 1:
+                if self.unit_selected.range_of_movement(diff,offset) == 1:
                     self.mover.move(starting_sprite, ending_sprite)
                 self.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
 

@@ -29,7 +29,7 @@ class MapObject(pygame.sprite.Sprite):
         r = grid_pos[0] - (grid_pos[1] - (grid_pos[1] & 1)) / 2
         return q, r, -q - r
     ## correct version. [col,row] in this order
-    def offset_to_cube_coords1(self, grid_pos,offset):
+    def offset_to_cube_coords_for_moving(self, grid_pos,offset):
     
         q = grid_pos[0]
         r = grid_pos[1] - (grid_pos[0] - offset*(grid_pos[0] & 1)) / 2
@@ -88,40 +88,27 @@ class Hexagon(MapObject):
         return f"Hexagon {self.grid_pos[0]}, {self.grid_pos[1]}"
 
     def update(self):
-        pass
-    
-    def neighbors_hex(self,grid_pos, offset,mobility):
-        q,r,s = self.offset_to_cube_coords1(grid_pos,offset)
-        if -mobility <= q and q <= mobility:
-            if - mobility <= r and r <= mobility:
-                if - mobility <= s and s <= mobility:
-                    if q + r + s == 0: 
-                        print(q," ",r," ",s)
-                        return 1
-        # direction_differences = [
-        #     ## even cols
-        #     [[+1,  0], [+1, -1], [ 0, -1], 
-        #      [-1, -1], [-1,  0], [ 0, +1]],
-        #     ## odd cols 
-        #     [[+1, +1], [+1,  0], [ 0, -1], 
-        #      [-1,  0], [-1, +1], [ 0, +1]],
-        # ]
-        # parity = grid_pos[0] & 1
-        # diff = direction_differences[parity][direction]
-        # return (grid_pos[0] + diff[0], grid_pos[1] + diff[1])
-        # axial_add(center, Hex(q, r))
-    
+        pass    
 
 class Unit(MapObject):
     def __init__(self, grid_pos):
         super().__init__(grid_pos)
         self.name = "unit"
+        self.mobility = None
 
     def move(self, move_on_hex_grid):
         self.grid_pos += move_on_hex_grid
 
         self.map_coord = self.calculate_coordinate_by_hex_position(self.grid_pos)
 
+    def range_of_movement(self,grid_pos, offset):
+        q,r,s = self.offset_to_cube_coords_for_moving(grid_pos,offset)
+        if -self.mobility <= q and q <= self.mobility:
+            if - self.mobility <= r and r <= self.mobility:
+                if - self.mobility <= s and s <= self.mobility:
+                    if q + r + s == 0: 
+                        print(q," ",r," ",s)
+                        return 1
 
 class MilitaryUnit(Unit):
     def __init__(self, grid_pos):
@@ -131,6 +118,8 @@ class MilitaryUnit(Unit):
         # self.mobility = 
         self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
         self.health_bar.draw(self.pict)
+
+
 
     def update_hp(self, hp):
         self.health_bar.hp -= hp
@@ -149,6 +138,7 @@ class TriangularUnit(MilitaryUnit):
         print("I am here")
         self.name = "triangular unit"
         self.attack = 1
+        self.mobility = 1
         # pygame.draw.polygon(self.surf, (255, 0, 0), [(0, 0), (self.width / 2, self.height), (self.width - 1, 0)])
         # self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         # self.health_bar.draw(self.pict)
@@ -172,6 +162,7 @@ class SquareUnit(MilitaryUnit):
         super().__init__(grid_pos)
         self.name = "square unit"
         self.attack = 2
+        self.mobility = 2
         pygame.draw.rect(self.surf, (255, 0, 0), (0, 0, self.width, self.height))
         # self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         # self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
@@ -195,6 +186,7 @@ class CircleUnit(MilitaryUnit):
         super().__init__(grid_pos)
         self.name = "circle unit"
         self.attack = 3
+        self.mobility = 3
         pygame.draw.circle(self.surf, (255, 0, 0), (self.width / 2, self.height / 2), 10)
         self.image = self.surf
         # self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
