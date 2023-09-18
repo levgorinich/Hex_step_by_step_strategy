@@ -37,7 +37,7 @@ def offline_game():
         events_list = pygame.event.get()
         game_map.hexes.update()
 
-        renderer.display(events_list, game_map)
+        renderer.display(events_list, game_map,click_handler.pos,click_handler.clear)
         pygame.display.flip()
 
         for event in events_list:
@@ -46,6 +46,9 @@ def offline_game():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 click_handler.handle_click(event)
+                # if click_handler.pos is not None:
+                #     renderer.cells(click_handler.pos, game_map.hexes.hexes_dict)
+                    # print("yeag")
 
         clock.tick(60)
 

@@ -10,6 +10,8 @@ class MouseClickHandler:
         self.tracker = tracker
         self.was_clicked = False
         self.mover = mover
+        self.pos = []
+        self.clear = None
         # self.mover = Mover(self.game_map)
         self.actions  = set()
         pass
@@ -78,29 +80,44 @@ class MouseClickHandler:
 
         mouse -= self.tracker.get_dragging_offset()
         if event.button == 1:
+            self.pos = []
             if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
                 self.selected_sprite = selected_sprite_clicked
                 if self.selected_sprite.unit_on_hex:
+
                     self.unit_selected = self.selected_sprite.unit_on_hex
+
+                    if self.selected_sprite.grid_pos[0]%2 == 0:
+                        offset = 1
+                    else:
+                        offset = -1
+                    
+                    # set the mobility
+                    col,row = self.unit_selected.range_of_2(self.selected_sprite.grid_pos,offset)
+                    for i in range(len(col)):
+                            self.pos.append((col[i],row[i]))
+                    self.clear = True
 
         if event.button == 3:
 
 
             self.sprite_clicked = self.check_if_hex_is_clicked(event)
             if self.check_if_hex_is_clicked(event) and self.unit_selected :
-
+                self.clear = None
+                # self.pos = []
                 starting_sprite = self.selected_sprite.grid_pos
                 ending_sprite = self.sprite_clicked.grid_pos
                 diff = (ending_sprite[0]-starting_sprite[0],ending_sprite[1]-starting_sprite[1])
 
-                # check on even or odd
+                # #check on even or odd
                 if starting_sprite[0]%2 == 0:
                     offset = 1
                 else:
                     offset = -1
                 
-                # set the mobility
-                if self.unit_selected.range_of_movement(diff,offset) == 1:
+                # # set the mobility
+                
+                if self.unit_selected.range_of_movement(diff,offset):
                     self.mover.move(starting_sprite, ending_sprite)
                 self.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
 

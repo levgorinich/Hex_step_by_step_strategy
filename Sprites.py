@@ -35,6 +35,19 @@ class MapObject(pygame.sprite.Sprite):
         r = grid_pos[1] - (grid_pos[0] - offset*(grid_pos[0] & 1)) / 2
         return q, r, -q - r
 
+
+    def qoffset_from_cube(self,q,r,s,offset):
+        # s = -col - row + (col - offset*(col & 1)) / 2
+        col = q
+        # row1 = r + (q - offset*(q & 1)) / 2
+        if offset == -1:
+            row = -col - s + (col - (col & 1)) / 2 + 1
+        else:
+            row = -col - s + (col - (col & 1)) / 2 
+        # if row1 == row2:
+        #     row = row1
+        return (col, row)
+
     def calculate_coordinate_by_hex_position(self, hex_position, ):
         map_coord_x = hex_width * (0.5 + 0.75 * hex_position[0])
 
@@ -109,6 +122,36 @@ class Unit(MapObject):
                     if q + r + s == 0: 
                         print(q," ",r," ",s)
                         return 1
+                    
+    def range_of_2(self, start_pos,offset):
+        q_s,r_s,s_s = self.offset_to_cube_coords_for_moving(start_pos,offset)
+        q = [i for i in range(-10,11,1)]
+        r = [i for i in range(-10,11,1)]
+        s = [i for i in range(-10,11,1)]
+        col = []
+        row = []
+        for i in q:
+            if -self.mobility <= i and i <= self.mobility:
+                for j in r:
+                    if - self.mobility <= j and j <= self.mobility:
+                        for h in s:
+                            if - self.mobility <= h and h <= self.mobility:
+                                if i + j + h == 0 and (i != 0 or j != 0 or h != 0): 
+                                    # print(i," ",j," ",h)
+                                    # print(q_s," ",r_s," ",s_s," ")
+                                    # if i%2 == 0:
+                                    #     offset = 1
+                                    # else:
+                                    #     offset = -1
+                                    co, ro=self.qoffset_from_cube(i+q_s,j+r_s,h+s_s,offset)
+                                    if co >= 0 and ro >= 0:
+                                        print(co," ",ro," ")
+                                        col.append(co)
+                                        row.append(int(ro))
+                                        print(col,row)
+                                    
+        return col,row
+
 
 class MilitaryUnit(Unit):
     def __init__(self, grid_pos):
