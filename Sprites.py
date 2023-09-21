@@ -35,6 +35,7 @@ class MapObject(pygame.sprite.Sprite):
         r = grid_pos[1] - (grid_pos[0] - offset*(grid_pos[0] & 1)) / 2
         return q, r, -q - r
 
+    
 
     def qoffset_from_cube(self,q,r,s,offset):
         # s = -col - row + (col - offset*(col & 1)) / 2
@@ -57,6 +58,26 @@ class MapObject(pygame.sprite.Sprite):
             map_coord_y = hex_height * (1 + hex_position[1])
 
         return map_coord_x, map_coord_y
+    
+
+
+    def oddq_offset_neighbor(self,hex,direction):
+        oddq_direction_differences = [
+        # even cols 
+        [[+1,  0], [+1, -1], [ 0, -1], 
+        [-1, -1], [-1,  0], [ 0, +1]],
+        # odd cols 
+        [[+1, +1], [+1,  0], [ 0, -1], 
+        [-1,  0], [-1, +1], [ 0, +1]],
+        ]
+        
+        
+        parity = hex[0] & 1
+        diff = oddq_direction_differences[parity][direction]
+        return (hex[0] + diff[0], hex[1]+ diff[1])
+
+
+
 
 
 class Hexagon(MapObject):
@@ -114,6 +135,34 @@ class Unit(MapObject):
 
         self.map_coord = self.calculate_coordinate_by_hex_position(self.grid_pos)
 
+
+    def hex_reachable(self,start,blocked):
+        visited = set() # set of hexes
+        visited.add(start)
+        l1,l2 = [],[]
+        fringes = [] # array of arrays of hexes
+        fringes.append([start])
+        # print(fringes)
+        for mov in range(1,self.mobility+1):
+            
+            for hex in fringes[mov-1]:
+                fringes.append([])
+                for dir in range(0,6):
+                    
+                    neighbor  = self.oddq_offset_neighbor(hex,dir)
+                    print(neighbor)
+                    if neighbor not in visited and neighbor not in blocked and neighbor[0] >= 0 and neighbor[1] >= 0 and neighbor[0] < 25 and neighbor[1] < 25:
+                        visited.add(neighbor)
+                        fringes[mov].append(neighbor)
+                        
+        for i in visited:
+            l1.append(i[0])
+            l2.append(i[1])
+        return l1,l2
+                
+
+    
+
     def range_of_movement(self,grid_pos, offset):
         q,r,s = self.offset_to_cube_coords_for_moving(grid_pos,offset)
         if -self.mobility <= q and q <= self.mobility:
@@ -123,7 +172,7 @@ class Unit(MapObject):
                         print(q," ",r," ",s)
                         return 1
                     
-    def range_of_2(self, start_pos,offset):
+    def range_of_2(self, start_pos ,offset):
         q_s,r_s,s_s = self.offset_to_cube_coords_for_moving(start_pos,offset)
         q = [i for i in range(-10,11,1)]
         r = [i for i in range(-10,11,1)]

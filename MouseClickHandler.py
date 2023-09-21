@@ -93,7 +93,8 @@ class MouseClickHandler:
                         offset = -1
                     
                     # set the mobility
-                    col,row = self.unit_selected.range_of_2(self.selected_sprite.grid_pos,offset)
+                    # col,row = self.unit_selected.range_of_2(self.selected_sprite.grid_pos,offset)
+                    col,row = self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,[(21,4),(21,6),(23,4),(23,6)])
                     for i in range(len(col)):
                             self.pos.append((col[i],row[i]))
                     self.clear = True
@@ -116,8 +117,9 @@ class MouseClickHandler:
                     offset = -1
                 
                 # # set the mobility
-                
-                if self.unit_selected.range_of_movement(diff,offset):
+                col1, row1= self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,[(21,4),(21,6),(23,4),(23,6)])
+                # if self.unit_selected.range_of_movement(diff,offset):
+                if ending_sprite[0] in col1 and ending_sprite[1] in row1:
                     self.mover.move(starting_sprite, ending_sprite)
                 self.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
 

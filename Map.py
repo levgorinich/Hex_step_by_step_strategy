@@ -26,10 +26,12 @@ class Map:
 
         for col in range(self.columns):
             for row in range(self.rows):
-                grid_pos =  col, row
-                # print(current_y,current_x)
-                hex = Hexagon( grid_pos)
-                hexes.add(hex)
+                if col not in [21,23] or row not in [4,6]:
+                    grid_pos =  col, row
+                    # print(current_y,current_x)
+                    hex = Hexagon( grid_pos)
+                    hexes.add(hex)
+        
         return hexes
     def create_units(self):
         Units = pygame.sprite.Group()
