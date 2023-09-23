@@ -38,15 +38,11 @@ class MapObject(pygame.sprite.Sprite):
     
 
     def qoffset_from_cube(self,q,r,s,offset):
-        # s = -col - row + (col - offset*(col & 1)) / 2
         col = q
-        # row1 = r + (q - offset*(q & 1)) / 2
         if offset == -1:
             row = -col - s + (col - (col & 1)) / 2 + 1
         else:
             row = -col - s + (col - (col & 1)) / 2 
-        # if row1 == row2:
-        #     row = row1
         return (col, row)
 
     def calculate_coordinate_by_hex_position(self, hex_position, ):
@@ -142,7 +138,7 @@ class Unit(MapObject):
         l1,l2 = [],[]
         fringes = [] # array of arrays of hexes
         fringes.append([start])
-        # print(fringes)
+
         for mov in range(1,self.mobility+1):
             
             for hex in fringes[mov-1]:
@@ -150,15 +146,11 @@ class Unit(MapObject):
                 for dir in range(0,6):
                     
                     neighbor  = self.oddq_offset_neighbor(hex,dir)
-                    print(neighbor)
                     if neighbor not in visited and neighbor not in blocked and neighbor[0] >= 0 and neighbor[1] >= 0 and neighbor[0] < 25 and neighbor[1] < 25:
                         visited.add(neighbor)
                         fringes[mov].append(neighbor)
                         
-        for i in visited:
-            l1.append(i[0])
-            l2.append(i[1])
-        return l1,l2
+        return tuple(visited)
                 
 
     
@@ -172,7 +164,7 @@ class Unit(MapObject):
                         print(q," ",r," ",s)
                         return 1
                     
-    def range_of_2(self, start_pos ,offset):
+    def range_of_drawing(self, start_pos ,offset):
         q_s,r_s,s_s = self.offset_to_cube_coords_for_moving(start_pos,offset)
         q = [i for i in range(-10,11,1)]
         r = [i for i in range(-10,11,1)]
@@ -186,12 +178,6 @@ class Unit(MapObject):
                         for h in s:
                             if - self.mobility <= h and h <= self.mobility:
                                 if i + j + h == 0 and (i != 0 or j != 0 or h != 0): 
-                                    # print(i," ",j," ",h)
-                                    # print(q_s," ",r_s," ",s_s," ")
-                                    # if i%2 == 0:
-                                    #     offset = 1
-                                    # else:
-                                    #     offset = -1
                                     co, ro=self.qoffset_from_cube(i+q_s,j+r_s,h+s_s,offset)
                                     if co >= 0 and ro >= 0:
                                         print(co," ",ro," ")

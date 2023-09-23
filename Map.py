@@ -10,6 +10,7 @@ class Map:
     def __init__(self, rows, columns):
         self.rows = rows
         self.columns = columns
+        self.empty_hexes = ([(20,5),(20,6),(20,7)])
 
 
         self.hex_width = 30* sqrt(3)
@@ -20,13 +21,15 @@ class Map:
     def __str__(self):
         return f"map with {self.rows} rows and {self.columns} columns"
 
+    def set_empty_hexes(self, list_of_hexes):
+        self.empty_hexes = list_of_hexes
 
     def create_tiles(self):
         hexes = HexesGroup()
 
         for col in range(self.columns):
             for row in range(self.rows):
-                if col not in [21,23] or row not in [4,6]:
+                if (col,row) not in self.empty_hexes:
                     grid_pos =  col, row
                     # print(current_y,current_x)
                     hex = Hexagon( grid_pos)

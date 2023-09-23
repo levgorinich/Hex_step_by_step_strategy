@@ -21,7 +21,6 @@ internal_surface_size = (2500, 2500)
 
 # creating main game classes
 game_map = Map(25, 25)
-
 mover = Mover(game_map)
 user_interface = UI(window_size, game_map)
 tracker = MapMovementTracker(internal_surface_size, window_size, )

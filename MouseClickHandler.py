@@ -1,5 +1,6 @@
 import pygame
 from mover import Mover
+
 class MouseClickHandler:
     def __init__(self,game_map,  User_interface, tracker, mover):
         self.user_interface = User_interface
@@ -94,9 +95,9 @@ class MouseClickHandler:
                     
                     # set the mobility
                     # col,row = self.unit_selected.range_of_2(self.selected_sprite.grid_pos,offset)
-                    col,row = self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,[(21,4),(21,6),(23,4),(23,6)])
-                    for i in range(len(col)):
-                            self.pos.append((col[i],row[i]))
+                    available_pos = self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.empty_hexes)
+                    for i in range(len(available_pos)):
+                            self.pos.append(available_pos[i])
                     self.clear = True
 
         if event.button == 3:
@@ -117,9 +118,9 @@ class MouseClickHandler:
                     offset = -1
                 
                 # # set the mobility
-                col1, row1= self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,[(21,4),(21,6),(23,4),(23,6)])
+                available_pos= self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.empty_hexes)
                 # if self.unit_selected.range_of_movement(diff,offset):
-                if ending_sprite[0] in col1 and ending_sprite[1] in row1:
+                if ending_sprite in available_pos:
                     self.mover.move(starting_sprite, ending_sprite)
                 self.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
 
