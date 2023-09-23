@@ -146,6 +146,7 @@ class Unit(MapObject):
                 for dir in range(0,6):
                     
                     neighbor  = self.oddq_offset_neighbor(hex,dir)
+                    
                     if neighbor not in visited and neighbor not in blocked and neighbor[0] >= 0 and neighbor[1] >= 0 and neighbor[0] < 25 and neighbor[1] < 25:
                         visited.add(neighbor)
                         fringes[mov].append(neighbor)

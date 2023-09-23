@@ -13,6 +13,7 @@ class MouseClickHandler:
         self.mover = mover
         self.pos = []
         self.clear = None
+        self.check_on_activate = 0
         # self.mover = Mover(self.game_map)
         self.actions  = set()
         pass
@@ -99,8 +100,10 @@ class MouseClickHandler:
                     for i in range(len(available_pos)):
                             self.pos.append(available_pos[i])
                     self.clear = True
+                    self.check_on_activate+=1
 
         if event.button == 3:
+            self.check_on_activate = 0
 
 
             self.sprite_clicked = self.check_if_hex_is_clicked(event)

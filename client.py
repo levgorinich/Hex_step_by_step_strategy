@@ -99,7 +99,7 @@ def main():
         events_list = pygame.event.get()
         game_map.hexes.update()
 
-        renderer.display(events_list, game_map,click_handler.pos,click_handler.clear)
+        renderer.display(events_list, game_map,click_handler.pos,click_handler.clear,click_handler.check_on_activate)
         pygame.display.flip()
 
         for event in events_list:
