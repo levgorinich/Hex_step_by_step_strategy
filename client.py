@@ -1,7 +1,7 @@
 import pygame
 from pygame import QUIT
 
-from Map import Map
+from global_pack.main_calasses.Map import Map
 from MouseClickHandler import MouseClickHandler
 from Render import Render
 from User_interface import UI
