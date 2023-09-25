@@ -1,5 +1,6 @@
 import pygame
 from mover import Mover
+
 class MouseClickHandler:
     def __init__(self,game_map,  User_interface, tracker, mover):
         self.user_interface = User_interface
@@ -12,6 +13,7 @@ class MouseClickHandler:
         self.mover = mover
         self.pos = []
         self.clear = None
+        self.check_on_activate = 0
         # self.mover = Mover(self.game_map)
         self.actions  = set()
         pass
@@ -70,7 +72,7 @@ class MouseClickHandler:
         result = self.user_interface.check_click(self.game_map)
         if result:
             self.was_clicked = True
-            self.actions.add(result)
+
         else:
             self.was_clicked = False
 
@@ -83,6 +85,7 @@ class MouseClickHandler:
             self.pos = []
             if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
                 self.selected_sprite = selected_sprite_clicked
+
                 if self.selected_sprite.unit_on_hex:
 
                     self.unit_selected = self.selected_sprite.unit_on_hex
@@ -93,12 +96,15 @@ class MouseClickHandler:
                         offset = -1
                     
                     # set the mobility
-                    col,row = self.unit_selected.range_of_2(self.selected_sprite.grid_pos,offset)
-                    for i in range(len(col)):
-                            self.pos.append((col[i],row[i]))
+                    # col,row = self.unit_selected.range_of_2(self.selected_sprite.grid_pos,offset)
+                    available_pos = self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.empty_hexes)
+                    for i in range(len(available_pos)):
+                            self.pos.append(available_pos[i])
                     self.clear = True
+                    self.check_on_activate+=1
 
         if event.button == 3:
+            self.check_on_activate = 0
 
 
             self.sprite_clicked = self.check_if_hex_is_clicked(event)
@@ -107,6 +113,7 @@ class MouseClickHandler:
                 # self.pos = []
                 starting_sprite = self.selected_sprite.grid_pos
                 ending_sprite = self.sprite_clicked.grid_pos
+
                 diff = (ending_sprite[0]-starting_sprite[0],ending_sprite[1]-starting_sprite[1])
 
                 # #check on even or odd
@@ -116,10 +123,12 @@ class MouseClickHandler:
                     offset = -1
                 
                 # # set the mobility
-                
-                if self.unit_selected.range_of_movement(diff,offset):
+                available_pos= self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.empty_hexes)
+                # if self.unit_selected.range_of_movement(diff,offset):
+                if ending_sprite in available_pos:
                     self.mover.move(starting_sprite, ending_sprite)
                 self.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
+
 
 
     def check_if_hex_is_clicked(self, event):
