@@ -1,15 +1,19 @@
 import pygame
 from pygame import QUIT
 
-from global_pack.main_calasses.Map import Map
+
+from Map import Map
+
 from MouseClickHandler import MouseClickHandler
 from Render import Render
 from User_interface import UI
 from mapMovement import MapMovementTracker
 from mover import Mover
+
 from network import Network
 from Spawner import Spawner
 from MoveParser import Parser
+
 
 pygame.font.init()
 width = 700
@@ -28,10 +32,12 @@ internal_surface_size = (2500, 2500)
 
 
 
+
 def main():
     run = True
     clock = pygame.time.Clock()
     n = Network()
+
     player_id = int(n.getP())
     print("You are player", player_id)
 
@@ -43,11 +49,13 @@ def main():
     tracker = MapMovementTracker(internal_surface_size, window_size, )
     renderer = Render(internal_surface_size, map_movement_tracker=tracker, user_interface=user_interface)
     click_handler = MouseClickHandler(game_map, user_interface, tracker, mover)
+
     while run:
         clock.tick(60)
 
 
         try:
+
             moves =""
             for move in game_map.actions:
                 moves += move
@@ -63,12 +71,15 @@ def main():
                 start, end = 0, 0
                 for idx, symbol in enumerate(update):
 
+
                     if symbol == "<":
                         start = idx
                     if symbol == ">":
                         end = idx
+
                         move_parser.parse_moves(update[start+1:end])
                         start, end = 0, 0
+
 
         except Exception as e :
             print(e)
@@ -79,7 +90,9 @@ def main():
         events_list = pygame.event.get()
         game_map.hexes.update()
 
-        renderer.display(events_list, game_map)
+
+        renderer.display(events_list, game_map,click_handler.pos,click_handler.clear,click_handler.check_on_activate)
+
         pygame.display.flip()
 
         for event in events_list:
@@ -92,6 +105,7 @@ def main():
         clock.tick(60)
 
     pygame.quit()
+
 
 main()
 

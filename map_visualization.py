@@ -20,8 +20,7 @@ screen = pygame.display.set_mode(window_size)
 internal_surface_size = (2500, 2500)
 
 # creating main game classes
-game_map = Map(25, 25)
-
+game_map = Map(25, 25,1)
 mover = Mover(game_map)
 user_interface = UI(window_size, game_map)
 tracker = MapMovementTracker(internal_surface_size, window_size, )
@@ -37,7 +36,7 @@ def offline_game():
         events_list = pygame.event.get()
         game_map.hexes.update()
 
-        renderer.display(events_list, game_map)
+        renderer.display(events_list, game_map,click_handler.pos,click_handler.clear,click_handler.check_on_activate)
         pygame.display.flip()
 
         for event in events_list:
@@ -46,6 +45,9 @@ def offline_game():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 click_handler.handle_click(event)
+                # if click_handler.pos is not None:
+                #     renderer.cells(click_handler.pos, game_map.hexes.hexes_dict)
+                    # print("yeag")
 
         clock.tick(60)
 
