@@ -58,19 +58,19 @@ def main():
 
             moves =""
             update = None
-            print(game_map.actions)
+            # print(game_map.actions)
             for move in game_map.actions:
                 moves += move
             if moves!="":
                 update = n.send(moves)
 
-            # else:
-            #     update = n.send("no_moves")
+            else:
+                update = n.send("no_moves")
 
             game_map.actions = set()
 
             if update:
-                print(update)
+
                 start, end = 0, 0
                 for idx, symbol in enumerate(update):
 

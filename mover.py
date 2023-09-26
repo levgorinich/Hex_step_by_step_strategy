@@ -20,12 +20,8 @@ class Mover():
             if self.atacking_unit.player_id != self.defending_unit.player_id:
                 self.handle_fighting(self.atacking_unit, self.defending_unit)
             else:
-                self.atacking_unit.grid_pos = hex_end
-                self.defending_unit.grid_pos = hex_start
-                self.starting_sprite.remove_unit()
-                self.ending_sprite.remove_unit()
-                self.starting_sprite.add_unit(self.defending_unit)
-                self.ending_sprite.add_unit(self.atacking_unit)
+                self.swap_units( hex_end, hex_start)
+
 
         elif unit := self.starting_sprite.unit_on_hex:
 
@@ -33,6 +29,14 @@ class Mover():
             unit.grid_pos = hex_end
             self.ending_sprite.add_unit(unit)
 
+    def swap_units(self, hex_end, hex_start):
+
+        self.atacking_unit.grid_pos = hex_end
+        self.defending_unit.grid_pos = hex_start
+        self.starting_sprite.remove_unit()
+        self.ending_sprite.remove_unit()
+        self.starting_sprite.add_unit(self.defending_unit)
+        self.ending_sprite.add_unit(self.atacking_unit)
     def handle_fighting(self, atacking_unit, defending_unit):
         if atacking_unit.grid_pos != defending_unit.grid_pos:
             self.kill_all(atacking_unit, defending_unit)

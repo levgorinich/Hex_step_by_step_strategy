@@ -18,47 +18,6 @@ class MouseClickHandler:
         self.actions  = set()
         pass
 
-    def handle_fighting(self, atacking_unit, defending_unit):
-        if atacking_unit.grid_pos != defending_unit.grid_pos:
-            self.kill_all(atacking_unit, defending_unit)
-            self.kill_enemy(atacking_unit, defending_unit)
-            self.kill_yourself(atacking_unit, defending_unit)
-            self.kill_nothing(atacking_unit, defending_unit)
-        else:
-            pass
-
-    def kill_all(self, atacking_unit, defending_unit):
-        if (defending_unit.health_bar.hp - atacking_unit.attack <= 0
-            and atacking_unit.health_bar.hp - defending_unit.attack <= 0):
-            self.selected_sprite.kill_unit()
-            self.sprite_clicked.kill_unit()
-            print("double death")
-
-    def kill_enemy(self, atacking_unit, defending_unit):
-        if (defending_unit.health_bar.hp - atacking_unit.attack <= 0
-            and atacking_unit.health_bar.hp - defending_unit.attack > 0):
-            self.sprite_clicked.kill_unit()
-            self.unit_selected.update(defending_unit.attack)
-
-            self.unit_selected.grid_pos = self.sprite_clicked.grid_pos
-
-            self.sprite_clicked.add_unit(self.unit_selected)
-            self.unit_selected = None           
-
-    def kill_yourself(self, atacking_unit, defending_unit):
-        if (defending_unit.health_bar.hp - atacking_unit.attack > 0
-            and atacking_unit.health_bar.hp - defending_unit.attack <= 0):
-            defending_unit.update(atacking_unit.attack)
-            self.selected_sprite.kill_unit()    
-
-    def kill_nothing(self, atacking_unit, defending_unit):
-        if (defending_unit.health_bar.hp - atacking_unit.attack > 0
-            and atacking_unit.health_bar.hp - defending_unit.attack > 0):
-            defending_unit.update(atacking_unit.attack)
-            self.unit_selected.update(defending_unit.attack)
-            print("last case")
-
-
 
     def handle_click(self, event):
 
@@ -88,20 +47,22 @@ class MouseClickHandler:
 
                 if self.selected_sprite.unit_on_hex:
 
-                    self.unit_selected = self.selected_sprite.unit_on_hex
 
-                    if self.selected_sprite.grid_pos[0]%2 == 0:
-                        offset = 1
-                    else:
-                        offset = -1
-                    
-                    # set the mobility
-                    # col,row = self.unit_selected.range_of_2(self.selected_sprite.grid_pos,offset)
-                    available_pos = self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.empty_hexes)
-                    for i in range(len(available_pos)):
-                            self.pos.append(available_pos[i])
-                    self.clear = True
-                    self.check_on_activate+=1
+                    print("check", self.selected_sprite.unit_on_hex.player_id == self.game_map.player_id)
+                    if self.selected_sprite.unit_on_hex and self.selected_sprite.unit_on_hex.player_id == self.game_map.player_id:
+                        self.unit_selected = self.selected_sprite.unit_on_hex
+                        if self.selected_sprite.grid_pos[0]%2 == 0:
+                            offset = 1
+                        else:
+                            offset = -1
+
+                        # set the mobility
+                        # col,row = self.unit_selected.range_of_2(self.selected_sprite.grid_pos,offset)
+                        available_pos = self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.empty_hexes)
+                        for i in range(len(available_pos)):
+                                self.pos.append(available_pos[i])
+                        self.clear = True
+                        self.check_on_activate+=1
 
         if event.button == 3:
             self.check_on_activate = 0
@@ -127,7 +88,7 @@ class MouseClickHandler:
                 # if self.unit_selected.range_of_movement(diff,offset):
                 if ending_sprite in available_pos:
                     self.mover.move(starting_sprite, ending_sprite)
-                self.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
+                self.game_map.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
 
 
 
