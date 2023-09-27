@@ -57,6 +57,8 @@ def main():
         try:
 
             moves =""
+            update = None
+            # print(game_map.actions)
             for move in game_map.actions:
                 moves += move
             if moves!="":
@@ -66,8 +68,9 @@ def main():
                 update = n.send("no_moves")
 
             game_map.actions = set()
-            if update != "empty":
-                print(update)
+
+            if update:
+
                 start, end = 0, 0
                 for idx, symbol in enumerate(update):
 
