@@ -19,6 +19,7 @@ async def main():
 
     # disable Nagle algorithm
     main_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    main_socket.setblocking(False)
     try:
         main_socket.bind((server, port))
     except socket.error as e:
@@ -39,20 +40,18 @@ async def get_client_move(p: int, gameID: int, conn: socket.socket, loop: Abstra
     conn.send(str.encode(str(p)))
     reply = ""
     while data :=  await loop.sock_recv(conn,4096):
-        print("got data from client")
+
         data = data.decode()
-        print(data)
+        # print(data)
         if gameID in games:
-            print("Game Exists")
             game = games[gameID]
             if not data:
                 print("Lost connection")
                 break
             else:
-                print("I am in else")
-                print(comands)
+                # print(comands)
                 if data != "no_moves":
-                    print(data)
+                    # print(data)
                     for key in comands:
                         if key != p:
                             comands[key] += data
@@ -60,14 +59,10 @@ async def get_client_move(p: int, gameID: int, conn: socket.socket, loop: Abstra
                 comands_to_send = comands[p]
                 if comands_to_send == "":
                     comands_to_send = "empty"
-                print(comands_to_send)
+                # print(comands_to_send)
                 await loop.sock_sendall(conn, str.encode(comands_to_send))
                 comands[p] = ""
 
-    #     else:
-    #         break
-    # except socket.error as e:
-    # pass
 
 async def listening_for_connection(main_socket, loop: AbstractEventLoop):
 
@@ -89,72 +84,5 @@ async def listening_for_connection(main_socket, loop: AbstractEventLoop):
             p=1
         asyncio.create_task(get_client_move(p, gameID, conn, loop))
 
-asyncio.run(main())
-# def threaded_client(conn, p, gameID):
-#     global idCount
-#     conn.send(str.encode(str(p)))
-#
-#
-#     reply = ""
-#     while True:
-#         time.sleep(0.1)
-#         try:
-#             data = conn.recv(4096).decode()
-#             if gameID in games:
-#                 game = games[gameID]
-#                 if not data:
-#                     print("Lost connection")
-#                     break
-#                 else:
-#                     print(comands)
-#                     if data != "no_moves":
-#                         print(data)
-#                         for key in comands:
-#                             if key != p:
-#                                 comands[key] += data
-#
-#                     comands_to_send = comands[p]
-#                     if comands_to_send == "":
-#                         comands_to_send = "empty"
-#
-#                     conn.send(str.encode(comands_to_send))
-#                     comands[p] = ""
-#
-#             else:
-#                 break
-#         except socket.error as e:
-#             pass
-#
-#     print("Lost connection")
-#
-#     try:
-#         del games[gameID]
-#
-#         print("closing game", gameID)
-#         print(games)
-#     except:
-#         pass
-#
-#     idCount -=1
-#
-#
-#
-# current_player = 0
-# while True:
-#
-#     # conn - new socket where newly connected client is redirected from main_socket
-#     conn, addr = main_socket.accept()
-#     conn.setblocking(False)
-#     print("Connected to: " + addr[0] + ":" + str(addr[1]))
-#     idCount +=1
-#     p=0
-#     gameID = (idCount-1)//2
-#
-#     if idCount %2 ==1:
-#         games[gameID] = Game(gameID)
-#         print("Created Game ID: ", gameID)
-#     else :
-#         p=1
-#     # else:
-#     #     p=2
-#     start_new_thread(threaded_client, (conn, p, gameID))
+
+asyncio.run(main(), debug = True)
