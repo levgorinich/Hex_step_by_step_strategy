@@ -10,7 +10,7 @@ from User_interface import UI
 from mapMovement import MapMovementTracker
 from mover import Mover
 
-from network import Network
+from internet_acsess.network import Network
 from Spawner import Spawner
 from MoveParser import Parser
 
@@ -37,8 +37,8 @@ def main():
     run = True
     clock = pygame.time.Clock()
     n = Network()
-
-    player_id = int(n.getP())
+    tmp = n.getP()
+    player_id = int(tmp)
     print("You are player", player_id)
 
     game_map = Map(25, 25, player_id)

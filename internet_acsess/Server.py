@@ -36,6 +36,7 @@ idCount = 0
 async def get_client_move(p: int, gameID: int, conn: socket.socket, loop: AbstractEventLoop):
 
     global idCount
+    print(123)
     conn.send(str.encode(str(p)))
     reply = ""
     while data :=  await loop.sock_recv(conn,4096):

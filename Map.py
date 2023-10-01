@@ -5,6 +5,7 @@ from math import *
 from Groups import HexesGroup, Grid
 from Sprites import *
 from Spawner import Spawner
+from Noise import Noise
 
 class Map:
 
@@ -15,7 +16,7 @@ class Map:
         self.player_id = player_id
         self.actions=set()
 # =======
-        self.empty_hexes = ([(20,5),(20,6),(20,7)])
+        self.empty_hexes = []
 
 
 # >>>>>>> 3fd439a7f36f26f90bed6b8818662dafa19250fb
@@ -23,8 +24,8 @@ class Map:
         self.hex_height = self.hex_width*sqrt(3)/2
         self.hexes = self.create_tiles()
         self.units =  pygame.sprite.Group()
-        self.spawner = Spawner(self)
-        self.spawner.create_start_unit()
+        # self.spawner = Spawner(self)
+        # self.spawner.create_start_unit()
 
 
     def __str__(self):
@@ -35,14 +36,17 @@ class Map:
 
     def create_tiles(self):
         hexes = HexesGroup()
-
+        noise = Noise(self.rows)
+        noi=noise.start
         for col in range(self.columns):
             for row in range(self.rows):
-                if (col,row) not in self.empty_hexes:
+                if noi[col][row] == 0:
                     grid_pos =  col, row
                     # print(current_y,current_x)
                     hex = Hexagon( grid_pos)
                     hexes.add(hex)
+                else:
+                    self.empty_hexes.append((col,row))
         
         return hexes
 

@@ -132,7 +132,7 @@ class Unit(MapObject):
         self.map_coord = self.calculate_coordinate_by_hex_position(self.grid_pos)
 
 
-    def hex_reachable(self,start,blocked):
+    def hex_reachable(self,start,blocked,x,y):
         visited = set() # set of hexes
         visited.add(start)
         l1,l2 = [],[]
@@ -147,7 +147,7 @@ class Unit(MapObject):
                     
                     neighbor  = self.oddq_offset_neighbor(hex,dir)
                     
-                    if neighbor not in visited and neighbor not in blocked and neighbor[0] >= 0 and neighbor[1] >= 0 and neighbor[0] < 25 and neighbor[1] < 25:
+                    if neighbor not in visited and neighbor not in blocked and neighbor[0] >= 0 and neighbor[1] >= 0 and neighbor[0] < x and neighbor[1] < y:
                         visited.add(neighbor)
                         fringes[mov].append(neighbor)
                         

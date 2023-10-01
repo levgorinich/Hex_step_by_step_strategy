@@ -5,10 +5,13 @@ class Network:
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # self.client.setblocking(False)
-        self.server = "localhost"
+        self.server = "5.42.78.110"
         self.port = 5555
         self.addr = (self.server, self.port)
+        # print("timeout==",self.client.gettimeout())
+        self.client.settimeout(3)
         self.p = self.connect()
+
 
     def getP(self):
         return self.p
@@ -16,9 +19,10 @@ class Network:
     def connect(self):
         try:
             self.client.connect(self.addr)
+            print("trying to connect")
             return self.client.recv(2048).decode()
-
-        except:
+        except Exception as e:
+            print("!!!!!Connect error::",e)
             pass
 
     def send(self, data):
