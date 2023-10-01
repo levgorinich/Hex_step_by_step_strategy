@@ -88,7 +88,8 @@ class MouseClickHandler:
                 # if self.unit_selected.range_of_movement(diff,offset):
                 if ending_sprite in available_pos:
                     self.mover.move(starting_sprite, ending_sprite)
-                self.game_map.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
+
+                    self.game_map.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
 
 
 
