@@ -6,15 +6,15 @@ class Spawner:
 
     def create_start_unit(self):
         print(self.player_id,"player", self.game_map.player_id)
-        # if self.player_id == 0:
-        #     "here"
-        #     self.spawn_unit("Triangular", (5, 2))
-        #     self.spawn_unit("Square", (6, 2))
-        #     self.spawn_unit("Circle", (7, 2))
-        # else:
-        #     self.spawn_unit("Square", (20, 2))
-        #     self.spawn_unit("Circle", (15, 3))
-        #     self.spawn_unit("Triangular", (15, 2))
+        if self.player_id == 0:
+            "here"
+            self.spawn_unit("Triangular", (5, 2))
+            self.spawn_unit("Square", (6, 2))
+            self.spawn_unit("Circle", (7, 2))
+        else:
+            self.spawn_unit("Square", (20, 2))
+            self.spawn_unit("Circle", (15, 3))
+            self.spawn_unit("Triangular", (15, 2))
     def spawn_unit(self, type, spawn_point, player_id=None):
 
         if player_id is None:

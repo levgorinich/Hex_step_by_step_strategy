@@ -32,8 +32,9 @@ class MenuButton(Button):
     def __init__(self, text, x, y, width, height,action = empty_funciton, color=(0, 255, 0), font_size=24, font_name="Arial",  ):
 
         super().__init__(text, x, y, width, height, action, color, font_size, font_name)
+        self.action = action
 
-    def check_click(self, function_if_clicked) -> bool:
+    def check_click(self, ) -> bool:
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(mouse_pos):
             if pygame.mouse.get_pressed()[0]:
