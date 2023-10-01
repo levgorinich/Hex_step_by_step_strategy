@@ -1,51 +1,168 @@
-from tkinter import *
-from tkinter import colorchooser
+import sys
+import pygame
+from pygame.locals import *
 
-def color_choose():
-    global colore
-    colore = colorchooser.askcolor(title="Choose")
-    print(colore)
+from internet_acsess.network import Network
+from main_components.Map import Map
+from main_components.MouseClickHandler import MouseClickHandler
+from main_components.Render import Render
+from main_components.User_interface import UI
+from main_components.mapMovement import MapMovementTracker
+from player_actions.Buttons import MenuButton
+from player_actions.MoveParser import Parser
+from player_actions.Spawner import Spawner
+from player_actions.mover import Mover
 
-def draw_pencil(event):
-    x1, y1 = (event.x - pad_size),(event.y - pad_size) 
-    x2, y2 = (event.x + pad_size),(event.y + pad_size)
-    canvas.create_oval(x1,y1,x2,y2, outline= colore[1], fill= colore[1])
+#
+pygame.init()
+clock = pygame.time.Clock()
 
-def size_of_line(size):
-    global pad_size
-    pad_size = int(size)
+# creating window
+window_size = (1280, 720)
+screen = pygame.display.set_mode(window_size)
 
-def clear():
-    canvas.delete('all')
-
-def eraser_color():
-    global colore
-    colore = [0,'white']
-
-
-colore = [0,"black"]
-pad_size = 10
-
-root = Tk()
-root.geometry('1280x720')
-root.columnconfigure(6, weight=1)
-root.rowconfigure(2,weight=1)
-
-button_1 = Button(root, text="Select", command=color_choose)
-button_1.grid(row=0,column=0)
-button_2 = Button(root, text="Clear",command=clear)
-button_2.grid(row=0,column=6)
-button_3 = Button(root, text="Eraser",command=eraser_color)
-button_3.grid(row=0,column=4)
-
-canvas = Canvas(root, cursor='pencil',bg='white')
-canvas.grid(row=2,column=0, columnspan=7,padx=5, pady=5,sticky=E + W + S + N)
-
-canvas.bind('<B1-Motion>', draw_pencil)
-canvas.bind('<Button-1>', draw_pencil)
+internal_surface_size = (2500, 2500)
 
 
-v = IntVar(value=10)
-Scale(root, variable=v,from_= 1, to=100, orient=HORIZONTAL, command=size_of_line).grid(row=0, column=1, padx=100)
+# creating main game classes
 
-root.mainloop()
+
+# main loop
+def offline_game():
+    game_map = Map(25, 25, 1)
+    mover = Mover(game_map)
+    user_interface = UI(window_size, game_map)
+    tracker = MapMovementTracker(internal_surface_size, window_size, )
+    renderer = Render(internal_surface_size, map_movement_tracker=tracker, user_interface=user_interface)
+    click_handler = MouseClickHandler(game_map, user_interface, tracker, mover)
+    running = True
+    while running:
+
+        events_list = pygame.event.get()
+        game_map.hexes.update()
+
+        renderer.display(events_list, game_map, click_handler.pos, click_handler.clear, click_handler.check_on_activate)
+        pygame.display.flip()
+
+        for event in events_list:
+            if event.type == QUIT:
+                running = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                click_handler.handle_click(event)
+                # if click_handler.pos is not None:
+                #     renderer.cells(click_handler.pos, game_map.hexes.hexes_dict)
+                # print("yeag")
+
+        clock.tick(60)
+
+    pygame.quit()
+
+
+def online_game():
+    run = True
+    clock = pygame.time.Clock()
+    n = Network()
+
+    player_id = int(n.getP())
+    print("You are player", player_id)
+
+    game_map = Map(25, 25, player_id)
+    mover = Mover(game_map)
+    spawner = Spawner(game_map)
+    move_parser = Parser(mover, spawner)
+    user_interface = UI(window_size, game_map)
+    tracker = MapMovementTracker(internal_surface_size, window_size, )
+    renderer = Render(internal_surface_size, map_movement_tracker=tracker, user_interface=user_interface)
+    click_handler = MouseClickHandler(game_map, user_interface, tracker, mover)
+    while run:
+        clock.tick(60)
+
+        try:
+
+            moves = ""
+            update = None
+            # print(game_map.actions)
+            for move in game_map.actions:
+                moves += move
+            if moves != "":
+                update = n.send(moves)
+
+            else:
+                update = n.send("no_moves")
+
+            game_map.actions = set()
+
+            if update:
+
+                start, end = 0, 0
+                for idx, symbol in enumerate(update):
+
+                    if symbol == "<":
+                        start = idx
+                    if symbol == ">":
+                        end = idx
+
+                        move_parser.parse_moves(update[start + 1:end])
+                        start, end = 0, 0
+
+
+        except Exception as e:
+            print(e)
+            run = False
+            print("Couldn't get game")
+            break
+
+        events_list = pygame.event.get()
+        game_map.hexes.update()
+
+        renderer.display(events_list, game_map, click_handler.pos, click_handler.clear, click_handler.check_on_activate)
+
+        pygame.display.flip()
+
+        for event in events_list:
+            if event.type == QUIT:
+                run = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                click_handler.handle_click(event)
+
+        clock.tick(60)
+
+    pygame.quit()
+
+
+def game_menu():
+    running = True
+
+    def stop_menue():
+        nonlocal running
+        running = False
+
+    while running:
+        screen.fill((255, 255, 255))
+        offline_game_button = MenuButton("Offline Game", 100, 100, 200, 50, offline_game, color=(0, 0, 255),
+                                         font_size=24, font_name="Arial")
+        online_game_button = MenuButton("Online Game", 300, 400, 200, 50, online_game, color=(0, 0, 255), font_size=24,
+                                        font_name="Arial")
+        exit_button = MenuButton("Exit", 100, 400, 200, 50, stop_menue, color=(0, 0, 255), font_size=24,
+                                 font_name="Arial")
+
+        buttons = [offline_game_button, online_game_button, exit_button]
+
+        for button in buttons:
+            button.draw(screen)
+            button.check_click()
+
+        events_list = pygame.event.get()
+
+        pygame.display.flip()
+        for event in events_list:
+            if event.type == QUIT:
+                running = False
+
+        if not running:
+            pygame.quit()
+
+
+game_menu()
