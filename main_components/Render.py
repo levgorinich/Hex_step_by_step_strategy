@@ -1,6 +1,6 @@
 
 import pygame
-from Buttons import *
+
 
 class Render:
     def __init__(self,internal_surface_size, map_movement_tracker, user_interface):

@@ -1,6 +1,9 @@
 import pygame
-from Buttons import *
-from Spawner import  Spawner
+
+from player_actions.Buttons import ButtonForUnitSpawner
+from player_actions.Spawner import Spawner
+
+
 class UI:
     def __init__(self, window_size, game_map,):
         self.UI_surface = pygame.Surface(window_size, pygame.SRCALPHA)

@@ -2,8 +2,8 @@ from typing import NoReturn
 from abc import ABC, abstractmethod
 import pygame, sys
 
-from Map import Map
-from Sprites import *
+from main_components.Map import Map
+
 
 def empty_funciton():
     print("")

@@ -1,5 +1,5 @@
 import pygame
-from mover import Mover
+
 
 class MouseClickHandler:
     def __init__(self,game_map,  User_interface, tracker, mover):

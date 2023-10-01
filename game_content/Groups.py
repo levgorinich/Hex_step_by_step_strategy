@@ -3,7 +3,6 @@ from typing import Any
 
 import pygame
 
-from Sprites import Hexagon
 class HexesGroup(pygame.sprite.Group):
     def __init__(self):
         super().__init__()

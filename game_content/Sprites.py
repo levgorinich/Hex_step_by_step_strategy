@@ -1,6 +1,7 @@
 from math import cos, sin, pi, sqrt
 import pygame
-import Health_bar
+
+from game_content.Health_bar import Health_bar
 
 hex_side = 15 * sqrt(3)
 hex_width = 30 * sqrt(3)
@@ -197,7 +198,7 @@ class MilitaryUnit(Unit):
         self.hp = 10
         self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         # self.mobility = 
-        self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
+        self.health_bar = Health_bar(0, 0, self.width, self.height / 4, 3)
         self.health_bar.draw(self.pict)
 
 
@@ -283,7 +284,7 @@ class CircleUnit(MilitaryUnit):
         self.surf.blit(self.pict, (0, 0))
 
     def __repr__(self):
-        return f"CircleUnit {self.grid_pos[0]}, {self.grid_pos[1]}, {player_id}"
+        return f"CircleUnit {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
     def update(self, hp):
         self.health_bar.hp -= hp
         if self.health_bar.hp > 0:

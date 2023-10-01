@@ -2,9 +2,10 @@ import pygame
 
 from math import *
 
-from Groups import HexesGroup, Grid
-from Sprites import *
-from Spawner import Spawner
+from game_content.Groups import HexesGroup
+from game_content.Sprites import Hexagon
+from player_actions.Spawner import Spawner
+
 
 class Map:
 
@@ -24,6 +25,7 @@ class Map:
         self.hexes = self.create_tiles()
         self.units =  pygame.sprite.Group()
         self.spawner = Spawner(self)
+
         self.spawner.create_start_unit()
 
 

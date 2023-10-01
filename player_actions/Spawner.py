@@ -1,4 +1,6 @@
-from Sprites import *
+from game_content.Sprites import *
+
+
 class Spawner:
     def __init__(self, game_map):
         self.game_map = game_map
