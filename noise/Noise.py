@@ -20,7 +20,9 @@ class Noise():
         self.start = self.start_generation()
         self.mountain_bound = mountain_bound
         self.water_bound = water_bound
-
+        self.mountain_hexes = []
+        self.sea_hexes = []
+        self.ordinary_hexes = []
 
 
 
@@ -43,11 +45,12 @@ class Noise():
             landscale[int(x)][int(z)] = y
 
         # чтобы можно было спавнить юнитов и прога не вылетала, устанавливаю для гекса (1,1) значение 1
-        landscale[1][1] = 0
+        # landscale[1][1] = 0
 
         return landscale
 
     def create_tiles(self):
+
         hexes = HexesGroup()
         landscape = self.start_generation()
         for col in range(self.columns):
@@ -57,17 +60,20 @@ class Noise():
                     # print(current_y,current_x)
                     hex = Hexagon(grid_pos)
                     hexes.add(hex)
+                    self.ordinary_hexes.append(grid_pos)
                 elif landscape[col][row] <= self.water_bound:
                     grid_pos = col, row
                     # print(current_y,current_x)
                     hex = Hexagon_sea(grid_pos)
                     hexes.add(hex)
+                    self.sea_hexes.append(grid_pos)
                     # self.empty_hexes.append((col,row))
                 elif landscape[col][row] > self.mountain_bound:
                     grid_pos = col, row
                     # print(current_y,current_x)
                     hex = Hexagon_mountain(grid_pos)
                     hexes.add(hex)
+                    self.mountain_hexes.append(grid_pos)
 
         return hexes
 

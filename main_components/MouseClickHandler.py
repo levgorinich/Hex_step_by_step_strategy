@@ -60,7 +60,8 @@ class MouseClickHandler:
 
                         # set the mobility
                         # col,row = self.unit_selected.range_of_2(self.selected_sprite.grid_pos,offset)
-                        available_pos = self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.empty_hexes,
+                        available_pos = self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.sea_hexes,
+                                                                         self.game_map.mountain_hexes,
                                                                          self.game_map.rows,self.game_map.columns)
                         for i in range(len(available_pos)):
                                 self.pos.append(available_pos[i])
@@ -87,7 +88,8 @@ class MouseClickHandler:
                     offset = -1
                 
                 # # set the mobility
-                available_pos= self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.empty_hexes,
+                available_pos= self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.sea_hexes,
+                                                                         self.game_map.mountain_hexes,
                                                                          self.game_map.rows,self.game_map.columns)
                 # if self.unit_selected.range_of_movement(diff,offset):
                 if ending_sprite in available_pos and self.player.moves > 0:

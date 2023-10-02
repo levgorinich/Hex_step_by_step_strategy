@@ -142,13 +142,18 @@ class Unit(MapObject):
         self.map_coord = self.calculate_coordinate_by_hex_position(self.grid_pos)
 
 
-    def hex_reachable(self,start,blocked,x,y):
+    def hex_reachable(self,start,switched_hexes,blocked,x,y):
         visited = set() # set of hexes
         visited.add(start)
         l1,l2 = [],[]
         fringes = [] # array of arrays of hexes
         fringes.append([start])
-
+        for dir in range(0,6):
+            neighbor = self.oddq_offset_neighbor(start,dir)
+            if neighbor in switched_hexes and start not in switched_hexes and neighbor not in blocked:
+                visited.add(neighbor)
+            elif neighbor not in switched_hexes and start in switched_hexes and neighbor not in blocked:
+                visited.add(neighbor)
         for mov in range(1,self.mobility+1):
             
             for hex in fringes[mov-1]:
@@ -156,10 +161,15 @@ class Unit(MapObject):
                 for dir in range(0,6):
                     
                     neighbor  = self.oddq_offset_neighbor(hex,dir)
-                    
-                    if neighbor not in visited and neighbor not in blocked and neighbor[0] >= 0 and neighbor[1] >= 0 and neighbor[0] < x and neighbor[1] < y:
-                        visited.add(neighbor)
-                        fringes[mov].append(neighbor)
+
+                    if start not in switched_hexes and neighbor not in blocked:
+                        if neighbor not in visited and neighbor not in switched_hexes and neighbor[0] >= 0 and neighbor[1] >= 0 and neighbor[0] < x and neighbor[1] < y:
+                            visited.add(neighbor)
+                            fringes[mov].append(neighbor)
+                    elif start in switched_hexes and neighbor not in blocked:
+                        if neighbor not in visited and neighbor in switched_hexes and neighbor[0] >= 0 and neighbor[1] >= 0 and neighbor[0] < x and neighbor[1] < y:
+                            visited.add(neighbor)
+                            fringes[mov].append(neighbor)
                         
         return tuple(visited)
                 
@@ -231,7 +241,7 @@ class TriangularUnit(MilitaryUnit):
         self.color = color
 
         self.name = "triangular unit"
-        self.attack = 1
+        self.attack = 3
         self.mobility = 1
         # pygame.draw.polygon(self.surf, (255, 0, 0), [(0, 0), (self.width / 2, self.height), (self.width - 1, 0)])
         # self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
@@ -286,7 +296,7 @@ class CircleUnit(MilitaryUnit):
         super().__init__(grid_pos, player_id,)
         self.color = color
         self.name = "circle unit"
-        self.attack = 3
+        self.attack = 1
         self.mobility = 3
         pygame.draw.circle(self.surf, self.color, (self.width / 2, self.height / 2), 10)
         self.image = self.surf

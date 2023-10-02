@@ -19,13 +19,13 @@ class Map:
         self.player_id = player_id
         self.actions=set()
 # =======
-        self.empty_hexes = []
+        # self.empty_hexes = []
 
 
 # >>>>>>> 3fd439a7f36f26f90bed6b8818662dafa19250fb
         self.hex_width = 30* sqrt(3)
         self.hex_height = self.hex_width*sqrt(3)/2
-        self.hexes = self.create_tiles()
+        self.hexes, self.sea_hexes ,self.mountain_hexes = self.create_tiles()
         self.units =  pygame.sprite.Group()
         # self.spawner = Spawner(self)
 
@@ -43,7 +43,7 @@ class Map:
         hexes = noise.create_tiles()
 
         
-        return hexes
+        return hexes, noise.sea_hexes, noise.mountain_hexes
 
 
 
