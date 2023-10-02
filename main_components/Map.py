@@ -3,7 +3,7 @@ import pygame
 from math import *
 
 from game_content.Groups import HexesGroup
-from game_content.Sprites import Hexagon
+from game_content.Sprites import Hexagon, Hexagon_mountain, Hexagon_sea
 from player_actions.Spawner import Spawner
 from noise.Noise import Noise
 
@@ -46,8 +46,18 @@ class Map:
                     # print(current_y,current_x)
                     hex = Hexagon( grid_pos)
                     hexes.add(hex)
-                else:
-                    self.empty_hexes.append((col,row))
+                elif noise.start[col][row] == -1:
+                    grid_pos =  col, row
+                    # print(current_y,current_x)
+                    hex = Hexagon_sea(grid_pos)
+                    hexes.add(hex)
+                    # self.empty_hexes.append((col,row))
+                elif noise.start[col][row] == -2:
+                    grid_pos =  col, row
+                    # print(current_y,current_x)
+                    hex = Hexagon_mountain(grid_pos)
+                    hexes.add(hex)
+
         
         return hexes
 

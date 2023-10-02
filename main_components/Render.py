@@ -13,18 +13,26 @@ class Render:
 
 
     def  cells(self, grid_p,hexes,clear,check_on_activate):
+        empty = pygame.Color(0,0,0,1)
         if check_on_activate != 0 and self.activate_hexes != []:
             for cell_activate in self.activate_hexes:
-                pygame.draw.polygon(cell_activate.image, (30, 70, 50),  cell_activate.calculate_points_for_hexagon())
+                pygame.draw.polygon(cell_activate.image, cell_activate.color,  cell_activate.calculate_points_for_hexagon())
                 self.activate_hexes = []
 
         for pos in grid_p:
+            # (30, 100, 50)
             cell_hex = hexes[pos]
+            color_activate_hex = []
+            for color in cell_hex.color:
+                if color <= 50:
+                    color_activate_hex.append(color)
+                else:
+                    color_activate_hex.append(color-50)
             if clear is not None:
-                pygame.draw.polygon(cell_hex.image, (30, 100, 50),  cell_hex.calculate_points_for_hexagon())
+                pygame.draw.polygon(cell_hex.image, tuple(color_activate_hex),  cell_hex.calculate_points_for_hexagon())
                 self.activate_hexes.append(cell_hex)
             else:
-                pygame.draw.polygon(cell_hex.image, (30, 70, 50),  cell_hex.calculate_points_for_hexagon())
+                pygame.draw.polygon(cell_hex.image, cell_hex.color,  cell_hex.calculate_points_for_hexagon())
 
 
     def display_objects(self,sprite_group: pygame.sprite.Group)->None:

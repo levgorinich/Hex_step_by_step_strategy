@@ -78,10 +78,10 @@ class MapObject(pygame.sprite.Sprite):
 
 
 class Hexagon(MapObject):
-    def __init__(self, grid_pos, color=(70, 70, 120), width=hex_width, height=hex_height):
+    def __init__(self, grid_pos, color=(30, 70, 50), width=hex_width, height=hex_height):
         super().__init__(grid_pos)
         self.grid_pos = grid_pos
-
+        self.color = color
         self.width = width
         self.height = height
         self.image = pygame.Surface((width, height), pygame.SRCALPHA)  # Create a blank surface with transparency
@@ -90,7 +90,7 @@ class Hexagon(MapObject):
 
         # calculating points for hexagon
 
-        pygame.draw.polygon(self.image, (30, 70, 50), self.calculate_points_for_hexagon())
+        pygame.draw.polygon(self.image, self.color, self.calculate_points_for_hexagon())
         self.mask = pygame.mask.from_surface(self.image)
 
         self.unit_on_hex = False
@@ -119,7 +119,16 @@ class Hexagon(MapObject):
         return f"Hexagon {self.grid_pos[0]}, {self.grid_pos[1]}"
 
     def update(self):
-        pass    
+        pass
+
+class Hexagon_mountain(Hexagon):
+    def __init__(self, grid_pos, color=(255,255, 255), width=hex_width, height=hex_height):
+        super().__init__(grid_pos, color, width=hex_width, height=hex_height)
+
+class Hexagon_sea(Hexagon):
+    def __init__(self, grid_pos, color=(83,236, 236), width=hex_width, height=hex_height):
+        super().__init__(grid_pos, color, width=hex_width, height=hex_height)
+
 
 class Unit(MapObject):
     def __init__(self, grid_pos):
@@ -133,7 +142,7 @@ class Unit(MapObject):
         self.map_coord = self.calculate_coordinate_by_hex_position(self.grid_pos)
 
 
-    def hex_reachable(self,start,blocked):
+    def hex_reachable(self,start,blocked,x,y):
         visited = set() # set of hexes
         visited.add(start)
         l1,l2 = [],[]
@@ -148,7 +157,7 @@ class Unit(MapObject):
                     
                     neighbor  = self.oddq_offset_neighbor(hex,dir)
                     
-                    if neighbor not in visited and neighbor not in blocked and neighbor[0] >= 0 and neighbor[1] >= 0 and neighbor[0] < 25 and neighbor[1] < 25:
+                    if neighbor not in visited and neighbor not in blocked and neighbor[0] >= 0 and neighbor[1] >= 0 and neighbor[0] < x and neighbor[1] < y:
                         visited.add(neighbor)
                         fringes[mov].append(neighbor)
                         
