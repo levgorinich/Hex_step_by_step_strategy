@@ -16,6 +16,7 @@ class MouseClickHandler:
         self.check_on_activate = 0
         # self.mover = Mover(self.game_map)
         self.actions  = set()
+        self.player = User_interface.player
         pass
 
 
@@ -51,6 +52,7 @@ class MouseClickHandler:
                     print("check", self.selected_sprite.unit_on_hex.player_id == self.game_map.player_id)
                     if self.selected_sprite.unit_on_hex and self.selected_sprite.unit_on_hex.player_id == self.game_map.player_id:
                         self.unit_selected = self.selected_sprite.unit_on_hex
+                        print("got inside ")
                         if self.selected_sprite.grid_pos[0]%2 == 0:
                             offset = 1
                         else:
@@ -88,10 +90,16 @@ class MouseClickHandler:
                 available_pos= self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.empty_hexes,
                                                                          self.game_map.rows,self.game_map.columns)
                 # if self.unit_selected.range_of_movement(diff,offset):
-                if ending_sprite in available_pos:
+                if ending_sprite in available_pos and self.player.moves > 0:
                     self.mover.move(starting_sprite, ending_sprite)
+                    self.player.moves -= 1
+                    if self.player.moves == 0:
+                        print("end turn")
+
 
                     self.game_map.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
+
+                    self.unit_selected = None
 
 
 

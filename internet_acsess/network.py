@@ -24,16 +24,15 @@ class Network:
             pass
 
     def send(self, data):
-        print("I am in networkd")
+
         try:
             # print("tried to send from network")
 
             self.client.send(str.encode(data))
-            print("sended")
+
             # print("i recieved")
             resp =self.client.recv(2048).decode()
-            print(resp)
-            print("this is done")
+
             return resp
         except socket.error as e:
             print("I stoped here ")

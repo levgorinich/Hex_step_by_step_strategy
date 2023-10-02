@@ -52,6 +52,7 @@ async def get_client_move(p: int, gameID: int, conn: socket.socket, loop: Abstra
                 # print(comands)
                 if data != "no_moves":
                     # print(data)
+
                     for key in comands:
                         if key != p:
                             comands[key] += data

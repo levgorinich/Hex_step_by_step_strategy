@@ -200,9 +200,10 @@ class Unit(MapObject):
 
 
 class MilitaryUnit(Unit):
-    def __init__(self, grid_pos, player_id):
+    def __init__(self, grid_pos, player_id, ):
         super().__init__(grid_pos)
         self.player_id = player_id
+
 
         self.hp = 10
         self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
@@ -224,9 +225,10 @@ class MilitaryUnit(Unit):
 
 class TriangularUnit(MilitaryUnit):
 
-    def __init__(self, grid_pos, player_id):
+    def __init__(self, grid_pos, player_id, color= (255, 0, 0)):
 
         super().__init__(grid_pos, player_id)
+        self.color = color
 
         self.name = "triangular unit"
         self.attack = 1
@@ -234,7 +236,7 @@ class TriangularUnit(MilitaryUnit):
         # pygame.draw.polygon(self.surf, (255, 0, 0), [(0, 0), (self.width / 2, self.height), (self.width - 1, 0)])
         # self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         # self.health_bar.draw(self.pict)
-        pygame.draw.polygon(self.pict, (255, 0, 0), [(0, self.height / 4 + 2), (self.width / 2, self.height),
+        pygame.draw.polygon(self.pict, color, [(0, self.height / 4 + 2), (self.width / 2, self.height),
                                                      (self.width - 1, self.height / 4 + 2)])
         self.surf.blit(self.pict, (0, 0))
 
@@ -245,24 +247,25 @@ class TriangularUnit(MilitaryUnit):
         self.health_bar.hp -= hp
         if self.health_bar.hp > 0:
             self.health_bar.draw(self.pict)
-            pygame.draw.polygon(self.pict, (255, 0, 0), [(0, self.height / 4 + 2), (self.width / 2, self.height),
+            pygame.draw.polygon(self.pict, self.color, [(0, self.height / 4 + 2), (self.width / 2, self.height),
                                                          (self.width - 1, self.height / 4 + 2)])
             self.surf.blit(self.pict, (0, 0))
         return self.health_bar.hp
 
 
 class SquareUnit(MilitaryUnit):
-    def __init__(self, grid_pos, player_id):
+    def __init__(self, grid_pos, player_id, color):
 
         super().__init__(grid_pos, player_id)
+        self.color = color
         self.name = "square unit"
         self.attack = 2
         self.mobility = 2
-        pygame.draw.rect(self.surf, (255, 0, 0), (0, 0, self.width, self.height))
+        pygame.draw.rect(self.surf, self.color, (0, 0, self.width, self.height))
         # self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         # self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
         # self.health_bar.draw(self.pict)
-        pygame.draw.rect(self.pict, (255, 0, 0), (0, self.height / 4 + 2, self.width,
+        pygame.draw.rect(self.pict, self.color, (0, self.height / 4 + 2, self.width,
                                                   self.height - self.height / 4 + 2))
         self.surf.blit(self.pict, (0, 0))
 
@@ -272,24 +275,25 @@ class SquareUnit(MilitaryUnit):
         self.health_bar.hp -= hp
         if self.health_bar.hp > 0:
             self.health_bar.draw(self.pict)
-            pygame.draw.rect(self.pict, (255, 0, 0), (0, self.height / 4 + 2, self.width,
+            pygame.draw.rect(self.pict, self.color, (0, self.height / 4 + 2, self.width,
                                                       self.height - self.height / 4 + 2))
             self.surf.blit(self.pict, (0, 0))
         return self.health_bar.hp
 
 
 class CircleUnit(MilitaryUnit):
-    def __init__(self, grid_pos, player_id):
-        super().__init__(grid_pos, player_id)
+    def __init__(self, grid_pos, player_id,color):
+        super().__init__(grid_pos, player_id,)
+        self.color = color
         self.name = "circle unit"
         self.attack = 3
         self.mobility = 3
-        pygame.draw.circle(self.surf, (255, 0, 0), (self.width / 2, self.height / 2), 10)
+        pygame.draw.circle(self.surf, self.color, (self.width / 2, self.height / 2), 10)
         self.image = self.surf
         # self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         # self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
         # self.health_bar.draw(self.pict)
-        pygame.draw.circle(self.surf, (255, 0, 0), (self.width / 2, self.height / 2), 10)
+        pygame.draw.circle(self.surf, self.color, (self.width / 2, self.height / 2), 10)
         self.surf.blit(self.pict, (0, 0))
 
     def __repr__(self):
@@ -298,6 +302,6 @@ class CircleUnit(MilitaryUnit):
         self.health_bar.hp -= hp
         if self.health_bar.hp > 0:
             self.health_bar.draw(self.pict)
-            pygame.draw.circle(self.surf, (255, 0, 0), (self.width / 2, self.height / 2), 10)
+            pygame.draw.circle(self.surf, self.color, (self.width / 2, self.height / 2), 10)
             self.surf.blit(self.pict, (0, 0))
         return self.health_bar.hp

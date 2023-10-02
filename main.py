@@ -12,7 +12,7 @@ from player_actions.Buttons import MenuButton
 from player_actions.MoveParser import Parser
 from player_actions.Spawner import Spawner
 from player_actions.mover import Mover
-
+from main_components.Player import Player
 #
 pygame.init()
 clock = pygame.time.Clock()
@@ -29,7 +29,7 @@ internal_surface_size = (2500, 2500)
 
 # main loop
 def offline_game():
-    game_map = Map(25, 25, 1)
+    game_map = Map(25, 25, 0)
     mover = Mover(game_map)
     user_interface = UI(window_size, game_map)
     tracker = MapMovementTracker(internal_surface_size, window_size, )
@@ -65,13 +65,17 @@ def online_game():
     n = Network()
 
     player_id = int(n.getP())
+
+    player = Player(player_id, )
     print("You are player", player_id)
+    if player.id == 0:
+        player.start_turn()
 
     game_map = Map(25, 25, player_id)
     mover = Mover(game_map)
-    spawner = Spawner(game_map)
-    move_parser = Parser(mover, spawner)
-    user_interface = UI(window_size, game_map)
+    spawner = Spawner(game_map,)
+    move_parser = Parser(mover, spawner, player)
+    user_interface = UI(window_size, game_map,player)
     tracker = MapMovementTracker(internal_surface_size, window_size, )
     renderer = Render(internal_surface_size, map_movement_tracker=tracker, user_interface=user_interface)
     click_handler = MouseClickHandler(game_map, user_interface, tracker, mover)
@@ -90,7 +94,6 @@ def online_game():
 
             else:
                 update = n.send("no_moves")
-
             game_map.actions = set()
 
             if update:
@@ -104,13 +107,14 @@ def online_game():
                         end = idx
 
                         move_parser.parse_moves(update[start + 1:end])
+                        # print("parsed moves")
                         start, end = 0, 0
 
 
         except Exception as e:
             print(e)
             run = False
-            print("Couldn't get game")
+            # print("Couldn't get game")
             break
 
         events_list = pygame.event.get()

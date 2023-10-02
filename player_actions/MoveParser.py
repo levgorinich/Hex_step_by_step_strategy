@@ -1,8 +1,9 @@
 
 class Parser:
-    def __init__(self, mover, spawner):
+    def __init__(self, mover, spawner, player ):
         self.mover = mover
         self.spawner = spawner
+        self.player = player
     def parse_moves(self, move):
         print(move, "string to parse")
 
@@ -10,6 +11,8 @@ class Parser:
             self.parse_spawn(move)
         elif move.startswith("move"):
             self.parse_moving(move)
+        elif move.startswith("end_turn"):
+            self.parse_end_turn(move)
 
     def parse_spawn(self, move):
 
@@ -21,8 +24,9 @@ class Parser:
 
         coords = coords.split(",")
         spawn = tuple(map(int, coords[:2]))
-        print("player_id in parser  ", coords[2])
+        # print("player_id in parser  ", coords[2])
         self.spawner.spawn_unit(type, spawn, coords[2])
+        # print("finished spawn parsing")
 
     def parse_moving(self, move):
 
@@ -33,3 +37,6 @@ class Parser:
 
         coords = list(map(int, coords))
         self.mover.move((coords[0], coords[1]), (coords[2], coords[3]))
+    def parse_end_turn(self, move):
+        move = move.replace("end_turn", "")
+        self.player.start_turn()

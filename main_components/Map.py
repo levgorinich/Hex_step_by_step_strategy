@@ -37,26 +37,8 @@ class Map:
         self.empty_hexes = list_of_hexes
 
     def create_tiles(self):
-        hexes = HexesGroup()
-        noise = Noise(self.rows)
-        for col in range(self.columns):
-            for row in range(self.rows):
-                if noise.start[col][row] == 0:
-                    grid_pos =  col, row
-                    # print(current_y,current_x)
-                    hex = Hexagon( grid_pos)
-                    hexes.add(hex)
-                elif noise.start[col][row] == -1:
-                    grid_pos =  col, row
-                    # print(current_y,current_x)
-                    hex = Hexagon_sea(grid_pos)
-                    hexes.add(hex)
-                    # self.empty_hexes.append((col,row))
-                elif noise.start[col][row] == -2:
-                    grid_pos =  col, row
-                    # print(current_y,current_x)
-                    hex = Hexagon_mountain(grid_pos)
-                    hexes.add(hex)
+        noise = Noise(self.rows, self.columns)
+        hexes = noise.create_tiles()
 
         
         return hexes

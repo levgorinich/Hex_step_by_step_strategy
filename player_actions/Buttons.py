@@ -34,7 +34,7 @@ class MenuButton(Button):
         super().__init__(text, x, y, width, height, action, color, font_size, font_name)
         self.action = action
 
-    def check_click(self, ) -> bool:
+    def check_click(self,) -> bool:
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(mouse_pos):
             if pygame.mouse.get_pressed()[0]:
@@ -52,7 +52,7 @@ class ButtonForUnitSpawner(Button):
         pygame.draw.rect(display_surface, "Black", self.rect, 2)
         display_surface.blit(self.text_surf, self.text_rect)
 
-    def check_click(self, game_map: Map) -> bool:
+    def check_click(self, ) -> bool:
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(mouse_pos):
             if pygame.mouse.get_pressed()[0]:
