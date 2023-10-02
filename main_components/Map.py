@@ -10,7 +10,9 @@ from noise.Noise import Noise
 
 class Map:
 
-    def __init__(self, rows, columns, player_id):
+    def __init__(self, rows, columns, player_id, seed):
+        self.seed = seed
+        print("this is seed in mape"+ str(self.seed))
         self.rows = rows
         self.columns = columns
 # <<<<<<< HEAD
@@ -37,7 +39,7 @@ class Map:
         self.empty_hexes = list_of_hexes
 
     def create_tiles(self):
-        noise = Noise(self.rows, self.columns)
+        noise = Noise(self.rows, self.columns,seed=self.seed)
         hexes = noise.create_tiles()
 
         

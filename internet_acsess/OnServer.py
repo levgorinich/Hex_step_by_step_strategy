@@ -1,5 +1,5 @@
 
 class Game:
-    def __init__(self, id):
+    def __init__(self, id, seed):
         self.id = id
-        self.player_actions = {}
+        self.seed = seed

@@ -8,16 +8,26 @@ from game_content.Sprites import Hexagon, Hexagon_sea, Hexagon_mountain
 
 
 class Noise():
-    def __init__(self, rows, columns, water_bound=-0.1, mountain_bound=0.5):
+    def __init__(self, rows, columns,seed =None, water_bound=-0.1, mountain_bound=0.5):
         self.rows = rows
         self.columns = columns
+
+        if seed is None:
+            self.seed = random.randint(0, 4000)
+        else:
+            self.seed = seed
+        print(self.seed)
         self.start = self.start_generation()
         self.mountain_bound = mountain_bound
         self.water_bound = water_bound
 
+
+
+
     def start_generation(self):
         # генерация основного шума и параметризация
-        noise = PerlinNoise(octaves=8, seed=random.randint(0, 4000))
+
+        noise = PerlinNoise(octaves=8, seed=self.seed)
         amp = 2
         period = 24
         terrain_width = self.rows

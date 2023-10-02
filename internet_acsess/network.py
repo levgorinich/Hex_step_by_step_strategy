@@ -8,17 +8,23 @@ class Network:
         self.server = "5.42.78.110"
         self.port = 5555
         self.addr = (self.server, self.port)
-        self.p = self.connect()
+        self.p, self.seed = self.connect()
 
     def getP(self):
         return self.p
+    def getSeed(self):
+        return self.seed
 
     def connect(self):
         try:
+            print("i tried ot connect")
             self.client.connect(self.addr)
+            print("i connected")
             first_result = self.client.recv(2048).decode()
-            print(first_result, "first result")
-            return first_result
+            print(first_result, " this I got ros")
+            player_id, seed = map(int, first_result.split())
+            print(player_id,seed, "first result")
+            return player_id, seed
 
         except:
             pass

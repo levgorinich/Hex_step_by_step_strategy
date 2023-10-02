@@ -65,13 +65,14 @@ def online_game():
     n = Network()
 
     player_id = int(n.getP())
+    seed = n.getSeed()
 
     player = Player(player_id, )
     print("You are player", player_id)
     if player.id == 0:
         player.start_turn()
 
-    game_map = Map(25, 25, player_id)
+    game_map = Map(25, 25, player_id, seed)
     mover = Mover(game_map)
     spawner = Spawner(game_map,)
     move_parser = Parser(mover, spawner, player)

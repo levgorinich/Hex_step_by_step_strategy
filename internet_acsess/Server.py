@@ -4,6 +4,7 @@ from _thread import *
 # from asyncio import get_event_loop
 from asyncio import AbstractEventLoop
 import asyncio
+import random
 from  OnServer import Game
 import  time
 
@@ -37,7 +38,7 @@ idCount = 0
 async def get_client_move(p: int, gameID: int, conn: socket.socket, loop: AbstractEventLoop):
 
     global idCount
-    conn.send(str.encode(str(p)))
+    conn.send(str.encode(str(p)+ " "+ str(games[gameID].seed)))
     reply = ""
     while data :=  await loop.sock_recv(conn,4096):
 
@@ -78,12 +79,16 @@ async def listening_for_connection(main_socket, loop: AbstractEventLoop):
         p=0
         gameID = (idCount-1)//2
 
+
+
         if idCount %2 ==1:
-            games[gameID] = Game(gameID)
+
+            seed = random.randint(0,4000)
+            games[gameID] = Game(gameID, seed)
             print("Created Game ID: ", gameID)
         else :
             p=1
-        asyncio.create_task(get_client_move(p, gameID, conn, loop))
+        asyncio.create_task(get_client_move(p, gameID,seed, conn, loop))
 
 
 asyncio.run(main(), debug = True)
