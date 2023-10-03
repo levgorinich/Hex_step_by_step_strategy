@@ -15,7 +15,11 @@ class Render:
 
 
     def  cells(self, grid_p,hexes,clear,check_on_activate):
-
+        empty = pygame.Color(0,0,0,1)
+        if check_on_activate != 0 and self.activate_hexes != []:
+            for cell_activate in self.activate_hexes:
+                pygame.draw.polygon(cell_activate.image, cell_activate.color,  cell_activate.calculate_points_for_hexagon())
+                self.activate_hexes = []
 
         for pos in grid_p:
             # (30, 100, 50)
