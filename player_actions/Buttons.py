@@ -43,9 +43,10 @@ class MenuButton(Button):
                 return True
 
 class ButtonForUnitSpawner(Button):
-    def __init__(self, text, x, y, width, height, spawer, action = empty_funciton, color=(0, 255, 0), font_size=24, font_name="Arial"):
+    def __init__(self, text, x, y, width, height, spawer, action = empty_funciton,spawn_point = (1,1), color=(0, 255, 0), font_size=24, font_name="Arial"):
         super().__init__(text, x, y, width, height, action, color, font_size, font_name)
         self.spawner = spawer
+        self.spawn_point = spawn_point[0], spawn_point[1]+1
 
     def draw(self, display_surface: pygame.Surface) -> None:
         pygame.draw.rect(display_surface, self.color, self.rect)
@@ -56,8 +57,8 @@ class ButtonForUnitSpawner(Button):
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(mouse_pos):
             if pygame.mouse.get_pressed()[0]:
-                spawn_point = (1, 1)
-                result  = self.action(self.spawner, self.text, spawn_point)
+
+                result  = self.action(self.spawner, self.text, self.spawn_point)
 
                 print("result", result)
                 return result

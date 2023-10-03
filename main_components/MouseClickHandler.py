@@ -42,7 +42,7 @@ class MouseClickHandler:
 
         mouse -= self.tracker.get_dragging_offset()
         if event.button == 1:
-            self.pos = []
+            self.hexes_available_move_selected_unit = []
             if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
                 self.selected_sprite = selected_sprite_clicked
 
@@ -101,6 +101,7 @@ class MouseClickHandler:
                     self.game_map.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
 
                     self.unit_selected = None
+
 
 
 

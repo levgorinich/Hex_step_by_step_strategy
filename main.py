@@ -18,7 +18,8 @@ pygame.init()
 clock = pygame.time.Clock()
 
 # creating window
-window_size = (1280, 720)
+# window_size = (1280, 720)
+window_size = (800, 800)
 screen = pygame.display.set_mode(window_size)
 
 internal_surface_size = (2500, 2500)
@@ -67,16 +68,20 @@ def online_game():
     player_id = int(n.getP())
     seed = n.getSeed()
 
-    player = Player(player_id, )
+
     print("You are player", player_id)
-    if player.id == 0:
-        player.start_turn()
+
 
     game_map = Map(25, 25, player_id, seed)
+
+    player = Player(player_id,game_map )
+
+    if player.id == 0:
+        player.start_turn()
     mover = Mover(game_map)
     spawner = Spawner(game_map,)
     move_parser = Parser(mover, spawner, player)
-    user_interface = UI(window_size, game_map,player)
+    user_interface = UI(window_size, game_map,player, spawner)
     tracker = MapMovementTracker(internal_surface_size, window_size, )
     renderer = Render(internal_surface_size, map_movement_tracker=tracker, user_interface=user_interface)
     click_handler = MouseClickHandler(game_map, user_interface, tracker, mover)
@@ -113,6 +118,7 @@ def online_game():
 
 
         except Exception as e:
+            print("this is my exception")
             print(e)
             run = False
             # print("Couldn't get game")

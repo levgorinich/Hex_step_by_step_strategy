@@ -93,7 +93,8 @@ class Hexagon(MapObject):
         pygame.draw.polygon(self.image, self.color, self.calculate_points_for_hexagon())
         self.mask = pygame.mask.from_surface(self.image)
 
-        self.unit_on_hex = False
+        self.unit_on_hex = None
+        self.building_on_hex = None
 
     def calculate_points_for_hexagon(self):
         points = []
@@ -106,6 +107,9 @@ class Hexagon(MapObject):
 
     def add_unit(self, unit):
         self.unit_on_hex = unit
+
+    def add_building(self, building):
+        self.building_on_hex = building
 
     def remove_unit(self):
         self.unit_on_hex = False
@@ -157,11 +161,24 @@ class Hexagon_sea(Hexagon):
         color_selected = (53,186, 186)
         pygame.draw.polygon(self.image, color_selected, self.calculate_points_for_hexagon())
 
+
+class Building(MapObject):
+    def __init__(self, grid_pos):
+        super().__init__(grid_pos)
+        self.image = pygame.Surface((hex_width, hex_height), pygame.SRCALPHA)
+
+class Mine(Building):
+    def __init__(self, grid_pos):
+        super().__init__(grid_pos)
+        coin_image=  pygame.image.load("Resources/goldcoin1.png")
+        self.image.blit(coin_image,(-17,-20))
+
+
 class Hexagon_mine(Hexagon):
     def __init__(self, grid_pos, color=(30, 70, 50), width=hex_width, height=hex_height):
         super().__init__(grid_pos, color, width=hex_width, height=hex_height)
         coin_image=  pygame.image.load("Resources/goldcoin1.png")
-        self.image.blit(coin_image,(-17,-20))
+        self.image.blit(coin_image,(-10,-10))
 
     def draw(self):
         pygame.draw.polygon(self.image, self.color, self.calculate_points_for_hexagon())
@@ -178,6 +195,7 @@ class Unit(MapObject):
         super().__init__(grid_pos)
         self.name = "unit"
         self.mobility = None
+        self.price=None
 
     def move(self, move_on_hex_grid):
         self.grid_pos += move_on_hex_grid
@@ -282,6 +300,7 @@ class TriangularUnit(MilitaryUnit):
 
         super().__init__(grid_pos, player_id)
         self.color = color
+        self.price = 30
 
         self.name = "triangular unit"
         self.attack = 3
@@ -312,6 +331,7 @@ class SquareUnit(MilitaryUnit):
         super().__init__(grid_pos, player_id)
         self.color = color
         self.name = "square unit"
+        self.price = 30
         self.attack = 2
         self.mobility = 2
         pygame.draw.rect(self.surf, self.color, (0, 0, self.width, self.height))
@@ -334,11 +354,41 @@ class SquareUnit(MilitaryUnit):
         return self.health_bar.hp
 
 
+class WarBase(MilitaryUnit):
+    def __init__(self, grid_pos, player_id, color):
+        super().__init__(grid_pos, player_id)
+        self.color = color
+        self.name = "war base"
+        self.mobility=0
+        self.attack = 0
+
+        self.hp = 10
+        pygame.draw.rect(self.surf, (0, 0,0 ), (0, 0, self.width, self.height))
+        # self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        # self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
+        # self.health_bar.draw(self.pict)
+        pygame.draw.rect(self.pict, (0,0,0), (0, self.height / 4 + 2, self.width,
+                                                  self.height - self.height / 4 + 2))
+        self.surf.blit(self.pict, (0, 0))
+
+    def __repr__(self):
+            return f"CircleUnit {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
+
+    def update(self, hp):
+            self.health_bar.hp -= hp
+            if self.health_bar.hp > 0:
+                self.health_bar.draw(self.pict)
+                pygame.draw.circle(self.surf, self.color, (self.width / 2, self.height / 2), 10)
+                self.surf.blit(self.pict, (0, 0))
+            return self.health_bar.hp
+
+
 class CircleUnit(MilitaryUnit):
     def __init__(self, grid_pos, player_id,color):
         super().__init__(grid_pos, player_id,)
         self.color = color
         self.name = "circle unit"
+        self.price = 30
         self.attack = 1
         self.mobility = 3
         pygame.draw.circle(self.surf, self.color, (self.width / 2, self.height / 2), 10)

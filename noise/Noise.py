@@ -58,11 +58,7 @@ class Noise():
                 if self.mountain_bound > landscape[col][row] > self.water_bound:
                     grid_pos = col, row
                     # print(current_y,current_x)
-                    a = random.random()
-                    if a < 0.06:
-                        hex = Hexagon_mine(grid_pos)
-                    else:
-                        hex = Hexagon(grid_pos)
+                    hex = Hexagon(grid_pos)
                     hexes.add(hex)
                     self.ordinary_hexes.append(grid_pos)
                 elif landscape[col][row] <= self.water_bound:
