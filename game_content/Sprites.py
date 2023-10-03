@@ -263,7 +263,6 @@ class MilitaryUnit(Unit):
         self.player_id = player_id
         self.attack = None
         self.hp = 10
-
         self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         self.draw()
 
@@ -271,21 +270,21 @@ class MilitaryUnit(Unit):
         pass
     def draw(self):
         self.draw_shape()
-        self.health_bar = Health_bar(0, 0, self.width, self.height / 4, 3)
+        self.health_bar = Health_bar(0, 0, self.width, self.height / 4, self.hp)
         self.health_bar.draw(self.image, self.hp)
 
-    def update_hp(self, ):
-        if self.hp > 0:
-            self.draw()
-
-
     def strike(self):
-
         return self.attack *(random.random()/2 +0.75)
 
     def defend(self):
         return self.attack * (random.random()/2 +0.25)
 
+    def update_hp(self, ):
+        if self.hp > 0:
+            self.health_bar.draw(self.image, self.hp)
+            pygame.draw.rect(self.image, self.color, (0, self.height / 4 + 2, self.width,
+                                                      self.height - self.height / 4 + 2))
+            self.surf.blit(self.image, (0, 0))
 
 
 class TriangularUnit(MilitaryUnit):
@@ -299,16 +298,14 @@ class TriangularUnit(MilitaryUnit):
         self.attack = 3
         self.mobility = 1
 
+        self.draw()
 
     def draw_shape(self):
         pygame.draw.polygon(self.image, self.color, [(0, self.height / 4 + 2), (self.width / 2, self.height),
                                                 (self.width - 1, self.height / 4 + 2)])
-        self.surf.blit(self.image, (0, 0))
 
     def __repr__(self):
         return f"{self.name} {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
-
-
 
 
 class SquareUnit(MilitaryUnit):
@@ -321,23 +318,13 @@ class SquareUnit(MilitaryUnit):
         self.attack = 2
         self.hp =3
         self.mobility = 2
-
-
-
-        # self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-        # self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
-        # self.health_bar.draw(self.pict)
-
+        self.draw()
 
     def draw_shape(self):
-        pygame.draw.rect(self.image, self.color, (0, self.height / 4 + 2, self.width,
-                                                  self.height - self.height / 4 + 2))
-        self.surf.blit(self.image, (0, 0))
+        pygame.draw.rect(self.image, self.color, (0, 0, self.width, self.height))
 
     def __repr__(self):
         return f"{self.name} {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
-
-
 
 
 class WarBase(MilitaryUnit):
@@ -350,18 +337,15 @@ class WarBase(MilitaryUnit):
         self.attack = 0
 
         self.hp = 10
+        self.draw()
 
     def draw_shape(self):
 
-        pygame.draw.rect(self.image, (0, 0, 0), (0, self.height / 4 + 2, self.width,
-                                                 self.height - self.height / 4 + 2))
-        self.surf.blit(self.image, (0, 0))
+        pygame.draw.rect(self.image, (0,0,0), (0, self.height / 4 + 2, self.width,
+                                               self.height - self.height / 4 + 2))
 
     def __repr__(self):
             return f"CircleUnit {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
-
-
-
 
 
 class CircleUnit(MilitaryUnit):
@@ -374,10 +358,10 @@ class CircleUnit(MilitaryUnit):
         self.attack = 1
         self.hp = 3
         self.mobility = 3
+        self.draw()
 
     def draw_shape(self):
-        pygame.draw.circle(self.surf, self.color, (self.width / 2, self.height / 2), 10)
-        self.surf.blit(self.image, (0, 0))
+        pygame.draw.circle(self.image, self.color, (self.width / 2, self.height / 2), 10)
 
     def __repr__(self):
         return f"CircleUnit {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
