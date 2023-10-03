@@ -5,6 +5,8 @@ class Player:
         self.max_moves = 3
         self.moves = 0
         self.cur_turn = False
+        self.coins= 0
+        self.income = 0
 
     def start_turn(self):
         self.cur_turn = True

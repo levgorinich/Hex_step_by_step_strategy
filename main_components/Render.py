@@ -1,6 +1,8 @@
 
 import pygame
 
+from game_content.Sprites import Hexagon_mine
+
 
 class Render:
     def __init__(self,internal_surface_size, map_movement_tracker, user_interface):
@@ -13,11 +15,7 @@ class Render:
 
 
     def  cells(self, grid_p,hexes,clear,check_on_activate):
-        empty = pygame.Color(0,0,0,1)
-        if check_on_activate != 0 and self.activate_hexes != []:
-            for cell_activate in self.activate_hexes:
-                pygame.draw.polygon(cell_activate.image, cell_activate.color,  cell_activate.calculate_points_for_hexagon())
-                self.activate_hexes = []
+
 
         for pos in grid_p:
             # (30, 100, 50)
@@ -30,10 +28,19 @@ class Render:
                     color_activate_hex.append(color-50)
             if clear is not None:
                 pygame.draw.polygon(cell_hex.image, tuple(color_activate_hex),  cell_hex.calculate_points_for_hexagon())
+                if isinstance(cell_hex, Hexagon_mine):
+                    image =pygame.image.load("Resources/goldcoin1.png")
+                    cell_hex.image.blit(image,(-17,-20))
                 self.activate_hexes.append(cell_hex)
+
+
             else:
+                print("I am here")
                 pygame.draw.polygon(cell_hex.image, cell_hex.color,  cell_hex.calculate_points_for_hexagon())
 
+                if isinstance(cell_hex, Hexagon_mine):
+                    image =pygame.image.load("Resources/goldcoin1.png")
+                    cell_hex.image.blit(image,(-17,-20))
 
     def display_objects(self,sprite_group: pygame.sprite.Group)->None:
         offset = self.map_movement_tracker.get_total_offset()

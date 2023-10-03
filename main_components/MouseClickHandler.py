@@ -11,7 +11,7 @@ class MouseClickHandler:
         self.tracker = tracker
         self.was_clicked = False
         self.mover = mover
-        self.pos = []
+        self.hexes_available_move_selected_unit = []
         self.clear = None
         self.check_on_activate = 0
         # self.mover = Mover(self.game_map)
@@ -60,11 +60,10 @@ class MouseClickHandler:
 
                         # set the mobility
                         # col,row = self.unit_selected.range_of_2(self.selected_sprite.grid_pos,offset)
-                        available_pos = self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.sea_hexes,
+                        self.hexes_available_move_selected_unit  = self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.sea_hexes,
                                                                          self.game_map.mountain_hexes,
                                                                          self.game_map.rows,self.game_map.columns)
-                        for i in range(len(available_pos)):
-                                self.pos.append(available_pos[i])
+
                         self.clear = True
                         self.check_on_activate+=1
 

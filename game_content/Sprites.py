@@ -120,14 +120,57 @@ class Hexagon(MapObject):
 
     def update(self):
         pass
+    def draw(self):
+        pass
+    def draw_in_unit_range(self):
+        pass
 
+class Hexagon_land(Hexagon):
+    def __init__(self, grid_pos, color=(30, 70, 50), width=hex_width, height=hex_height):
+        super().__init__(grid_pos, color, width=hex_width, height=hex_height)
+        self.color = color
+
+    def draw(self):
+        pygame.draw.polygon(self.image, self.color, self.calculate_points_for_hexagon())
+
+    def draw_in_unit_range(self):
+        color_selected = (30,20,0)
+        pygame.draw.polygon(self.image, color_selected, self.calculate_points_for_hexagon())
 class Hexagon_mountain(Hexagon):
     def __init__(self, grid_pos, color=(255,255, 255), width=hex_width, height=hex_height):
         super().__init__(grid_pos, color, width=hex_width, height=hex_height)
+        self.color = color
+
+    def draw(self):
+        pygame.draw.polygon(self.image, self.color, self.calculate_points_for_hexagon())
+
+    def draw_in_unit_range(self):
+        color_selected = (225,225, 225)
+        pygame.draw.polygon(self.image, color_selected, self.calculate_points_for_hexagon())
 
 class Hexagon_sea(Hexagon):
     def __init__(self, grid_pos, color=(83,236, 236), width=hex_width, height=hex_height):
         super().__init__(grid_pos, color, width=hex_width, height=hex_height)
+        self.color = color
+
+    def draw_in_unit_range(self):
+        color_selected = (53,186, 186)
+        pygame.draw.polygon(self.image, color_selected, self.calculate_points_for_hexagon())
+
+class Hexagon_mine(Hexagon):
+    def __init__(self, grid_pos, color=(30, 70, 50), width=hex_width, height=hex_height):
+        super().__init__(grid_pos, color, width=hex_width, height=hex_height)
+        coin_image=  pygame.image.load("Resources/goldcoin1.png")
+        self.image.blit(coin_image,(-17,-20))
+
+    def draw(self):
+        pygame.draw.polygon(self.image, self.color, self.calculate_points_for_hexagon())
+
+    def draw_in_unit_range(self):
+        color_selected = (30,20,0)
+        pygame.draw.polygon(self.image, color_selected, self.calculate_points_for_hexagon())
+        coin_image=  pygame.image.load("Resources/goldcoin1.png")
+        self.image.blit(coin_image,(-17,-20))
 
 
 class Unit(MapObject):
