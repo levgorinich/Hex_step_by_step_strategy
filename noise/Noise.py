@@ -4,7 +4,7 @@ from perlin_noise import PerlinNoise
 import random
 
 from game_content.Groups import HexesGroup
-from game_content.Sprites import Hexagon, Hexagon_sea, Hexagon_mountain, Hexagon_mine
+from game_content.Sprites import Hexagon, Hexagon_sea, Hexagon_mountain
 
 
 class Noise():

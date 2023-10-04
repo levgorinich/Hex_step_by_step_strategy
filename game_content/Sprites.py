@@ -174,20 +174,7 @@ class Mine(Building):
         self.image.blit(coin_image,(-17,-20))
 
 
-class Hexagon_mine(Hexagon):
-    def __init__(self, grid_pos, color=(30, 70, 50), width=hex_width, height=hex_height):
-        super().__init__(grid_pos, color, width=hex_width, height=hex_height)
-        coin_image=  pygame.image.load("Resources/goldcoin1.png")
-        self.image.blit(coin_image,(-10,-10))
 
-    def draw(self):
-        pygame.draw.polygon(self.image, self.color, self.calculate_points_for_hexagon())
-
-    def draw_in_unit_range(self):
-        color_selected = (30,20,0)
-        pygame.draw.polygon(self.image, color_selected, self.calculate_points_for_hexagon())
-        coin_image=  pygame.image.load("Resources/goldcoin1.png")
-        self.image.blit(coin_image,(-17,-20))
 
 
 class Unit(MapObject):
@@ -275,22 +262,21 @@ class MilitaryUnit(Unit):
         super().__init__(grid_pos)
         self.player_id = player_id
         self.attack = None
-
-
         self.hp = 10
-        self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-        # self.mobility = 
+
+        self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        self.draw()
+
+    def draw_shape(self):
+        pass
+    def draw(self):
+        self.draw_shape()
         self.health_bar = Health_bar(0, 0, self.width, self.height / 4, 3)
-        self.health_bar.draw(self.pict, self.hp)
-
-
+        self.health_bar.draw(self.image, self.hp)
 
     def update_hp(self, ):
         if self.hp > 0:
-            self.health_bar.draw(self.pict, self.hp)
-            pygame.draw.rect(self.pict, (255, 0, 0), (0, self.height / 4 + 2, self.width,
-                                                      self.height - self.height / 4 + 2))
-            self.surf.blit(self.pict, (0, 0))
+            self.draw()
 
 
     def strike(self):
@@ -305,126 +291,94 @@ class MilitaryUnit(Unit):
 class TriangularUnit(MilitaryUnit):
 
     def __init__(self, grid_pos, player_id, color= (255, 0, 0)):
-
-        super().__init__(grid_pos, player_id)
         self.color = color
+        super().__init__(grid_pos, player_id)
         self.price = 30
         self.hp = 3
         self.name = "triangular unit"
         self.attack = 3
         self.mobility = 1
-        self.health_bar = Health_bar(0, 0, self.width, self.height / 4, self.hp)
-        self.health_bar.draw(self.pict, self.hp)
-        # pygame.draw.polygon(self.surf, (255, 0, 0), [(0, 0), (self.width / 2, self.height), (self.width - 1, 0)])
-        # self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-        # self.health_bar.draw(self.pict)
-        pygame.draw.polygon(self.pict, color, [(0, self.height / 4 + 2), (self.width / 2, self.height),
-                                                     (self.width - 1, self.height / 4 + 2)])
-        self.surf.blit(self.pict, (0, 0))
 
+
+    def draw_shape(self):
+        pygame.draw.polygon(self.image, self.color, [(0, self.height / 4 + 2), (self.width / 2, self.height),
+                                                (self.width - 1, self.height / 4 + 2)])
+        self.surf.blit(self.image, (0, 0))
 
     def __repr__(self):
         return f"{self.name} {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
-    def update(self, ):
 
-        if self.hp > 0:
-            self.health_bar.draw(self.pict, self.hp)
-            pygame.draw.polygon(self.pict, self.color, [(0, self.height / 4 + 2), (self.width / 2, self.height),
-                                                         (self.width - 1, self.height / 4 + 2)])
-            self.surf.blit(self.pict, (0, 0))
 
 
 
 class SquareUnit(MilitaryUnit):
     def __init__(self, grid_pos, player_id, color):
+        self.color = color
 
         super().__init__(grid_pos, player_id)
-        self.color = color
         self.name = "square unit"
         self.price = 30
         self.attack = 2
         self.hp =3
         self.mobility = 2
-        self.health_bar = Health_bar(0, 0, self.width, self.height / 4, self.hp)
-        self.health_bar.draw(self.pict, self.hp)
-        pygame.draw.rect(self.surf, self.color, (0, 0, self.width, self.height))
+
+
         # self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         # self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
         # self.health_bar.draw(self.pict)
-        pygame.draw.rect(self.pict, self.color, (0, self.height / 4 + 2, self.width,
+
+
+    def draw_shape(self):
+        pygame.draw.rect(self.image, self.color, (0, self.height / 4 + 2, self.width,
                                                   self.height - self.height / 4 + 2))
-        self.surf.blit(self.pict, (0, 0))
+        self.surf.blit(self.image, (0, 0))
 
     def __repr__(self):
         return f"{self.name} {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
-    def update(self, ):
 
-        if self.hp > 0:
-            self.health_bar.draw(self.pict, self.hp)
-            pygame.draw.rect(self.pict, self.color, (0, self.height / 4 + 2, self.width,
-                                                      self.height - self.height / 4 + 2))
-            self.surf.blit(self.pict, (0, 0))
 
 
 
 class WarBase(MilitaryUnit):
     def __init__(self, grid_pos, player_id, color):
-        super().__init__(grid_pos, player_id)
         self.color = color
+        super().__init__(grid_pos, player_id)
+
         self.name = "war base"
         self.mobility=0
         self.attack = 0
 
         self.hp = 10
-        self.health_bar = Health_bar(0, 0, self.width, self.height / 4, self.hp)
-        self.health_bar.draw(self.pict, self.hp)
-        pygame.draw.rect(self.surf, (0, 0,0 ), (0, 0, self.width, self.height))
-        # self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-        # self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
-        # self.health_bar.draw(self.pict)
-        pygame.draw.rect(self.pict, (0,0,0), (0, self.height / 4 + 2, self.width,
-                                                  self.height - self.height / 4 + 2))
-        self.surf.blit(self.pict, (0, 0))
+
+    def draw_shape(self):
+
+        pygame.draw.rect(self.image, (0, 0, 0), (0, self.height / 4 + 2, self.width,
+                                                 self.height - self.height / 4 + 2))
+        self.surf.blit(self.image, (0, 0))
 
     def __repr__(self):
             return f"CircleUnit {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
 
-    def update(self, ):
-            if self.hp > 0:
-                self.health_bar.draw(self.pict, self.hp)
 
-
-                pygame.draw.circle(self.surf, self.color, (self.width / 2, self.height / 2), 10)
-                self.surf.blit(self.pict, (0, 0))
 
 
 
 class CircleUnit(MilitaryUnit):
     def __init__(self, grid_pos, player_id,color):
-        super().__init__(grid_pos, player_id,)
         self.color = color
+        super().__init__(grid_pos, player_id,)
+
         self.name = "circle unit"
         self.price = 30
         self.attack = 1
         self.hp = 3
         self.mobility = 3
-        pygame.draw.circle(self.surf, self.color, (self.width / 2, self.height / 2), 10)
-        self.image = self.surf
-        # self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-        # self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
-        # self.health_bar.draw(self.pict)
-        pygame.draw.circle(self.surf, self.color, (self.width / 2, self.height / 2), 10)
-        self.surf.blit(self.pict, (0, 0))
-        self.health_bar = Health_bar(0, 0, self.width, self.height / 4, self.hp)
 
-        self.health_bar.draw(self.pict, self.hp)
+    def draw_shape(self):
+        pygame.draw.circle(self.surf, self.color, (self.width / 2, self.height / 2), 10)
+        self.surf.blit(self.image, (0, 0))
 
     def __repr__(self):
         return f"CircleUnit {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
-    def update(self,):
-        if self.hp > 0:
-            print(self.hp, "hp to be drawn")
-            self.health_bar.draw(self.pict, self.hp)
-            pygame.draw.circle(self.surf, self.color, (self.width / 2, self.height / 2), 10)
-            self.surf.blit(self.pict, (0, 0))
+
 

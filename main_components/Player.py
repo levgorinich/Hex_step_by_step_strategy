@@ -2,7 +2,7 @@ class Player:
 
     def __init__(self, id,game_map ):
         self.id = id
-        self.max_moves = 3
+        self.max_moves = 8
         self.moves = 0
         self.cur_turn = False
         self.coins= 100

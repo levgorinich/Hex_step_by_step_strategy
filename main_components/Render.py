@@ -1,7 +1,7 @@
 
 import pygame
 
-from game_content.Sprites import Hexagon_mine, Mine
+from game_content.Sprites import Mine
 
 
 class Render:

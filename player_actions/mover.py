@@ -66,7 +66,7 @@ class Mover():
 
     def kill_enemy(self, atacking_unit, defending_unit):
             self.ending_sprite.kill_unit()
-            self.atacking_unit.update()
+            self.atacking_unit.update_hp()
 
             self.atacking_unit.grid_pos = self.ending_sprite.grid_pos
 
@@ -75,12 +75,12 @@ class Mover():
             self.atacking_unit = None
 
     def kill_yourself(self, atacking_unit, defending_unit):
-            defending_unit.update()
+            defending_unit.update_hp()
             self.starting_sprite.kill_unit()
 
     def kill_nothing(self, atacking_unit, defending_unit):
-            defending_unit.update()
-            atacking_unit.update()
+            defending_unit.update_hp()
+            atacking_unit.update_hp()
             print("last case")
 
     def move_unit(self):

@@ -40,7 +40,7 @@ def offline_game():
     while running:
 
         events_list = pygame.event.get()
-        game_map.hexes.update()
+        game_map.hexes.update_hp()
 
         renderer.display(events_list, game_map, click_handler.pos, click_handler.clear, click_handler.check_on_activate)
         pygame.display.flip()
@@ -125,7 +125,7 @@ def online_game():
             break
 
         events_list = pygame.event.get()
-        game_map.hexes.update()
+        game_map.hexes.update_hp()
 
         renderer.display(events_list, game_map, click_handler.hexes_available_move_selected_unit,
                          click_handler.clear, click_handler.check_on_activate)
