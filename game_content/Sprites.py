@@ -323,6 +323,7 @@ class SquareUnit(MilitaryUnit):
         self.mobility = 2
 
 
+
         # self.pict = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         # self.health_bar = Health_bar.Health_bar(0, 0, self.width, self.height / 4, 3)
         # self.health_bar.draw(self.pict)
