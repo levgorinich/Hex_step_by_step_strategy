@@ -85,13 +85,14 @@ class Hexagon(MapObject):
         self.width = width
         self.height = height
         self.type = "hexagon"
+        self.points = self.calculate_points_for_hexagon()
         self.image = pygame.Surface((width, height), pygame.SRCALPHA)  # Create a blank surface with transparency
 
         self.rect = self.image.get_rect(center=(self.map_coords[0], self.map_coords[1]))
 
         # calculating points for hexagon
 
-        pygame.draw.polygon(self.image, self.color, self.calculate_points_for_hexagon())
+        pygame.draw.polygon(self.image, self.color, self.points)
         self.mask = pygame.mask.from_surface(self.image)
 
         self.unit_on_hex = None
@@ -138,12 +139,12 @@ class Hexagon_land(Hexagon):
         self.type = "land Hexagon"
 
     def draw(self):
-        pygame.draw.polygon(self.image, self.color, self.calculate_points_for_hexagon())
+        pygame.draw.polygon(self.image, self.color, self.points)
 
     def draw_in_unit_range(self):
-        print("here")
+
         color_selected = (30,20,50)
-        pygame.draw.polygon(self.image, color_selected, self.calculate_points_for_hexagon())
+        pygame.draw.polygon(self.image, color_selected, self.points)
 class Hexagon_mountain(Hexagon):
     def __init__(self, grid_pos, color=(255,255, 255), width=hex_width, height=hex_height):
         super().__init__(grid_pos, color, width=hex_width, height=hex_height)
@@ -151,11 +152,11 @@ class Hexagon_mountain(Hexagon):
         self.type = "mountain Hexagon"
 
     def draw(self):
-        pygame.draw.polygon(self.image, self.color, self.calculate_points_for_hexagon())
+        pygame.draw.polygon(self.image, self.color, self.points)
 
     def draw_in_unit_range(self):
         color_selected = (225,225, 225)
-        pygame.draw.polygon(self.image, color_selected, self.calculate_points_for_hexagon())
+        pygame.draw.polygon(self.image, color_selected, self.points)
 
 class Hexagon_sea(Hexagon):
     def __init__(self, grid_pos, color=(83,236, 236), width=hex_width, height=hex_height):
@@ -164,10 +165,10 @@ class Hexagon_sea(Hexagon):
         self.type = "sea Hexagon"
 
     def draw(self):
-        pygame.draw.polygon(self.image, self.color, self.calculate_points_for_hexagon())
+        pygame.draw.polygon(self.image, self.color, self.points)
     def draw_in_unit_range(self):
         color_selected = (53,186, 186)
-        pygame.draw.polygon(self.image, color_selected, self.calculate_points_for_hexagon())
+        pygame.draw.polygon(self.image, color_selected, self.points)
 
 
 class Building(MapObject):
@@ -201,7 +202,7 @@ class Unit(MapObject):
     def hex_reachable(self,start,switched_hexes,blocked,x,y):
         visited = set() # set of hexes
         visited.add(start)
-        l1,l2 = [],[]
+
         fringes = [] # array of arrays of hexes
         fringes.append([start])
         for dir in range(0,6):
@@ -232,38 +233,6 @@ class Unit(MapObject):
 
     
 
-    def range_of_movement(self,grid_pos, offset):
-        q,r,s = self.offset_to_cube_coords_for_moving(grid_pos,offset)
-        if -self.mobility <= q and q <= self.mobility:
-            if - self.mobility <= r and r <= self.mobility:
-                if - self.mobility <= s and s <= self.mobility:
-                    if q + r + s == 0: 
-                        print(q," ",r," ",s)
-                        return 1
-                    
-    def range_of_drawing(self, start_pos ,offset):
-        q_s,r_s,s_s = self.offset_to_cube_coords_for_moving(start_pos,offset)
-        q = [i for i in range(-10,11,1)]
-        r = [i for i in range(-10,11,1)]
-        s = [i for i in range(-10,11,1)]
-        col = []
-        row = []
-        for i in q:
-            if -self.mobility <= i and i <= self.mobility:
-                for j in r:
-                    if - self.mobility <= j and j <= self.mobility:
-                        for h in s:
-                            if - self.mobility <= h and h <= self.mobility:
-                                if i + j + h == 0 and (i != 0 or j != 0 or h != 0): 
-                                    co, ro=self.qoffset_from_cube(i+q_s,j+r_s,h+s_s,offset)
-                                    if co >= 0 and ro >= 0:
-                                        print(co," ",ro," ")
-                                        col.append(co)
-                                        row.append(int(ro))
-                                        print(col,row)
-                                    
-        return col,row
-
 
 class MilitaryUnit(Unit):
     def __init__(self, grid_pos, player_id, ):
@@ -290,9 +259,7 @@ class MilitaryUnit(Unit):
     def update_hp(self, ):
         if self.hp > 0:
             self.health_bar.draw(self.image, self.hp)
-            pygame.draw.rect(self.image, self.color, (0, self.height / 4 + 2, self.width,
-                                                      self.height - self.height / 4 + 2))
-            self.surf.blit(self.image, (0, 0))
+
 
 
 class TriangularUnit(MilitaryUnit):

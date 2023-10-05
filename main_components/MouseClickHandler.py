@@ -12,12 +12,12 @@ class MouseClickHandler:
         self.was_clicked = False
         self.mover = mover
         self.hexes_available_move_selected_unit = []
-        self.clear = None
-        self.check_on_activate = 0
+
+
         # self.mover = Mover(self.game_map)
         self.actions  = set()
         self.player = User_interface.player
-        self.activate_hexes = []
+
         pass
 
 
@@ -38,35 +38,25 @@ class MouseClickHandler:
             self.was_clicked = False
 
     def check_hex_click(self, event):
-
+        self.clear_selected_hexes()
         mouse = pygame.math.Vector2(pygame.mouse.get_pos())
 
         mouse -= self.tracker.get_dragging_offset()
+
         if event.button == 1:
-            self.hexes_available_move_selected_unit = []
+
             if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
                 self.selected_sprite = selected_sprite_clicked
 
-                if self.selected_sprite.unit_on_hex:
+                if self.selected_sprite.unit_on_hex and self.selected_sprite.unit_on_hex.player_id == self.game_map.player_id:
+                    self.unit_selected = self.selected_sprite.unit_on_hex
+
+                    self.hexes_available_move_selected_unit  = self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.sea_hexes,
+                                                                     self.game_map.mountain_hexes,
+                                                                     self.game_map.rows,self.game_map.columns)
 
 
-                    print("check", self.selected_sprite.unit_on_hex.player_id == self.game_map.player_id)
-                    if self.selected_sprite.unit_on_hex and self.selected_sprite.unit_on_hex.player_id == self.game_map.player_id:
-                        self.unit_selected = self.selected_sprite.unit_on_hex
-                        print("got inside ")
-                        if self.selected_sprite.grid_pos[0]%2 == 0:
-                            offset = 1
-                        else:
-                            offset = -1
 
-                        # set the mobility
-                        # col,row = self.unit_selected.range_of_2(self.selected_sprite.grid_pos,offset)
-                        self.hexes_available_move_selected_unit  = self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.sea_hexes,
-                                                                         self.game_map.mountain_hexes,
-                                                                         self.game_map.rows,self.game_map.columns)
-
-                        self.clear = True
-                        self.check_on_activate+=1
 
         if event.button == 3:
             self.check_on_activate = 0
@@ -74,19 +64,11 @@ class MouseClickHandler:
 
             self.sprite_clicked = self.check_if_hex_is_clicked(event)
             if self.check_if_hex_is_clicked(event) and self.unit_selected :
-                self.clear = None
+
                 # self.pos = []
                 starting_sprite = self.selected_sprite.grid_pos
                 ending_sprite = self.sprite_clicked.grid_pos
 
-                diff = (ending_sprite[0]-starting_sprite[0],ending_sprite[1]-starting_sprite[1])
-
-                # #check on even or odd
-                if starting_sprite[0]%2 == 0:
-                    offset = 1
-                else:
-                    offset = -1
-                
                 # # set the mobility
                 available_pos= self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.sea_hexes,
                                                                          self.game_map.mountain_hexes,
@@ -103,30 +85,20 @@ class MouseClickHandler:
 
                     self.unit_selected = None
 
+        self.draw_selected_hexes()
 
 
-
-
-
-        if self.check_on_activate != 0 and self.activate_hexes != []:
-            for cell_activate in self.activate_hexes:
-                cell_activate.draw()
-                self.activate_hexes = []
+    def clear_selected_hexes(self):
 
         for pos in self.hexes_available_move_selected_unit:
-            # (30, 100, 50)
             cell_hex = self.game_map.hexes.hexes_dict[pos]
+            cell_hex.draw()
+        self.hexes_available_move_selected_unit = []
+    def draw_selected_hexes(self):
 
-            if self.clear is not None:
-                cell_hex.draw_in_unit_range()
-
-                self.activate_hexes.append(cell_hex)
-
-
-            else:
-
-                cell_hex.draw()
-
+        for pos in self.hexes_available_move_selected_unit:
+            cell_hex = self.game_map.hexes.hexes_dict[pos]
+            cell_hex.draw_in_unit_range()
     def check_if_hex_is_clicked(self, event):
         mouse = pygame.math.Vector2(event.pos)
 

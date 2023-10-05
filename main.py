@@ -127,8 +127,7 @@ def online_game():
         events_list = pygame.event.get()
         game_map.hexes.update()
 
-        renderer.display(events_list, game_map, click_handler.hexes_available_move_selected_unit,
-                         click_handler.clear, click_handler.check_on_activate)
+        renderer.display(events_list, game_map,)
 
         pygame.display.flip()
 

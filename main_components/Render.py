@@ -49,7 +49,7 @@ class Render:
         self.display_surface.fill('#71deee')
 
 
-    def display(self, events_list, game_map,hexes_available_move_selected_unit,clear,check_on_activate):
+    def display(self, events_list, game_map,):
 
         self.pre_display(events_list)
         # self.cells(hexes_available_move_selected_unit,game_map.hexes.hexes_dict,clear,check_on_activate)
