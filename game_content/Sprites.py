@@ -84,6 +84,7 @@ class Hexagon(MapObject):
         self.color = color
         self.width = width
         self.height = height
+        self.type = "hexagon"
         self.image = pygame.Surface((width, height), pygame.SRCALPHA)  # Create a blank surface with transparency
 
         self.rect = self.image.get_rect(center=(self.map_coords[0], self.map_coords[1]))
@@ -120,30 +121,34 @@ class Hexagon(MapObject):
         self.remove_unit()
 
     def __str__(self):
-        return f"Hexagon {self.grid_pos[0]}, {self.grid_pos[1]}"
+        return f"{self.type}, {self.grid_pos[0]}, {self.grid_pos[1]}"
 
     def update(self):
         pass
     def draw(self):
         pass
     def draw_in_unit_range(self):
+        print("Do nothing")
         pass
 
 class Hexagon_land(Hexagon):
     def __init__(self, grid_pos, color=(30, 70, 50), width=hex_width, height=hex_height):
         super().__init__(grid_pos, color, width=hex_width, height=hex_height)
         self.color = color
+        self.type = "land Hexagon"
 
     def draw(self):
         pygame.draw.polygon(self.image, self.color, self.calculate_points_for_hexagon())
 
     def draw_in_unit_range(self):
-        color_selected = (30,20,0)
+        print("here")
+        color_selected = (30,20,50)
         pygame.draw.polygon(self.image, color_selected, self.calculate_points_for_hexagon())
 class Hexagon_mountain(Hexagon):
     def __init__(self, grid_pos, color=(255,255, 255), width=hex_width, height=hex_height):
         super().__init__(grid_pos, color, width=hex_width, height=hex_height)
         self.color = color
+        self.type = "mountain Hexagon"
 
     def draw(self):
         pygame.draw.polygon(self.image, self.color, self.calculate_points_for_hexagon())
@@ -156,7 +161,10 @@ class Hexagon_sea(Hexagon):
     def __init__(self, grid_pos, color=(83,236, 236), width=hex_width, height=hex_height):
         super().__init__(grid_pos, color, width=hex_width, height=hex_height)
         self.color = color
+        self.type = "sea Hexagon"
 
+    def draw(self):
+        pygame.draw.polygon(self.image, self.color, self.calculate_points_for_hexagon())
     def draw_in_unit_range(self):
         color_selected = (53,186, 186)
         pygame.draw.polygon(self.image, color_selected, self.calculate_points_for_hexagon())

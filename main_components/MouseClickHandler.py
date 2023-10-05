@@ -17,6 +17,7 @@ class MouseClickHandler:
         # self.mover = Mover(self.game_map)
         self.actions  = set()
         self.player = User_interface.player
+        self.activate_hexes = []
         pass
 
 
@@ -104,6 +105,27 @@ class MouseClickHandler:
 
 
 
+
+
+
+        if self.check_on_activate != 0 and self.activate_hexes != []:
+            for cell_activate in self.activate_hexes:
+                cell_activate.draw()
+                self.activate_hexes = []
+
+        for pos in self.hexes_available_move_selected_unit:
+            # (30, 100, 50)
+            cell_hex = self.game_map.hexes.hexes_dict[pos]
+
+            if self.clear is not None:
+                cell_hex.draw_in_unit_range()
+
+                self.activate_hexes.append(cell_hex)
+
+
+            else:
+
+                cell_hex.draw()
 
     def check_if_hex_is_clicked(self, event):
         mouse = pygame.math.Vector2(event.pos)
