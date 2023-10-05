@@ -199,7 +199,7 @@ class Unit(MapObject):
         self.map_coord = self.calculate_coordinate_by_hex_position(self.grid_pos)
 
 
-    def hex_reachable(self,start,switched_hexes,blocked,x,y):
+    def hex_reachable(self,start,water,mountains,x,y):
         visited = set() # set of hexes
         visited.add(start)
 
@@ -207,27 +207,27 @@ class Unit(MapObject):
         fringes.append([start])
         for dir in range(0,6):
             neighbor = self.oddq_offset_neighbor(start,dir)
-            if neighbor in switched_hexes and start not in switched_hexes and neighbor not in blocked:
+            if neighbor in water and start not in water and neighbor not in mountains:
                 visited.add(neighbor)
-            elif neighbor not in switched_hexes and start in switched_hexes and neighbor not in blocked:
+            elif neighbor not in water and start in water and neighbor not in mountains:
                 visited.add(neighbor)
         for mov in range(1,self.mobility+1):
-            
+
             for hex in fringes[mov-1]:
                 fringes.append([])
                 for dir in range(0,6):
-                    
+
                     neighbor  = self.oddq_offset_neighbor(hex,dir)
 
-                    if start not in switched_hexes and neighbor not in blocked:
-                        if neighbor not in visited and neighbor not in switched_hexes and neighbor[0] >= 0 and neighbor[1] >= 0 and neighbor[0] < x and neighbor[1] < y:
+                    if start not in water and neighbor not in mountains:
+                        if neighbor not in visited and neighbor not in water and neighbor[0] >= 0 and neighbor[1] >= 0 and neighbor[0] < x and neighbor[1] < y:
                             visited.add(neighbor)
                             fringes[mov].append(neighbor)
-                    elif start in switched_hexes and neighbor not in blocked:
-                        if neighbor not in visited and neighbor in switched_hexes and neighbor[0] >= 0 and neighbor[1] >= 0 and neighbor[0] < x and neighbor[1] < y:
+                    elif start in water and neighbor not in mountains:
+                        if neighbor not in visited and neighbor in water and neighbor[0] >= 0 and neighbor[1] >= 0 and neighbor[0] < x and neighbor[1] < y:
                             visited.add(neighbor)
                             fringes[mov].append(neighbor)
-                        
+
         return tuple(visited)
                 
 

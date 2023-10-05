@@ -37,7 +37,7 @@ class UI:
             self.player.cur_turn = False
             self.player.moves = 0
             string = "<end_turn" + str(self.game_map.player_id) + ">"
-            self.game_map.actions.add(string)
+            self.game_map.actions.append(string)
     def add_buttons(self, text):
         buttons = []
         titles = ["Triangular","Square","Circle"]

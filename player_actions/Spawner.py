@@ -13,7 +13,7 @@ class Spawner:
     def spawn_unit(self, type, spawn_point, player_id=None):
 
         if player_id is None:
-            player_id = self.player_id
+            player_id = self.game_map.player_id
         color = self.id_colors[int(player_id)]
 
         # idx = self.player_id
@@ -36,7 +36,7 @@ class Spawner:
             hexagon.add_unit(unit)
             self.game_map.units.add(unit)
             if player_id == self.player_id:
-                self.game_map.actions.add(string)
+                self.game_map.actions.append(string)
 
     def spawn_building (self, type, spawn_point, player_id=None):
         if type == "Mine":

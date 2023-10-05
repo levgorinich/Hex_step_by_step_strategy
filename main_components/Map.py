@@ -11,7 +11,7 @@ import random
 
 class Map:
 
-    def __init__(self, rows, columns, player_id, seed):
+    def __init__(self, rows, columns, player_id, seed, Offline=False):
         self.seed = seed
         random.seed(self.seed)
         print("this is seed in mape"+ str(self.seed))
@@ -19,8 +19,10 @@ class Map:
         self.columns = columns
 # <<<<<<< HEAD
         self.player_id = player_id
-        self.actions=set()
+        self.actions=[]
         self.spawn_point = None
+        self.offline = Offline
+        self.offline_spawn_point = {0: (2,2), 1: (4,4)}
 # =======
         # self.empty_hexes = []
 
@@ -38,7 +40,8 @@ class Map:
         # self.spawner = Spawner(self)
 
         # self.spawner.create_start_unit()
-
+    def get_spawer(self):
+        return self.Spawner
 
     def __str__(self):
         return f"map with {self.rows} rows and {self.columns} columns"
@@ -58,12 +61,17 @@ class Map:
             a = random.random()
             if a < 0.03:
                 self.Spawner.spawn_building("Mine",hex)
-        base1 = random.choice(land_hexes)
-        base2 = random.choice(land_hexes)
-        if self.player_id == 0:
-            self.spawn_point = base1
+        if self.offline:
+            base1 = (2,2)
+            base2 = (3,2)
+            self.spawn_point= self.offline_spawn_point[self.player_id]
         else:
-            self.spawn_point = base2
+            base1 = random.choice(land_hexes)
+            base2 = random.choice(land_hexes)
+            if self.player_id == 0:
+                self.spawn_point = base1
+            else:
+                self.spawn_point = base2
 
         self.Spawner.spawn_unit("WarBase",base1,player_id=0)
         self.Spawner.spawn_unit("WarBase",base2,player_id=1)

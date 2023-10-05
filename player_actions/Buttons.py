@@ -38,7 +38,7 @@ class MenuButton(Button):
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(mouse_pos):
             if pygame.mouse.get_pressed()[0]:
-                print(self.action)
+
                 self.action()
                 return True
 
