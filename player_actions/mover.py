@@ -12,6 +12,7 @@ class Mover():
         self.defending_unit = None
 
     def move(self, hex_start: tuple[int, int], hex_end: tuple[int, int]):
+
         self.starting_sprite = self.game_map.get_hex_by_coord(hex_start)
         self.ending_sprite = self.game_map.get_hex_by_coord(hex_end)
 
@@ -48,13 +49,14 @@ class Mover():
             defending_unit.hp -= strike
 
             if atacking_unit.hp <=0 and defending_unit.hp <= 0:
-                self.kill_all(atacking_unit, defending_unit)
+                self.kill_all()
             elif defending_unit.hp <=0 and atacking_unit.hp >0:
-                self.kill_enemy(atacking_unit, defending_unit)
+                print("killing enemy", atacking_unit, defending_unit)
+                self.kill_enemy()
             elif defending_unit.hp >0 and atacking_unit.hp <=0:
-                self.kill_yourself(atacking_unit, defending_unit)
+                self.kill_yourself()
             elif defending_unit.hp > 0 and atacking_unit.hp > 0:
-                self.kill_nothing(atacking_unit, defending_unit)
+                self.kill_nothing()
         else:
             pass
 
@@ -77,9 +79,9 @@ class Mover():
             self.defending_unit.update_hp()
             self.starting_sprite.kill_unit()
 
-    def kill_nothing(self, atacking_unit, defending_unit):
-            defending_unit.update_hp()
-            atacking_unit.update_hp()
+    def kill_nothing(self, ):
+            self.defending_unit.update_hp()
+            self.atacking_unit.update_hp()
 
 
     def move_unit(self):

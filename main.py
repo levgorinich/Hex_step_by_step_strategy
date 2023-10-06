@@ -132,6 +132,8 @@ def online_game():
 
             else:
                 update = n.send("no_moves")
+            print("update", update)
+            print("game_map.actions", game_map.actions)
             game_map.actions = []
 
             if update:

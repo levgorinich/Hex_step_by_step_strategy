@@ -12,7 +12,6 @@ class MapMovementTracker(pygame.sprite.Group):
         self.display_surface_half_width = self.display_surface_size[0] // 2
         self.display_surface_half_height = self.display_surface_size[1] // 2
 
-
         self.mouse_speed = 0.4
 
         # camera control
@@ -46,8 +45,8 @@ class MapMovementTracker(pygame.sprite.Group):
                 self.handle_dragging(event)
     def change_zoom(self, event):
         self.zoom_scale += event.y * 0.03
-        if self.zoom_scale > 1.0 and event.y > 0:
-            self.zoom_scale = 1.0
+        if self.zoom_scale > 1.25 and event.y > 0:
+            self.zoom_scale = 1.25
         if self.zoom_scale < 0.75 and event.y < 0:
             self.zoom_scale = 0.75
 

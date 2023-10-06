@@ -7,6 +7,7 @@ class Parser:
         self.player = player
     def parse_moves(self, move):
 
+        print("this is string to parse", move)
 
         if move.startswith("spawn"):
             self.parse_spawn(move)

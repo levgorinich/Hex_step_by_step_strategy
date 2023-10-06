@@ -22,6 +22,7 @@ class Spawner:
         elif type == "Square":
             unit = SquareUnit(spawn_point, player_id, color)
         elif type == "Circle":
+            print("got to spwawn circle")
             unit = CircleUnit(spawn_point, player_id, color)
         elif type == "WarBase":
             unit = WarBase(spawn_point, player_id, color)

@@ -1,7 +1,7 @@
 import pygame
 from pygame import font
 
-from player_actions.Buttons import ButtonForUnitSpawner,MenuButton
+from player_actions.Buttons import MenuButton
 from player_actions.Spawner import Spawner
 from main_components.Player import Player
 
@@ -43,8 +43,8 @@ class UI:
         titles = ["Triangular","Square","Circle"]
         display_size = pygame.display.get_surface().get_size()
         for i in range(len(titles)):
-            button = ButtonForUnitSpawner(titles[i], display_size[0]-100, display_size[1]-100-100*i, 100, 100,
-                                          self.spawner, action=self.spawn_function, spawn_point =self.game_map.spawn_point)
+            button = MenuButton(titles[i], display_size[0]-100, display_size[1]-100-100*i, 100, 100,
+                                           action=self.spawn_function, action_args =(self.spawner, titles[i],self.game_map.spawn_point))
             buttons.append(button)
         finish_move = MenuButton("Finish Move", display_size[0]-100, display_size[1]-100-100*len(titles), 100, 100, self.end_turn,
                                                 color=(255, 0, 0), font_size=24, font_name="Arial")
@@ -59,11 +59,10 @@ class UI:
     def fill_UI_surface(self):
         self.display_buttons(self.UI_surface)
 
-    def check_click(self, game_map):
+    def check_click(self, ):
         for button in self.buttons:
-            result = button.check_click()
-            if result:
-                return result
+            if button.check_click():
+                return True
         return False
 
 

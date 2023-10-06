@@ -5,21 +5,16 @@ class MouseClickHandler:
     def __init__(self,game_map,  User_interface, tracker, mover):
         self.user_interface = User_interface
         self.game_map = game_map
+        self.tracker = tracker
+        self.mover = mover
         self.selected_sprite = None
         self.sprite_clicked = None
         self.unit_selected = None
-        self.tracker = tracker
+
         self.was_clicked = False
-        self.mover = mover
         self.hexes_available_move_selected_unit = []
 
-
-        # self.mover = Mover(self.game_map)
-        self.actions  = set()
         self.player = User_interface.player
-
-        pass
-
 
     def handle_click(self, event):
 
@@ -30,7 +25,7 @@ class MouseClickHandler:
         if not self.was_clicked:
             self.check_hex_click(event)
     def check_UI_click(self):
-        result = self.user_interface.check_click(self.game_map)
+        result = self.user_interface.check_click()
         if result:
             self.was_clicked = True
 
@@ -41,7 +36,6 @@ class MouseClickHandler:
 
         self.clear_selected_hexes()
         mouse = pygame.math.Vector2(pygame.mouse.get_pos())
-
         mouse -= self.tracker.get_dragging_offset()
 
         if event.button == 1:
@@ -54,37 +48,20 @@ class MouseClickHandler:
                     self.hexes_available_move_selected_unit  = self.game_map.reachable_hexes(
                         self.selected_sprite.grid_pos, self.unit_selected.mobility)
 
-
-
-
         if event.button == 3:
-
-            self.check_on_activate = 0
-
 
             self.sprite_clicked = self.check_if_hex_is_clicked(event)
             if self.check_if_hex_is_clicked(event) and self.unit_selected :
-
-
-                # self.pos = []
                 starting_sprite = self.selected_sprite.grid_pos
                 ending_sprite = self.sprite_clicked.grid_pos
 
-                # # set the mobility
                 available_pos= self.game_map.reachable_hexes(
                         self.selected_sprite.grid_pos, self.unit_selected.mobility)
-                # if self.unit_selected.range_of_movement(diff,offset):
 
                 if ending_sprite in available_pos and self.player.moves > 0:
-
                     self.mover.move(starting_sprite, ending_sprite)
-                    self.player.moves -= 1
-                    if self.player.moves == 0:
-                        print("end turn")
-
-
                     self.game_map.actions.append("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
-
+                    self.player.moves -= 1
                     self.unit_selected = None
 
         self.draw_selected_hexes()

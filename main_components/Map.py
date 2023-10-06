@@ -3,7 +3,7 @@ import pygame
 from math import *
 
 from game_content.Groups import HexesGroup
-from game_content.Sprites import Hexagon, Hexagon_mountain, Hexagon_sea
+from game_content.Sprites import Hexagon, Hexagon_mountain, Hexagon_sea, Hexagon_land
 from player_actions.Spawner import Spawner
 from noise.Noise import Noise
 import random
@@ -22,7 +22,7 @@ class Map:
         self.actions=[]
         self.spawn_point = None
         self.offline = Offline
-        self.offline_spawn_point = {0: (2,2), 1: (4,4)}
+        self.offline_spawn_point = {0: (2,3), 1: (4,4)}
 
         self.hex_width = 30* sqrt(3)
         self.hex_height = self.hex_width*sqrt(3)/2
@@ -31,7 +31,7 @@ class Map:
         self.units =  pygame.sprite.Group()
         self.buildings = pygame.sprite.Group()
         self.Spawner = Spawner(self)
-        self.create_mines([(1,1)])
+        self.create_mines()
 
 
         # self.spawner = Spawner(self)
@@ -49,7 +49,12 @@ class Map:
         hexes = noise.create_tiles()
         return hexes
 
-    def create_mines(self, land_hexes):
+    def create_mines(self, ):
+        land_hexes = []
+        for hex in self.hexes:
+            if isinstance(hex, Hexagon_land):
+                land_hexes.append(hex.grid_pos)
+
         for hex in land_hexes:
 
             a = random.random()
@@ -59,13 +64,15 @@ class Map:
             base1 = (2,2)
             base2 = (3,2)
             self.spawn_point= self.offline_spawn_point[self.player_id]
+            print("spawn point in map ",self.spawn_point)
         else:
             base1 = random.choice(land_hexes)
             base2 = random.choice(land_hexes)
             if self.player_id == 0:
-                self.spawn_point = base1
+                self.spawn_point = base1[0], base1[1]+1
             else:
-                self.spawn_point = base2
+                self.spawn_point = base2[0], base2[1]+1
+            print("spawn point in map ",self.spawn_point)
 
         self.Spawner.spawn_unit("WarBase",base1,player_id=0)
         self.Spawner.spawn_unit("WarBase",base2,player_id=1)
