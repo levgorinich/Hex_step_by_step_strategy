@@ -12,13 +12,13 @@ class Mover():
         self.defending_unit = None
 
     def move(self, hex_start: tuple[int, int], hex_end: tuple[int, int]):
-        self.starting_sprite = self.game_map.hexes.hexes_dict[hex_start]
-        self.ending_sprite = self.game_map.hexes.hexes_dict[hex_end]
+        self.starting_sprite = self.game_map.get_hex_by_coord(hex_start)
+        self.ending_sprite = self.game_map.get_hex_by_coord(hex_end)
 
         if self.starting_sprite.unit_on_hex and self.ending_sprite.unit_on_hex:
             self.atacking_unit = self.starting_sprite.unit_on_hex
             self.defending_unit = self.ending_sprite.unit_on_hex
-            print(self.atacking_unit.player_id, self.defending_unit.player_id)
+
             if self.atacking_unit.player_id != self.defending_unit.player_id:
                 self.handle_fighting(self.atacking_unit, self.defending_unit)
             else:
@@ -59,24 +59,21 @@ class Mover():
             pass
 
 
-    def kill_all(self, atacking_unit, defending_unit):
+    def kill_all(self, ):
             self.ending_sprite.kill_unit()
             self.starting_sprite.kill_unit()
             print("double death")
 
-    def kill_enemy(self, atacking_unit, defending_unit):
+    def kill_enemy(self, ):
             self.ending_sprite.kill_unit()
-
             self.atacking_unit.update_hp()
-
-
             self.atacking_unit.grid_pos = self.ending_sprite.grid_pos
 
             self.starting_sprite.remove_unit()
             self.ending_sprite.add_unit(self.atacking_unit)
             self.atacking_unit = None
 
-    def kill_yourself(self, atacking_unit, defending_unit):
+    def kill_yourself(self,):
             self.defending_unit.update_hp()
             self.starting_sprite.kill_unit()
 
@@ -84,10 +81,8 @@ class Mover():
             defending_unit.update_hp()
             atacking_unit.update_hp()
 
-            print("last case")
 
     def move_unit(self):
-
         self.ending_sprite.remove_unit()
         self.unit_selected.grid_pos = self.ending_sprite.grid_pos
         self.ending_sprite.add_unit(self.unit_selected)

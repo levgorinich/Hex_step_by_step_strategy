@@ -16,9 +16,7 @@ class MapObject(pygame.sprite.Sprite):
         self.height = 25
         self.name = "map object"
         self.surf = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-        # self.surf.fill((125,125,125))
         self.image = self.surf
-
         self.map_coords = self.calculate_coordinate_by_hex_position(self.grid_pos)
         self.rect = self.image.get_rect(center=self.map_coords)
 
@@ -36,15 +34,6 @@ class MapObject(pygame.sprite.Sprite):
         r = grid_pos[1] - (grid_pos[0] - offset*(grid_pos[0] & 1)) / 2
         return q, r, -q - r
 
-    
-
-    def qoffset_from_cube(self,q,r,s,offset):
-        col = q
-        if offset == -1:
-            row = -col - s + (col - (col & 1)) / 2 + 1
-        else:
-            row = -col - s + (col - (col & 1)) / 2 
-        return (col, row)
 
     def calculate_coordinate_by_hex_position(self, hex_position, ):
         map_coord_x = hex_width * (0.5 + 0.75 * hex_position[0])
@@ -55,26 +44,6 @@ class MapObject(pygame.sprite.Sprite):
             map_coord_y = hex_height * (1 + hex_position[1])
 
         return map_coord_x, map_coord_y
-    
-
-
-    def oddq_offset_neighbor(self,hex,direction):
-        oddq_direction_differences = [
-        # even cols 
-        [[+1,  0], [+1, -1], [ 0, -1], 
-        [-1, -1], [-1,  0], [ 0, +1]],
-        # odd cols 
-        [[+1, +1], [+1,  0], [ 0, -1], 
-        [-1,  0], [-1, +1], [ 0, +1]],
-        ]
-        
-        
-        parity = hex[0] & 1
-        diff = oddq_direction_differences[parity][direction]
-        return (hex[0] + diff[0], hex[1]+ diff[1])
-
-
-
 
 
 class Hexagon(MapObject):
@@ -87,11 +56,7 @@ class Hexagon(MapObject):
         self.type = "hexagon"
         self.points = self.calculate_points_for_hexagon()
         self.image = pygame.Surface((width, height), pygame.SRCALPHA)  # Create a blank surface with transparency
-
         self.rect = self.image.get_rect(center=(self.map_coords[0], self.map_coords[1]))
-
-        # calculating points for hexagon
-
         pygame.draw.polygon(self.image, self.color, self.points)
         self.mask = pygame.mask.from_surface(self.image)
 
@@ -183,9 +148,6 @@ class Mine(Building):
         self.image.blit(coin_image,(-17,-20))
 
 
-
-
-
 class Unit(MapObject):
     def __init__(self, grid_pos):
         super().__init__(grid_pos)
@@ -195,43 +157,9 @@ class Unit(MapObject):
 
     def move(self, move_on_hex_grid):
         self.grid_pos += move_on_hex_grid
-
         self.map_coord = self.calculate_coordinate_by_hex_position(self.grid_pos)
 
 
-    def hex_reachable(self,start,water,mountains,x,y):
-        visited = set() # set of hexes
-        visited.add(start)
-
-        fringes = [] # array of arrays of hexes
-        fringes.append([start])
-        for dir in range(0,6):
-            neighbor = self.oddq_offset_neighbor(start,dir)
-            if neighbor in water and start not in water and neighbor not in mountains:
-                visited.add(neighbor)
-            elif neighbor not in water and start in water and neighbor not in mountains:
-                visited.add(neighbor)
-        for mov in range(1,self.mobility+1):
-
-            for hex in fringes[mov-1]:
-                fringes.append([])
-                for dir in range(0,6):
-
-                    neighbor  = self.oddq_offset_neighbor(hex,dir)
-
-                    if start not in water and neighbor not in mountains:
-                        if neighbor not in visited and neighbor not in water and neighbor[0] >= 0 and neighbor[1] >= 0 and neighbor[0] < x and neighbor[1] < y:
-                            visited.add(neighbor)
-                            fringes[mov].append(neighbor)
-                    elif start in water and neighbor not in mountains:
-                        if neighbor not in visited and neighbor in water and neighbor[0] >= 0 and neighbor[1] >= 0 and neighbor[0] < x and neighbor[1] < y:
-                            visited.add(neighbor)
-                            fringes[mov].append(neighbor)
-
-        return tuple(visited)
-                
-
-    
 
 
 class MilitaryUnit(Unit):
@@ -261,7 +189,6 @@ class MilitaryUnit(Unit):
             self.health_bar.draw(self.image, self.hp)
 
 
-
 class TriangularUnit(MilitaryUnit):
 
     def __init__(self, grid_pos, player_id, color= (255, 0, 0)):
@@ -272,7 +199,6 @@ class TriangularUnit(MilitaryUnit):
         self.name = "triangular unit"
         self.attack = 3
         self.mobility = 1
-
         self.draw()
 
     def draw_shape(self):
@@ -286,7 +212,6 @@ class TriangularUnit(MilitaryUnit):
 class SquareUnit(MilitaryUnit):
     def __init__(self, grid_pos, player_id, color):
         self.color = color
-
         super().__init__(grid_pos, player_id)
         self.name = "square unit"
         self.price = 30
@@ -306,28 +231,24 @@ class WarBase(MilitaryUnit):
     def __init__(self, grid_pos, player_id, color):
         self.color = color
         super().__init__(grid_pos, player_id)
-
         self.name = "war base"
         self.mobility=0
         self.attack = 0
-
         self.hp = 10
         self.draw()
 
     def draw_shape(self):
-
         pygame.draw.rect(self.image, (0,0,0), (0, self.height / 4 + 2, self.width,
                                                self.height - self.height / 4 + 2))
 
     def __repr__(self):
-            return f"CircleUnit {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
+        return f"CircleUnit {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
 
 
 class CircleUnit(MilitaryUnit):
     def __init__(self, grid_pos, player_id,color):
         self.color = color
         super().__init__(grid_pos, player_id,)
-
         self.name = "circle unit"
         self.price = 30
         self.attack = 1

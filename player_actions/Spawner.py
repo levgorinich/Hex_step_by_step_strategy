@@ -29,7 +29,7 @@ class Spawner:
         string = "<spawn"+type+"("+str(spawn_point[0])+","+str(spawn_point[1])+"),"+str(player_id)+">"
 
 
-        hexagon = self.game_map.hexes.hexes_dict[spawn_point]
+        hexagon = self.game_map.get_hex_by_coord(spawn_point)
         # print(hexagon)
         if not hexagon.unit_on_hex:
 
@@ -46,7 +46,7 @@ class Spawner:
         # string = "<spawn"+type+"("+str(spawn_point[0])+","+str(spawn_point[1])+"),"+str(player_id)+">"
         # self.game_map.actions.add(string)
 
-        hexagon = self.game_map.hexes.hexes_dict[spawn_point]
+        hexagon = self.game_map.get_hex_by_coord(spawn_point)
         hexagon.add_building(building)
         print("building added")
         self.game_map.buildings.add(building)

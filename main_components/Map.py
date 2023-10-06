@@ -14,47 +14,41 @@ class Map:
     def __init__(self, rows, columns, player_id, seed, Offline=False):
         self.seed = seed
         random.seed(self.seed)
-        print("this is seed in mape"+ str(self.seed))
+
         self.rows = rows
         self.columns = columns
-# <<<<<<< HEAD
+
         self.player_id = player_id
         self.actions=[]
         self.spawn_point = None
         self.offline = Offline
         self.offline_spawn_point = {0: (2,2), 1: (4,4)}
-# =======
-        # self.empty_hexes = []
 
-
-# >>>>>>> 3fd439a7f36f26f90bed6b8818662dafa19250fb
         self.hex_width = 30* sqrt(3)
         self.hex_height = self.hex_width*sqrt(3)/2
-        self.hexes,  self.ordinary_hexes, self.sea_hexes ,self.mountain_hexes = self.create_tiles()
+        self.hexes   = self.create_tiles()
+
         self.units =  pygame.sprite.Group()
         self.buildings = pygame.sprite.Group()
         self.Spawner = Spawner(self)
-        self.create_mines(self.ordinary_hexes)
+        self.create_mines([(1,1)])
 
 
         # self.spawner = Spawner(self)
 
-        # self.spawner.create_start_unit()
-    def get_spawer(self):
-        return self.Spawner
+    def get_hex_by_coord(self, grid_pos):
+        return self.hexes.hexes_dict[grid_pos]
+
 
     def __str__(self):
         return f"map with {self.rows} rows and {self.columns} columns"
 
-    def set_empty_hexes(self, list_of_hexes):
-        self.empty_hexes = list_of_hexes
 
     def create_tiles(self):
         noise = Noise(self.rows, self.columns,seed=self.seed)
         hexes = noise.create_tiles()
+        return hexes
 
-        
-        return hexes,noise.ordinary_hexes, noise.sea_hexes, noise.mountain_hexes
     def create_mines(self, land_hexes):
         for hex in land_hexes:
 
@@ -77,19 +71,68 @@ class Map:
         self.Spawner.spawn_unit("WarBase",base2,player_id=1)
 
 
+    def check_coord_validity(self,cords):
+        return cords[0] >= 0 and cords[1] >= 0 and cords[0] < self.rows and cords[1] < self.columns
+
+    def oddq_offset_neighbor(self,hex,direction):
+        oddq_direction_differences = [
+            # even cols
+            [[+1,  0], [+1, -1], [ 0, -1],
+             [-1, -1], [-1,  0], [ 0, +1]],
+            # odd cols
+            [[+1, +1], [+1,  0], [ 0, -1],
+             [-1,  0], [-1, +1], [ 0, +1]],
+        ]
+
+
+        parity = hex[0] & 1
+        diff = oddq_direction_differences[parity][direction]
+        return (hex[0] + diff[0], hex[1]+ diff[1])
+
+    def reachable_hexes(self,start, radius):
+        print(start)
+        visited = set() # set of hexes
+        visited.add(start)
+        star = self.get_hex_by_coord(start)
+        fringes = [] # array of arrays of hexes
+        fringes.append([start])
+
+        for dir in range(6):
+            neighbor = self.oddq_offset_neighbor(start,dir)
+            neighbor_hex = self.get_hex_by_coord(neighbor)
+            if isinstance(neighbor_hex, Hexagon_sea) and not isinstance(star, Hexagon_sea) or\
+                    not isinstance(neighbor_hex, (Hexagon_mountain, Hexagon_sea)) and isinstance(star, Hexagon_sea):
+                visited.add(neighbor)
+
+        for mov in range(1,radius+1):
+
+            for hex in fringes[mov-1]:
+                fringes.append([])
+                for dir in range(0,6):
+
+                    neighbor  = self.oddq_offset_neighbor(hex,dir)
+                    neighbor_hex = self.get_hex_by_coord(neighbor)
+
+                    if not isinstance(star, Hexagon_sea) and not isinstance(neighbor_hex, (Hexagon_mountain, Hexagon_sea)) or\
+                            isinstance(star, Hexagon_sea) and isinstance(neighbor_hex, Hexagon_sea):
+
+                        if neighbor not in visited and  self.check_coord_validity(neighbor):
+                            visited.add(neighbor)
+                            fringes[mov].append(neighbor)
+
+        return tuple(visited)
+
+    def qoffset_from_cube(self,q,r,s,offset):
+        col = q
+        if offset == -1:
+            row = -col - s + (col - (col & 1)) / 2 + 1
+        else:
+            row = -col - s + (col - (col & 1)) / 2
+        return (col, row)
 
 
 
 
-
-
-# class UnitPlacer:
-#     def __init__(self, map):
-#         self.map = map
-#
-#     def place_unit_and_add_it_to_player(self, unit, player):
-#         self.map.hexes.hexes_dict[unit.grid_pos]
-#         player.
 
 
 
