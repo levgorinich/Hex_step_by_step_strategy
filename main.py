@@ -85,7 +85,7 @@ def offline_game():
                 player.click_handler.handle_click(event)
                 # if click_handler.pos is not None:
                 #     renderer.cells(click_handler.pos, game_map.hexes.hexes_dict)
-                # print("yeag")
+                # print("yeagsdf")
 
         clock.tick(60)
 
