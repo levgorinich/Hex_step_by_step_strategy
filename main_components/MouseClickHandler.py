@@ -71,13 +71,15 @@ class MouseClickHandler:
 
         for pos in self.hexes_available_move_selected_unit:
             cell_hex = self.game_map.get_hex_by_coord(pos)
-            cell_hex.draw()
+            if cell_hex:
+                cell_hex.draw()
         self.hexes_available_move_selected_unit = []
     def draw_selected_hexes(self):
 
         for pos in self.hexes_available_move_selected_unit:
             cell_hex = self.game_map.get_hex_by_coord(pos)
-            cell_hex.draw_in_unit_range()
+            if cell_hex:
+                cell_hex.draw_in_unit_range()
     def check_if_hex_is_clicked(self, event):
         mouse = pygame.math.Vector2(event.pos)
 

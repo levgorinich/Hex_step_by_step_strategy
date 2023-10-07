@@ -37,7 +37,9 @@ class Map:
         # self.spawner = Spawner(self)
 
     def get_hex_by_coord(self, grid_pos):
-        return self.hexes.hexes_dict[grid_pos]
+        if grid_pos[0] in range(0, self.columns + 1) and grid_pos[0] in range(0, self.rows + 1):
+            return self.hexes.hexes_dict[grid_pos]
+        return False
 
 
     def __str__(self):
@@ -107,7 +109,7 @@ class Map:
         for dir in range(6):
             neighbor = self.oddq_offset_neighbor(start,dir)
             neighbor_hex = self.get_hex_by_coord(neighbor)
-            if isinstance(neighbor_hex, Hexagon_sea) and not isinstance(star, Hexagon_sea) or\
+            if neighbor_hex and isinstance(neighbor_hex, Hexagon_sea) and not isinstance(star, Hexagon_sea) or\
                     not isinstance(neighbor_hex, (Hexagon_mountain, Hexagon_sea)) and isinstance(star, Hexagon_sea):
                 visited.add(neighbor)
 
@@ -121,7 +123,7 @@ class Map:
                     neighbor_hex = self.get_hex_by_coord(neighbor)
 
                     if not isinstance(star, Hexagon_sea) and not isinstance(neighbor_hex, (Hexagon_mountain, Hexagon_sea)) or\
-                            isinstance(star, Hexagon_sea) and isinstance(neighbor_hex, Hexagon_sea):
+                            isinstance(star, Hexagon_sea) and isinstance(neighbor_hex, Hexagon_sea) and neighbor_hex:
 
                         if neighbor not in visited and  self.check_coord_validity(neighbor):
                             visited.add(neighbor)
