@@ -46,7 +46,7 @@ class MouseClickHandler:
                 if self.selected_sprite.unit_on_hex and self.selected_sprite.unit_on_hex.player_id == self.game_map.player_id:
                     self.unit_selected = self.selected_sprite.unit_on_hex
                     self.hexes_available_move_selected_unit  = self.game_map.reachable_hexes(
-                        self.selected_sprite.grid_pos, self.unit_selected.mobility)
+                        self.selected_sprite.grid_pos, self.unit_selected.stamina)
 
         if event.button == 3:
 
@@ -56,7 +56,7 @@ class MouseClickHandler:
                 ending_sprite = self.sprite_clicked.grid_pos
 
                 available_pos= self.game_map.reachable_hexes(
-                        self.selected_sprite.grid_pos, self.unit_selected.mobility)
+                        self.selected_sprite.grid_pos, self.unit_selected.stamina)
 
                 if ending_sprite in available_pos and self.player.moves > 0:
                     self.mover.move(starting_sprite, ending_sprite)

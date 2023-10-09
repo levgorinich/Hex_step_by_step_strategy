@@ -38,8 +38,18 @@ class Map:
 
     def get_hex_by_coord(self, grid_pos):
         if grid_pos[0] in range(0, self.columns + 1) and grid_pos[0] in range(0, self.rows + 1):
-            return self.hexes.hexes_dict[grid_pos]
+
+            return self.hexes[grid_pos]
         return False
+    def get_cube_coords(self, hex):
+        return self.hexes.get_hex_cube_coords(hex)
+
+    def calculate_distance(self, hex1, hex2):
+
+
+        cube_coords1 = self.get_cube_coords(hex1)
+        cube_coords2 = self.get_cube_coords(hex2)
+        return int((abs(cube_coords1[0] - cube_coords2[0]) + abs(cube_coords1[1] - cube_coords2[1])+abs(cube_coords1[2] - cube_coords2[2]))//2)
 
 
     def __str__(self):
@@ -138,6 +148,13 @@ class Map:
         else:
             row = -col - s + (col - (col & 1)) / 2
         return (col, row)
+
+    def end_turn(self):
+        for unit in self.units:
+            unit.restore_stamina()
+        string = "<end_turn" + str(self.player_id) + ">"
+        self.actions.append(string)
+
 
 
 

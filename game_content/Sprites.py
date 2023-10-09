@@ -152,12 +152,17 @@ class Unit(MapObject):
     def __init__(self, grid_pos):
         super().__init__(grid_pos)
         self.name = "unit"
-        self.mobility = None
+        self.max_stamina = None
+        self.stamina = None
         self.price=None
 
-    def move(self, move_on_hex_grid):
-        self.grid_pos += move_on_hex_grid
-        self.map_coord = self.calculate_coordinate_by_hex_position(self.grid_pos)
+    def move(self, grid_pos, distance):
+        self.grid_pos = grid_pos
+        self.stamina -= distance
+        # self.map_coord = self.calculate_coordinate_by_hex_position(self.grid_pos)
+
+    def restore_stamina(self):
+        self.stamina = self.max_stamina
 
 
 
@@ -179,6 +184,7 @@ class MilitaryUnit(Unit):
         self.health_bar.draw(self.image, self.hp)
 
     def strike(self):
+        self.stamina =0
         return self.attack *(random.random()/2 +0.75)
 
     def defend(self):
@@ -198,7 +204,8 @@ class TriangularUnit(MilitaryUnit):
         self.hp = 3
         self.name = "triangular unit"
         self.attack = 3
-        self.mobility = 1
+        self.max_stamina =1
+        self.stamina = 1
         self.draw()
 
     def draw_shape(self):
@@ -217,7 +224,8 @@ class SquareUnit(MilitaryUnit):
         self.price = 30
         self.attack = 2
         self.hp =3
-        self.mobility = 2
+        self.max_stamina= 2
+        self.stamina = 2
         self.draw()
 
     def draw_shape(self):
@@ -232,7 +240,9 @@ class WarBase(MilitaryUnit):
         self.color = color
         super().__init__(grid_pos, player_id)
         self.name = "war base"
-        self.mobility=0
+        self.max_stamina= 0
+        self.stamina = 0
+
         self.attack = 0
         self.hp = 10
         self.draw()
@@ -253,7 +263,8 @@ class CircleUnit(MilitaryUnit):
         self.price = 30
         self.attack = 1
         self.hp = 3
-        self.mobility = 3
+        self.max_stamina= 3
+        self.stamina = 3
         self.draw()
 
     def draw_shape(self):
