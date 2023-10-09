@@ -88,7 +88,7 @@ async def listening_for_connection(main_socket, loop: AbstractEventLoop):
             print("Created Game ID: ", gameID)
         else :
             p=1
-        asyncio.create_task(get_client_move(p, gameID,seed, conn, loop))
+        asyncio.create_task(get_client_move(p, gameID, conn, loop))
 
 
 asyncio.run(main(), debug = True)
