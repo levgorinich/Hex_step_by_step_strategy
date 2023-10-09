@@ -1,5 +1,6 @@
 import sys
 import pygame
+from time import sleep
 from pygame.locals import *
 import logging
 
@@ -117,6 +118,7 @@ def online_game():
     tracker = MapMovementTracker(internal_surface_size, window_size, )
     renderer = Render(internal_surface_size, map_movement_tracker=tracker, user_interface=user_interface)
     click_handler = MouseClickHandler(game_map, user_interface, tracker, mover)
+    counter = 0
     while run:
         clock.tick(60)
 
@@ -128,12 +130,17 @@ def online_game():
             for move in game_map.actions:
                 moves += move
             if moves != "":
+                print("sending", moves)
                 update = n.send(moves)
 
             else:
+                # print("send no_moves")
                 update = n.send("no_moves")
-            print("update", update)
-            print("game_map.actions", game_map.actions)
+            counter+=1
+            # if counter == 10:
+                # sleep(2)
+            # print("update", update)
+            # print("game_map.actions", game_map.actions)
             game_map.actions = []
 
             if update:
@@ -167,6 +174,8 @@ def online_game():
 
         for event in events_list:
             if event.type == QUIT:
+                print("Quitting")
+                n.close()
                 run = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:

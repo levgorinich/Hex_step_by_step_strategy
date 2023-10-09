@@ -7,10 +7,13 @@ import asyncio
 import random
 from  OnServer import Game
 import  time
+import logging
+logging.basicConfig(filename="server.log", level=logging.DEBUG)
 
 
-comands = {0: "", 1: "",}
+
 games = {}
+
 
 async def main():
 
@@ -35,60 +38,99 @@ connected = set()
 games = {}
 idCount = 0
 
-async def get_client_move(p: int, gameID: int, conn: socket.socket, loop: AbstractEventLoop):
+async def get_client_move(p: int, gameID: int, conn: socket.socket, loop: AbstractEventLoop, open_games = None):
 
     global idCount
-    conn.send(str.encode(str(p)+ " "+ str(games[gameID].seed)))
+    game = games[gameID]
+    conn.send(str.encode(str(p)+ " "+ str(game.seed)))
     reply = ""
-    while data :=  await loop.sock_recv(conn,4096):
+    while True:
+        try:
+            data=  await asyncio.wait_for(loop.sock_recv(conn,4096), 1)
+            # print(data =="")
+            # print(type(data))
+            data = data.decode()
 
-        data = data.decode()
+        except asyncio.exceptions.TimeoutError:
+            conn.close()
+            game.remove_player(p)
+            games.pop(gameID)
+            if game == open_games[0]:
+                open_games.pop()
+            # print("Timeout")
+
+
         # print(data)
         if gameID in games:
             game = games[gameID]
             if not data:
                 print("Lost connection")
+                conn.close()
+                game.remove_player(p)
+                games.pop(gameID)
+                if game == open_games[0]:
+                    open_games.pop()
                 break
+
             else:
                 # print(comands)
                 if data != "no_moves":
                     # print(data)
 
-                    for key in comands:
+                    for key in game.comands:
                         if key != p:
-                            comands[key] += data
+                            game.comands[key] += data
 
-                comands_to_send = comands[p]
+                comands_to_send = game.comands[p]
                 if comands_to_send == "":
                     comands_to_send = "empty"
                 # print(comands_to_send)
                 await loop.sock_sendall(conn, str.encode(comands_to_send))
-                comands[p] = ""
+                game.comands[p] = ""
+
+    print("stop  a loop", data)
+
 
 
 async def listening_for_connection(main_socket, loop: AbstractEventLoop):
 
+    global game_with
     connected = set()
-
+    open_games = []
     idCount = 0
+    gameIDCount = 0
     while True:
         conn, addr = await loop.sock_accept(main_socket)
         conn.setblocking(False)
         print("Connected to: " + addr[0] + ":" + str(addr[1]))
         idCount +=1
-        p=0
-        gameID = (idCount-1)//2
 
 
 
-        if idCount %2 ==1:
 
+        print(open_games)
+        if not open_games:
+            print("createing player 0")
+            p= 0
+            gameIDCount+=1
+
+            gameID = gameIDCount
             seed = random.randint(0,4000)
-            games[gameID] = Game(gameID, seed)
+            game= Game(gameID, seed)
+            game.add_player(p)
+            games[gameID] = game
+            open_games.append(games[gameID])
             print("Created Game ID: ", gameID)
         else :
-            p=1
-        asyncio.create_task(get_client_move(p, gameID,seed, conn, loop))
+            p= len(open_games[0].players)
+            print("Created player 1", p)
+            open_games[0].add_player(p)
+            if p == open_games[0].max_players -1:
+                open_games.pop()
+        print(open_games)
+
+
+        asyncio.create_task(get_client_move(p, gameIDCount, conn, loop, open_games))
 
 
 asyncio.run(main(), debug = True)
