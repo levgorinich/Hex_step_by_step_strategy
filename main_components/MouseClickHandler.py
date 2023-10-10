@@ -5,20 +5,16 @@ class MouseClickHandler:
     def __init__(self,game_map,  User_interface, tracker, mover):
         self.user_interface = User_interface
         self.game_map = game_map
+        self.tracker = tracker
+        self.mover = mover
         self.selected_sprite = None
         self.sprite_clicked = None
         self.unit_selected = None
-        self.tracker = tracker
-        self.was_clicked = False
-        self.mover = mover
-        self.pos = []
-        self.clear = None
-        self.check_on_activate = 0
-        # self.mover = Mover(self.game_map)
-        self.actions  = set()
-        self.player = User_interface.player
-        pass
 
+        self.was_clicked = False
+        self.hexes_available_move_selected_unit = []
+
+        self.player = User_interface.player
 
     def handle_click(self, event):
 
@@ -29,7 +25,7 @@ class MouseClickHandler:
         if not self.was_clicked:
             self.check_hex_click(event)
     def check_UI_click(self):
-        result = self.user_interface.check_click(self.game_map)
+        result = self.user_interface.check_click()
         if result:
             self.was_clicked = True
 
@@ -38,73 +34,53 @@ class MouseClickHandler:
 
     def check_hex_click(self, event):
 
+        self.clear_selected_hexes()
         mouse = pygame.math.Vector2(pygame.mouse.get_pos())
-
         mouse -= self.tracker.get_dragging_offset()
+
         if event.button == 1:
-            self.pos = []
+
             if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
                 self.selected_sprite = selected_sprite_clicked
 
-                if self.selected_sprite.unit_on_hex:
 
-
-                    print("check", self.selected_sprite.unit_on_hex.player_id == self.game_map.player_id)
-                    if self.selected_sprite.unit_on_hex and self.selected_sprite.unit_on_hex.player_id == self.game_map.player_id:
-                        self.unit_selected = self.selected_sprite.unit_on_hex
-                        print("got inside ")
-                        if self.selected_sprite.grid_pos[0]%2 == 0:
-                            offset = 1
-                        else:
-                            offset = -1
-
-                        # set the mobility
-                        # col,row = self.unit_selected.range_of_2(self.selected_sprite.grid_pos,offset)
-                        available_pos = self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.sea_hexes,
-                                                                         self.game_map.mountain_hexes,
-                                                                         self.game_map.rows,self.game_map.columns)
-                        for i in range(len(available_pos)):
-                                self.pos.append(available_pos[i])
-                        self.clear = True
-                        self.check_on_activate+=1
+                if self.selected_sprite.unit_on_hex and self.selected_sprite.unit_on_hex.player_id == self.game_map.player_id:
+                    self.unit_selected = self.selected_sprite.unit_on_hex
+                    self.hexes_available_move_selected_unit  = self.game_map.reachable_hexes(
+                        self.selected_sprite.grid_pos, self.unit_selected.stamina)
 
         if event.button == 3:
-            self.check_on_activate = 0
-
 
             self.sprite_clicked = self.check_if_hex_is_clicked(event)
             if self.check_if_hex_is_clicked(event) and self.unit_selected :
-                self.clear = None
-                # self.pos = []
                 starting_sprite = self.selected_sprite.grid_pos
                 ending_sprite = self.sprite_clicked.grid_pos
 
-                diff = (ending_sprite[0]-starting_sprite[0],ending_sprite[1]-starting_sprite[1])
+                available_pos= self.game_map.reachable_hexes(
+                        self.selected_sprite.grid_pos, self.unit_selected.stamina)
 
-                # #check on even or odd
-                if starting_sprite[0]%2 == 0:
-                    offset = 1
-                else:
-                    offset = -1
-                
-                # # set the mobility
-                available_pos= self.unit_selected.hex_reachable(self.selected_sprite.grid_pos,self.game_map.sea_hexes,
-                                                                         self.game_map.mountain_hexes,
-                                                                         self.game_map.rows,self.game_map.columns)
-                # if self.unit_selected.range_of_movement(diff,offset):
                 if ending_sprite in available_pos and self.player.moves > 0:
                     self.mover.move(starting_sprite, ending_sprite)
+                    self.game_map.actions.append("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
                     self.player.moves -= 1
-                    if self.player.moves == 0:
-                        print("end turn")
-
-
-                    self.game_map.actions.add("<move"+str(starting_sprite)+ ","+str(ending_sprite)+">")
-
                     self.unit_selected = None
 
+        self.draw_selected_hexes()
 
 
+    def clear_selected_hexes(self):
+
+        for pos in self.hexes_available_move_selected_unit:
+            cell_hex = self.game_map.get_hex_by_coord(pos)
+            if cell_hex:
+                cell_hex.draw()
+        self.hexes_available_move_selected_unit = []
+    def draw_selected_hexes(self):
+
+        for pos in self.hexes_available_move_selected_unit:
+            cell_hex = self.game_map.get_hex_by_coord(pos)
+            if cell_hex:
+                cell_hex.draw_in_unit_range()
     def check_if_hex_is_clicked(self, event):
         mouse = pygame.math.Vector2(event.pos)
 
