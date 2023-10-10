@@ -49,6 +49,7 @@ def offline_game():
         if not player.player.cur_turn:
 
             update = str(player.game_map.actions)
+            player.game_map.actions = []
             print(update)
 
             player = players.popleft()

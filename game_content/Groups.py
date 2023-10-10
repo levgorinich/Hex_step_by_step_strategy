@@ -20,11 +20,13 @@ class HexesGroup(pygame.sprite.Group):
         return self.hexes_dict[item]
 
     def get_hex_offset_coord (self, hex):
+
         cube_pos = self.hexes_dict.get_keys(hex)[0]
+
         return cube_pos
 
     def get_hex_cube_coords(self, hex):
-        print("this is hex in getting cube coords ", hex)
+
         cube_pos = self.hexes_dict.get_keys(hex)[1]
         return cube_pos
 

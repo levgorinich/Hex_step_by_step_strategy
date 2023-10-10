@@ -35,6 +35,9 @@ class Spawner:
         if not hexagon.unit_on_hex:
 
             hexagon.add_unit(unit)
+            if unit.player_id == self.game_map.player_id:
+                self.game_map.coordinate_range(hexagon, unit.discovery_range)
+                unit.hexes_viewed = self.game_map.view_range(hexagon, unit.view_range)
             self.game_map.units.add(unit)
             if player_id == self.player_id:
                 self.game_map.actions.append(string)

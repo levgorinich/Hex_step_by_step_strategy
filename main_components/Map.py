@@ -49,6 +49,7 @@ class Map:
 
         cube_coords1 = self.get_cube_coords(hex1)
         cube_coords2 = self.get_cube_coords(hex2)
+        print("Calculating distance between ",cube_coords1,cube_coords2)
         return int((abs(cube_coords1[0] - cube_coords2[0]) + abs(cube_coords1[1] - cube_coords2[1])+abs(cube_coords1[2] - cube_coords2[2]))//2)
 
 
@@ -115,32 +116,61 @@ class Map:
         star = self.get_hex_by_coord(start)
         fringes = [] # array of arrays of hexes
         fringes.append([start])
+        if radius >0:
+            for dir in range(6):
+                neighbor = self.oddq_offset_neighbor(start,dir)
+                neighbor_hex = self.get_hex_by_coord(neighbor)
+                if neighbor_hex and isinstance(neighbor_hex, Hexagon_sea) and not isinstance(star, Hexagon_sea) or\
+                        not isinstance(neighbor_hex, (Hexagon_mountain, Hexagon_sea)) and isinstance(star, Hexagon_sea):
+                    visited.add(neighbor)
 
-        for dir in range(6):
-            neighbor = self.oddq_offset_neighbor(start,dir)
-            neighbor_hex = self.get_hex_by_coord(neighbor)
-            if neighbor_hex and isinstance(neighbor_hex, Hexagon_sea) and not isinstance(star, Hexagon_sea) or\
-                    not isinstance(neighbor_hex, (Hexagon_mountain, Hexagon_sea)) and isinstance(star, Hexagon_sea):
-                visited.add(neighbor)
+            for mov in range(1,radius+1):
 
-        for mov in range(1,radius+1):
+                for hex in fringes[mov-1]:
+                    fringes.append([])
+                    for dir in range(0,6):
 
-            for hex in fringes[mov-1]:
-                fringes.append([])
-                for dir in range(0,6):
+                        neighbor  = self.oddq_offset_neighbor(hex,dir)
+                        neighbor_hex = self.get_hex_by_coord(neighbor)
 
-                    neighbor  = self.oddq_offset_neighbor(hex,dir)
-                    neighbor_hex = self.get_hex_by_coord(neighbor)
+                        if not isinstance(star, Hexagon_sea) and not isinstance(neighbor_hex, (Hexagon_mountain, Hexagon_sea)) or\
+                                isinstance(star, Hexagon_sea) and isinstance(neighbor_hex, Hexagon_sea) and neighbor_hex:
 
-                    if not isinstance(star, Hexagon_sea) and not isinstance(neighbor_hex, (Hexagon_mountain, Hexagon_sea)) or\
-                            isinstance(star, Hexagon_sea) and isinstance(neighbor_hex, Hexagon_sea) and neighbor_hex:
-
-                        if neighbor not in visited and  self.check_coord_validity(neighbor):
-                            visited.add(neighbor)
-                            fringes[mov].append(neighbor)
+                            if neighbor not in visited and  self.check_coord_validity(neighbor):
+                                visited.add(neighbor)
+                                fringes[mov].append(neighbor)
 
         return tuple(visited)
 
+    def coordinate_range(self, hex, distance):
+        distance = int(distance)
+        qs,rs,ss = map(int,self.get_cube_coords(hex))
+        for q in range(qs - distance, qs + distance + 1):
+
+            for r in range(rs - distance, rs + distance + 1):
+                for s in range(ss - distance, ss + distance + 1):
+
+                    if q + r + s == 0 and q >= 0 and q < self.columns and r > -self.rows  and s <=0:
+
+                        hex = self.hexes[(q,r,s)]
+                        if hex:
+                            hex.reveal_hex()
+
+    def view_range(self, hex, distance):
+        hexes = []
+        distance = int(distance)
+        qs,rs,ss = map(int,self.get_cube_coords(hex))
+
+        for q in range(qs - distance, qs + distance + 1):
+            for r in range(rs - distance, rs + distance + 1):
+                for s in range(ss - distance, ss + distance + 1):
+
+                    if q + r + s == 0 and q >= 0 and q < self.columns and r > -self.rows  and s <=0:
+                        hex = self.hexes[(q,r,s)]
+                        if hex and hex.is_discovered:
+                            hex.view_hex()
+                            hexes.append(hex)
+        return hexes
     def qoffset_from_cube(self,q,r,s,offset):
         col = q
         if offset == -1:
@@ -154,6 +184,7 @@ class Map:
             unit.restore_stamina()
         string = "<end_turn" + str(self.player_id) + ">"
         self.actions.append(string)
+
 
 
 

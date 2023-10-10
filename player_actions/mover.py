@@ -1,5 +1,5 @@
 import random
-
+import logging
 import pygame
 
 
@@ -33,10 +33,18 @@ class Mover():
             self.starting_sprite.remove_unit()
 
             unit.move(hex_end, distance)
+            print("in mover", unit.hexes_viewed)
+            for hex in unit.hexes_viewed:
+                hex.hide_hex()
+            unit.hexes_viewed=[]
+            if unit.player_id == self.game_map.player_id:
+                self.game_map.coordinate_range(self.ending_sprite, unit.discovery_range)
+                unit.hexes_viewed = self.game_map.view_range(self.ending_sprite, unit.view_range)
             self.ending_sprite.add_unit(unit)
 
     def swap_units(self, hex_end, hex_start, distance):
 
+        logging.debug("swap units attacking", self.atacking_unit, self.defending_unit)
         self.atacking_unit.move(hex_end, distance)
         self.defending_unit.move(hex_start, distance)
         self.starting_sprite.remove_unit()
@@ -66,11 +74,13 @@ class Mover():
 
 
     def kill_all(self, ):
+            logging.debug("kill all")
             self.ending_sprite.kill_unit()
             self.starting_sprite.kill_unit()
             print("double death")
 
     def kill_enemy(self, ):
+            logging.debug("kill enemy")
             self.ending_sprite.kill_unit()
             self.atacking_unit.update_hp()
             self.atacking_unit.move(self.ending_sprite.grid_pos, 0)
@@ -80,16 +90,14 @@ class Mover():
             self.atacking_unit = None
 
     def kill_yourself(self,):
+            logging.debug("kill yourself")
             self.defending_unit.update_hp()
             self.starting_sprite.kill_unit()
 
     def kill_nothing(self, ):
+            logging.debug("kill nothing")
             self.defending_unit.update_hp()
             self.atacking_unit.update_hp()
 
 
-    def move_unit(self):
-        self.ending_sprite.remove_unit()
-        self.unit_selected.grid_pos = self.ending_sprite.grid_pos
-        self.ending_sprite.add_unit(self.unit_selected)
-        self.unit_selected = None
+
