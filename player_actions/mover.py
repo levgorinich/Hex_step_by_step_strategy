@@ -24,8 +24,10 @@ class Mover():
 
             if self.atacking_unit.player_id != self.defending_unit.player_id and  distance ==1:
                 self.handle_fighting(self.atacking_unit, self.defending_unit)
-            elif distance <= min(self.atacking_unit.stamina, self.defending_unit.stamina):
+            elif distance <= min(self.atacking_unit.stamina, self.defending_unit.stamina)\
+                and self.atacking_unit.player_id == self.defending_unit.player_id:
                 self.swap_units( hex_end, hex_start, distance)
+            
 
 
         elif unit := self.starting_sprite.unit_on_hex:

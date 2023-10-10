@@ -106,7 +106,7 @@ def online_game():
     print("You are player", player_id)
 
 
-    game_map = Map(25, 25, player_id, seed)
+    game_map = Map(20, 20, player_id, seed)
 
     player = Player(player_id,game_map )
 
