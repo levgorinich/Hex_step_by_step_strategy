@@ -24,7 +24,8 @@ class Mover():
 
             if self.atacking_unit.player_id != self.defending_unit.player_id and  distance ==1:
                 self.handle_fighting(self.atacking_unit, self.defending_unit)
-            elif distance <= min(self.atacking_unit.stamina, self.defending_unit.stamina):
+            elif distance <= min(self.atacking_unit.stamina, self.defending_unit.stamina)\
+                    and self.atacking_unit.player_id == self.defending_unit.player_id:
                 self.swap_units( hex_end, hex_start, distance)
 
 
@@ -32,21 +33,14 @@ class Mover():
 
             self.starting_sprite.remove_unit()
 
-            unit.move(hex_end, distance)
-            print("in mover", unit.hexes_viewed)
-            for hex in unit.hexes_viewed:
-                hex.hide_hex()
-            unit.hexes_viewed=[]
-            if unit.player_id == self.game_map.player_id:
-                self.game_map.coordinate_range(self.ending_sprite, unit.discovery_range)
-                unit.hexes_viewed = self.game_map.view_range(self.ending_sprite, unit.view_range)
+            self.move_unit(unit, self.starting_sprite, self.ending_sprite)
             self.ending_sprite.add_unit(unit)
 
     def swap_units(self, hex_end, hex_start, distance):
 
         logging.debug("swap units attacking", self.atacking_unit, self.defending_unit)
-        self.atacking_unit.move(hex_end, distance)
-        self.defending_unit.move(hex_start, distance)
+        self.move_unit(self.atacking_unit, self.starting_sprite, self.ending_sprite)
+        self.move_unit(self.defending_unit, self.ending_sprite, self.starting_sprite)
         self.starting_sprite.remove_unit()
         self.ending_sprite.remove_unit()
         self.starting_sprite.add_unit(self.defending_unit)
@@ -83,7 +77,7 @@ class Mover():
             logging.debug("kill enemy")
             self.ending_sprite.kill_unit()
             self.atacking_unit.update_hp()
-            self.atacking_unit.move(self.ending_sprite.grid_pos, 0)
+            self.move_unit(self.atacking_unit, self.starting_sprite, self.ending_sprite)
 
             self.starting_sprite.remove_unit()
             self.ending_sprite.add_unit(self.atacking_unit)
@@ -98,6 +92,20 @@ class Mover():
             logging.debug("kill nothing")
             self.defending_unit.update_hp()
             self.atacking_unit.update_hp()
+
+    def move_unit(self, unit, starting_sprite, ending_sprite):
+
+        distance = self.game_map.calculate_distance(self.starting_sprite, self.ending_sprite)
+        unit.move(ending_sprite.grid_pos, distance)
+
+
+        if unit.player_id == self.game_map.player_id:
+            unit.hide_hexes()
+            discoverd_hexes = self.game_map.coordinate_range(self.ending_sprite, unit.discovery_range)
+            [hex.reveal_hex() for hex in discoverd_hexes]
+            unit.hexes_viewed = self.game_map.coordinate_range(self.ending_sprite, unit.view_range)
+            unit.view_hexes()
+
 
 
 

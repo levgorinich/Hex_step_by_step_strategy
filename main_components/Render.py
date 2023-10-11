@@ -49,7 +49,8 @@ class Render:
         self.display_map_objects(game_map.buildings, game_map.hexes.hexes_dict)
 
 
-        scaled_surface = pygame.transform.scale(self.internal_surface, self.map_movement_tracker.get_internal_surface_scale())
+        # scaled_surface = pygame.transform.scale(self.internal_surface, self.map_movement_tracker.get_internal_surface_scale())
+        scaled_surface = pygame.transform.smoothscale(self.internal_surface, self.map_movement_tracker.get_internal_surface_scale())
         scaled_rect = scaled_surface.get_rect(center = self.internal_surface_rect.center)
         # print(scaled_rect, "size")
         self.display_surface.blit(scaled_surface,(scaled_rect[0],scaled_rect[1]))

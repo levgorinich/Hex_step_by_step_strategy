@@ -143,6 +143,7 @@ class Map:
         return tuple(visited)
 
     def coordinate_range(self, hex, distance):
+        hexes=[]
         distance = int(distance)
         qs,rs,ss = map(int,self.get_cube_coords(hex))
         for q in range(qs - distance, qs + distance + 1):
@@ -154,7 +155,8 @@ class Map:
 
                         hex = self.hexes[(q,r,s)]
                         if hex:
-                            hex.reveal_hex()
+                            hexes.append(hex)
+        return hexes
 
     def view_range(self, hex, distance):
         hexes = []

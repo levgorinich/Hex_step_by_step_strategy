@@ -86,6 +86,8 @@ class Hexagon(MapObject):
 
     def kill_unit(self):
         if self.unit_on_hex:
+            print("kill unit")
+            self.unit_on_hex.hide_hexes()
             self.unit_on_hex.kill()
         self.remove_unit()
 
@@ -196,6 +198,13 @@ class Unit(MapObject):
 
     def restore_stamina(self):
         self.stamina = self.max_stamina
+
+    def hide_hexes(self):
+        [hex.hide_hex() for hex in self.hexes_viewed]
+        self.hexes_viewed = []
+    def view_hexes(self):
+        [hex.view_hex() for hex in self.hexes_viewed]
+
 
 
 

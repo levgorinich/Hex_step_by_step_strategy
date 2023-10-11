@@ -18,7 +18,7 @@ from player_actions.mover import Mover
 from main_components.Player import Player
 from collections import deque
 #
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
 pygame.init()
 clock = pygame.time.Clock()
 
@@ -106,7 +106,7 @@ def online_game():
     print("You are player", player_id)
 
 
-    game_map = Map(25, 25, player_id, seed)
+    game_map = Map(20, 20, player_id, seed)
 
     player = Player(player_id,game_map )
 
