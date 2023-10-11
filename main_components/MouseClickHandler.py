@@ -43,10 +43,11 @@ class MouseClickHandler:
             if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
                 self.selected_sprite = selected_sprite_clicked
 
+
                 if self.selected_sprite.unit_on_hex and self.selected_sprite.unit_on_hex.player_id == self.game_map.player_id:
                     self.unit_selected = self.selected_sprite.unit_on_hex
                     self.hexes_available_move_selected_unit  = self.game_map.reachable_hexes(
-                        self.selected_sprite.grid_pos, self.unit_selected.mobility)
+                        self.selected_sprite.grid_pos, self.unit_selected.stamina)
 
         if event.button == 3:
 
@@ -56,7 +57,7 @@ class MouseClickHandler:
                 ending_sprite = self.sprite_clicked.grid_pos
 
                 available_pos= self.game_map.reachable_hexes(
-                        self.selected_sprite.grid_pos, self.unit_selected.mobility)
+                        self.selected_sprite.grid_pos, self.unit_selected.stamina)
 
                 if ending_sprite in available_pos and self.player.moves > 0:
                     self.mover.move(starting_sprite, ending_sprite)
@@ -71,13 +72,15 @@ class MouseClickHandler:
 
         for pos in self.hexes_available_move_selected_unit:
             cell_hex = self.game_map.get_hex_by_coord(pos)
-            cell_hex.draw()
+            if cell_hex:
+                cell_hex.draw()
         self.hexes_available_move_selected_unit = []
     def draw_selected_hexes(self):
 
         for pos in self.hexes_available_move_selected_unit:
             cell_hex = self.game_map.get_hex_by_coord(pos)
-            cell_hex.draw_in_unit_range()
+            if cell_hex:
+                cell_hex.draw_in_unit_range()
     def check_if_hex_is_clicked(self, event):
         mouse = pygame.math.Vector2(event.pos)
 

@@ -24,8 +24,8 @@ class MapObject(pygame.sprite.Sprite):
         return f"{self.name} {self.grid_pos[0]}, {self.grid_pos[1]}"
 
     def offset_to_cube_coords(self, grid_pos):
-        q = grid_pos[1]
-        r = grid_pos[0] - (grid_pos[1] - (grid_pos[1] & 1)) / 2
+        q = grid_pos[0]
+        r = grid_pos[1] - (grid_pos[0] - (grid_pos[0] & 1)) / 2
         return q, r, -q - r
     ## correct version. [col,row] in this order
     def offset_to_cube_coords_for_moving(self, grid_pos,offset):
@@ -47,10 +47,11 @@ class MapObject(pygame.sprite.Sprite):
 
 
 class Hexagon(MapObject):
-    def __init__(self, grid_pos, color=(30, 70, 50), width=hex_width, height=hex_height):
+    def __init__(self, grid_pos, color=(30, 70, 50), color_not_viewed = (0,0,0), width=hex_width, height=hex_height):
         super().__init__(grid_pos)
         self.grid_pos = grid_pos
         self.color = color
+        self.color_not_viewed = color_not_viewed
         self.width = width
         self.height = height
         self.type = "hexagon"
@@ -59,6 +60,8 @@ class Hexagon(MapObject):
         self.rect = self.image.get_rect(center=(self.map_coords[0], self.map_coords[1]))
         pygame.draw.polygon(self.image, self.color, self.points)
         self.mask = pygame.mask.from_surface(self.image)
+        self.is_discovered = False
+        self.is_viewed = 0
 
         self.unit_on_hex = None
         self.building_on_hex = None
@@ -92,19 +95,39 @@ class Hexagon(MapObject):
     def update(self):
         pass
     def draw(self):
-        pass
+        if self.is_discovered and self.is_viewed:
+            pygame.draw.polygon(self.image, self.color, self.points)
+        elif self.is_discovered and not self.is_viewed:
+            pygame.draw.polygon(self.image, self.color_not_viewed, self.points)
+        else:
+            pygame.draw.polygon(self.image, (0, 0, 0), self.points)
+
     def draw_in_unit_range(self):
         print("Do nothing")
         pass
+
+    def reveal_hex(self):
+        self.is_discovered = True
+        self.draw()
+
+    def view_hex(self):
+        self.is_viewed+=1
+        self.draw()
+
+    def hide_hex(self):
+        self.is_viewed-=1
+        self.draw()
 
 class Hexagon_land(Hexagon):
     def __init__(self, grid_pos, color=(30, 70, 50), width=hex_width, height=hex_height):
         super().__init__(grid_pos, color, width=hex_width, height=hex_height)
         self.color = color
+        self.color_not_viewed = (20,50,40)
         self.type = "land Hexagon"
+        self.draw()
 
-    def draw(self):
-        pygame.draw.polygon(self.image, self.color, self.points)
+    # def draw(self):
+    #     pygame.draw.polygon(self.image, self.color, self.points)
 
     def draw_in_unit_range(self):
 
@@ -114,10 +137,12 @@ class Hexagon_mountain(Hexagon):
     def __init__(self, grid_pos, color=(255,255, 255), width=hex_width, height=hex_height):
         super().__init__(grid_pos, color, width=hex_width, height=hex_height)
         self.color = color
+        self.color_not_viewed = (240,230,240)
         self.type = "mountain Hexagon"
+        self.draw()
 
-    def draw(self):
-        pygame.draw.polygon(self.image, self.color, self.points)
+    # def draw(self):
+    #     pygame.draw.polygon(self.image, self.color, self.points)
 
     def draw_in_unit_range(self):
         color_selected = (225,225, 225)
@@ -125,12 +150,17 @@ class Hexagon_mountain(Hexagon):
 
 class Hexagon_sea(Hexagon):
     def __init__(self, grid_pos, color=(83,236, 236), width=hex_width, height=hex_height):
+
         super().__init__(grid_pos, color, width=hex_width, height=hex_height)
         self.color = color
+        self.color_not_viewed = (70,210,220)
+
         self.type = "sea Hexagon"
 
-    def draw(self):
-        pygame.draw.polygon(self.image, self.color, self.points)
+        self.draw()
+
+    # def draw(self):
+    #     pygame.draw.polygon(self.image, self.color, self.points)
     def draw_in_unit_range(self):
         color_selected = (53,186, 186)
         pygame.draw.polygon(self.image, color_selected, self.points)
@@ -152,12 +182,20 @@ class Unit(MapObject):
     def __init__(self, grid_pos):
         super().__init__(grid_pos)
         self.name = "unit"
-        self.mobility = None
+        self.max_stamina = None
+        self.stamina = None
         self.price=None
+        self.view_range =4
+        self.hexes_viewed = []
 
-    def move(self, move_on_hex_grid):
-        self.grid_pos += move_on_hex_grid
-        self.map_coord = self.calculate_coordinate_by_hex_position(self.grid_pos)
+
+    def move(self, grid_pos, distance):
+        self.grid_pos = grid_pos
+        self.stamina -= distance
+        # self.map_coord = self.calculate_coordinate_by_hex_position(self.grid_pos)
+
+    def restore_stamina(self):
+        self.stamina = self.max_stamina
 
 
 
@@ -170,6 +208,7 @@ class MilitaryUnit(Unit):
         self.hp = 10
         self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         self.draw()
+        self.discovery_range = 2
 
     def draw_shape(self):
         pass
@@ -179,6 +218,7 @@ class MilitaryUnit(Unit):
         self.health_bar.draw(self.image, self.hp)
 
     def strike(self):
+        self.stamina =0
         return self.attack *(random.random()/2 +0.75)
 
     def defend(self):
@@ -198,7 +238,8 @@ class TriangularUnit(MilitaryUnit):
         self.hp = 3
         self.name = "triangular unit"
         self.attack = 3
-        self.mobility = 1
+        self.max_stamina =1
+        self.stamina = 1
         self.draw()
 
     def draw_shape(self):
@@ -206,7 +247,7 @@ class TriangularUnit(MilitaryUnit):
                                                 (self.width - 1, self.height / 4 + 2)])
 
     def __repr__(self):
-        return f"{self.name} {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
+        return f" unit {self.name} on hex {self.grid_pos[0]}, {self.grid_pos[1]} player {self.player_id}"
 
 
 class SquareUnit(MilitaryUnit):
@@ -217,14 +258,15 @@ class SquareUnit(MilitaryUnit):
         self.price = 30
         self.attack = 2
         self.hp =3
-        self.mobility = 2
+        self.max_stamina= 2
+        self.stamina = 2
         self.draw()
 
     def draw_shape(self):
         pygame.draw.rect(self.image, self.color, (0, 0, self.width, self.height))
 
     def __repr__(self):
-        return f"{self.name} {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
+        return f"{self.name} on hex {self.grid_pos[0]}, {self.grid_pos[1]} player {self.player_id}"
 
 
 class WarBase(MilitaryUnit):
@@ -232,7 +274,9 @@ class WarBase(MilitaryUnit):
         self.color = color
         super().__init__(grid_pos, player_id)
         self.name = "war base"
-        self.mobility=0
+        self.max_stamina= 0
+        self.stamina = 0
+
         self.attack = 0
         self.hp = 10
         self.draw()
@@ -242,7 +286,7 @@ class WarBase(MilitaryUnit):
                                                self.height - self.height / 4 + 2))
 
     def __repr__(self):
-        return f"CircleUnit {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
+        return f"{self.name} on hex {self.grid_pos[0]}, {self.grid_pos[1]}, player {self.player_id}"
 
 
 class CircleUnit(MilitaryUnit):
@@ -253,13 +297,14 @@ class CircleUnit(MilitaryUnit):
         self.price = 30
         self.attack = 1
         self.hp = 3
-        self.mobility = 3
+        self.max_stamina= 3
+        self.stamina = 3
         self.draw()
 
     def draw_shape(self):
         pygame.draw.circle(self.image, self.color, (self.width / 2, self.height / 2), 10)
 
     def __repr__(self):
-        return f"CircleUnit {self.grid_pos[0]}, {self.grid_pos[1]}, {self.player_id}"
+        return f"CircleUnit o hex {self.grid_pos[0]}, {self.grid_pos[1]} player {self.player_id}"
 
 

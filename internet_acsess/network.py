@@ -43,6 +43,8 @@ class Network:
         except socket.error as e:
             print("I stoped here ")
             print(e)
+    def close(self):
+        self.client.close()
     def get_changes(self):
         try:
             return self.client.recv(2048).decode()

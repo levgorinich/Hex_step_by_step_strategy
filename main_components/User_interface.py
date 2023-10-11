@@ -36,8 +36,8 @@ class UI:
         if self.player.cur_turn:
             self.player.cur_turn = False
             self.player.moves = 0
-            string = "<end_turn" + str(self.game_map.player_id) + ">"
-            self.game_map.actions.append(string)
+            self.game_map.end_turn()
+
     def add_buttons(self, text):
         buttons = []
         titles = ["Triangular","Square","Circle"]

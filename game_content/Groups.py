@@ -16,6 +16,21 @@ class HexesGroup(pygame.sprite.Group):
             self.hexes_dict[hex] = [hex.grid_pos, cube_pos]  # Add sprite to the lookup dictionary
 
 
+    def __getitem__(self, item):
+        return self.hexes_dict[item]
+
+    def get_hex_offset_coord (self, hex):
+
+        cube_pos = self.hexes_dict.get_keys(hex)[0]
+
+        return cube_pos
+
+    def get_hex_cube_coords(self, hex):
+
+        cube_pos = self.hexes_dict.get_keys(hex)[1]
+        return cube_pos
+
+
 
 class KeyAlreadyExistsError(Exception):
     pass
@@ -27,6 +42,8 @@ class Grid(dict):
         self.value_to_keys = {}
 
     def __setitem__(self, value: Any, keys: list[Any])  -> None:
+
+        print(value, keys)
         for key in keys:
             if key not in self.key_to_value.keys():
                 # print(key, value)
