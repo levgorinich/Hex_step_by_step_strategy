@@ -43,7 +43,7 @@ class Grid(dict):
 
     def __setitem__(self, value: Any, keys: list[Any])  -> None:
 
-        print(value, keys)
+
         for key in keys:
             if key not in self.key_to_value.keys():
                 # print(key, value)

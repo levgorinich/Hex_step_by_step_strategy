@@ -42,7 +42,8 @@ async def get_client_move(p: int, gameID: int, conn: socket.socket, loop: Abstra
 
     global idCount
     game = games[gameID]
-    conn.send(str.encode(str(p)+ " "+ str(game.seed)))
+    conn.send(str.encode(str(p)+ " "+ str(game.seed) + " " + str(game.max_players)))
+    print("send starting data ")
     reply = ""
     while True:
         try:
@@ -116,7 +117,7 @@ async def listening_for_connection(main_socket, loop: AbstractEventLoop):
 
             gameID = gameIDCount
             seed = random.randint(0,4000)
-            game= Game(gameID, seed)
+            game= Game(gameID, seed, 3)
             game.add_player(p)
             games[gameID] = game
             open_games.append(games[gameID])

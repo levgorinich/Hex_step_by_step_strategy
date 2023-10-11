@@ -1,10 +1,11 @@
 
 import logging
 class Parser:
-    def __init__(self, mover, spawner, player ):
+    def __init__(self, mover, spawner, player, max_players=2 ):
         self.mover = mover
         self.spawner = spawner
         self.player = player
+        self.max_players = max_players
     def parse_moves(self, move):
 
         logging.debug("Sting to parse: " + move)
@@ -45,5 +46,7 @@ class Parser:
 
     def parse_end_turn(self, move):
         move = move.replace("end_turn", "")
-        self.player.start_turn()
+        move = int(move)
+        if move == self.player.id-1 or (move == self.max_players and self.player.id ==1):
+            self.player.start_turn()
         logging.debug("Parsed command for end turn")

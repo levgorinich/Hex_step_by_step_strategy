@@ -101,12 +101,14 @@ def online_game():
 
     player_id = int(n.getP())
     seed = n.getSeed()
+    playrs_amount = int(n.getPlayersAmount())
+    print("players amount in main ", playrs_amount)
 
 
     print("You are player", player_id)
 
 
-    game_map = Map(20, 20, player_id, seed)
+    game_map = Map(6, 6, player_id, seed, playrs_amount)
 
     player = Player(player_id,game_map )
 
@@ -114,7 +116,7 @@ def online_game():
         player.start_turn()
     mover = Mover(game_map)
     spawner = Spawner(game_map,)
-    move_parser = Parser(mover, spawner, player)
+    move_parser = Parser(mover, spawner, player, playrs_amount)
     user_interface = UI(window_size, game_map,player, spawner)
     tracker = MapMovementTracker(internal_surface_size, window_size, )
     renderer = Render(internal_surface_size, map_movement_tracker=tracker, user_interface=user_interface)

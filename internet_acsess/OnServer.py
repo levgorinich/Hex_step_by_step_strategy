@@ -6,7 +6,7 @@ class Game:
         self.players = []
         self.max_players = max_players
 
-        self.comands = {0: "", 1: "",}
+        self.comands = {x:"" for x in range(self.max_players)}
 
     def add_player(self, player):
         self.players.append(player)

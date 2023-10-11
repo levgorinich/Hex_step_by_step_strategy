@@ -5,7 +5,7 @@ class Spawner:
     def __init__(self, game_map):
         self.game_map = game_map
         self.player_id = game_map.player_id
-        self.id_colors= {0 : (255, 0, 0), 1: (0, 125, 255)}
+        self.id_colors= {0 : (255, 0, 0), 1: (0, 125, 255), 2:(125, 125,0), 3:(125, 0, 125)}
         self.create_start_unit()
 
     def create_start_unit(self):

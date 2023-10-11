@@ -11,12 +11,13 @@ import random
 
 class Map:
 
-    def __init__(self, rows, columns, player_id, seed, Offline=False):
+    def __init__(self, rows, columns, player_id, seed, players_amount = 2, Offline=False):
         self.seed = seed
         random.seed(self.seed)
 
         self.rows = rows
         self.columns = columns
+        self.players_amount = players_amount
 
         self.player_id = player_id
         self.actions=[]
@@ -77,18 +78,22 @@ class Map:
             base1 = (2,2)
             base2 = (3,2)
             self.spawn_point= self.offline_spawn_point[self.player_id]
+            self.Spawner.spawn_unit("WarBase",base1,player_id=0)
+            self.Spawner.spawn_unit("WarBase",base1,player_id=1)
             print("spawn point in map ",self.spawn_point)
         else:
-            base1 = random.choice(land_hexes)
-            base2 = random.choice(land_hexes)
-            if self.player_id == 0:
-                self.spawn_point = base1[0], base1[1]+1
-            else:
-                self.spawn_point = base2[0], base2[1]+1
-            print("spawn point in map ",self.spawn_point)
+            for i in range(self.players_amount):
+                print("amount of players in this game ", self.players_amount)
+                base1 = random.choice(land_hexes)
 
-        self.Spawner.spawn_unit("WarBase",base1,player_id=0)
-        self.Spawner.spawn_unit("WarBase",base2,player_id=1)
+                if self.player_id == i:
+                    self.spawn_point = base1[0], base1[1]+1
+
+                print("spawn point in map ",self.spawn_point)
+
+
+                self.Spawner.spawn_unit("WarBase",base1,player_id=i)
+
 
 
     def check_coord_validity(self,cords):
