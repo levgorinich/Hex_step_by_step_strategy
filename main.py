@@ -4,7 +4,7 @@ from time import sleep
 from pygame.locals import *
 import logging
 
-from Offline_Player import OfflinePlayer
+from main_components.Offline_Player import OfflinePlayer
 from internet_acsess.network import Network
 from main_components.Map import Map
 from main_components.MouseClickHandler import MouseClickHandler
@@ -29,32 +29,37 @@ screen = pygame.display.set_mode(window_size)
 
 internal_surface_size = (2500, 2500)
 
-
+running = True
 # creating main game classes
 
 
 # main loop
 def offline_game():
     players = deque()
-    for id in range(2):
+    for id in range(3):
         players.append(OfflinePlayer(window_size, internal_surface_size,id))
 
 
     player = players.popleft()
     players.append(player)
     player.player.start_turn()
+    commands = {i:[] for i in range(3)}
 
-    running = True
-    while running:
+    run = True
+    while run:
         if not player.player.cur_turn:
 
-            update = str(player.game_map.actions)
+            for key in commands.keys():
+                if key != player.player.id:
+                    commands[key].append(player.game_map.actions)
             player.game_map.actions = []
-            print(update)
 
             player = players.popleft()
             players.append(player)
             player.player.start_turn()
+            update = str(commands[player.player.id])
+            commands[player.player.id] = []
+            print(update)
             if update:
 
                 start, end = 0, 0
@@ -80,6 +85,8 @@ def offline_game():
 
         for event in events_list:
             if event.type == QUIT:
+                run = False
+                global running
                 running = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -108,7 +115,7 @@ def online_game():
     print("You are player", player_id)
 
 
-    game_map = Map(6, 6, player_id, seed, playrs_amount)
+    game_map = Map(20, 20, player_id, seed, playrs_amount)
 
     player = Player(player_id,game_map )
 
@@ -180,6 +187,8 @@ def online_game():
                 print("Quitting")
                 n.close()
                 run = False
+                global running
+                running = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 click_handler.handle_click(event)
@@ -190,10 +199,9 @@ def online_game():
 
 
 def game_menu():
-    running = True
-
+    global running
     def stop_menue():
-        nonlocal running
+        global running
         running = False
 
     while running:
@@ -208,18 +216,22 @@ def game_menu():
         buttons = [offline_game_button, online_game_button, exit_button]
 
         for button in buttons:
-            button.draw(screen)
-            button.check_click()
+            try:
+                button.draw(screen)
+                button.check_click()
+            except Exception as e:
+                print(e)
+        if running:
+            events_list = pygame.event.get()
 
-        events_list = pygame.event.get()
+            pygame.display.flip()
+            for event in events_list:
+                if event.type == QUIT:
+                    running = False
 
-        pygame.display.flip()
-        for event in events_list:
-            if event.type == QUIT:
-                running = False
-
-        if not running:
-            pygame.quit()
+            if not running:
+                pygame.quit()
+                sys.exit()
 
 
 game_menu()

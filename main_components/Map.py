@@ -50,7 +50,7 @@ class Map:
 
         cube_coords1 = self.get_cube_coords(hex1)
         cube_coords2 = self.get_cube_coords(hex2)
-        print("Calculating distance between ",cube_coords1,cube_coords2)
+
         return int((abs(cube_coords1[0] - cube_coords2[0]) + abs(cube_coords1[1] - cube_coords2[1])+abs(cube_coords1[2] - cube_coords2[2]))//2)
 
 
@@ -74,25 +74,20 @@ class Map:
             a = random.random()
             if a < 0.03:
                 self.Spawner.spawn_building("Mine",hex)
-        if self.offline:
-            base1 = (2,2)
-            base2 = (3,2)
-            self.spawn_point= self.offline_spawn_point[self.player_id]
-            self.Spawner.spawn_unit("WarBase",base1,player_id=0)
-            self.Spawner.spawn_unit("WarBase",base1,player_id=1)
-            print("spawn point in map ",self.spawn_point)
-        else:
-            for i in range(self.players_amount):
-                print("amount of players in this game ", self.players_amount)
-                base1 = random.choice(land_hexes)
-
-                if self.player_id == i:
-                    self.spawn_point = base1[0], base1[1]+1
-
-                print("spawn point in map ",self.spawn_point)
 
 
-                self.Spawner.spawn_unit("WarBase",base1,player_id=i)
+        for i in range(self.players_amount):
+            print("amount of players in this game ", self.players_amount)
+            base1 = random.choice(land_hexes)
+            print("base1 ",base1)
+
+            if self.player_id == i:
+                self.spawn_point = base1[0], base1[1]+1
+
+            print("spawn point in map ",self.spawn_point,i, self.player_id)
+
+
+            self.Spawner.spawn_unit("WarBase",base1,player_id=i)
 
 
 

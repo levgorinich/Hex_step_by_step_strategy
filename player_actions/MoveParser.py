@@ -47,6 +47,6 @@ class Parser:
     def parse_end_turn(self, move):
         move = move.replace("end_turn", "")
         move = int(move)
-        if move == self.player.id-1 or (move == self.max_players and self.player.id ==1):
+        if move == self.player.id-1 or (move == self.max_players-1 and self.player.id ==0):
             self.player.start_turn()
         logging.debug("Parsed command for end turn")
