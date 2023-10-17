@@ -126,6 +126,7 @@ class Hexagon_land(Hexagon):
         self.color = color
         self.color_not_viewed = (20,50,40)
         self.type = "land Hexagon"
+
         self.draw()
 
     # def draw(self):
