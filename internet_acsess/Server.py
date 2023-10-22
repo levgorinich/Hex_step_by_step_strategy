@@ -8,11 +8,25 @@ import random
 from  OnServer import Game
 import  time
 import logging
+import json
 logging.basicConfig(filename="server.log", level=logging.DEBUG)
 
 
 
 games = {}
+ta = 0 # game id count
+
+
+def create_game(ta):
+    game_id = ta
+    ta += 1
+
+    seed = random.randint(0,4000)
+    game= Game(game_id, seed, 3)
+    p = game.add_player()
+    games[game_id] = game
+
+
 
 
 async def main():
@@ -91,6 +105,27 @@ async def get_client_move(p: int, gameID: int, conn: socket.socket, loop: Abstra
 
     print("stop  a loop", data)
 
+async def client_room_selection(conn: socket.socket, loop: AbstractEventLoop, player_id: int):
+
+    conn.send(str.encode(str(player_id)))
+
+
+    while True:
+        data = await loop.sock_recv(conn, 4096)
+
+        data = data.decode()
+
+        if data == "get_open_games":
+
+            games_created  = {game_id : games[game_id].get_dict() for game_id in games}
+            print(games_created)
+            await loop.sock_sendall(conn, str.encode(json.dumps(games_created)))
+        if data.startswith("join_game"):
+            game_id = int(data.split(" ")[1])
+            game = games[game_id]
+            game.add_player(player_id)
+        if data == "create_game":
+
 
 
 async def listening_for_connection(main_socket, loop: AbstractEventLoop):
@@ -132,7 +167,9 @@ async def listening_for_connection(main_socket, loop: AbstractEventLoop):
         print(open_games)
 
 
-        asyncio.create_task(get_client_move(p, gameIDCount, conn, loop, open_games))
+        # asyncio.create_task(get_client_move(p, gameIDCount, conn, loop, open_games))
+        p = idCount
+        asyncio.create_task(client_room_selection(conn, loop, p))
 
 
 

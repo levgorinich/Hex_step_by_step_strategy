@@ -3,6 +3,7 @@ import pygame
 from time import sleep
 from pygame.locals import *
 import logging
+import json
 
 from main_components.Offline_Player import OfflinePlayer
 from internet_acsess.network import Network
@@ -11,12 +12,13 @@ from main_components.MouseClickHandler import MouseClickHandler
 from main_components.Render import Render
 from main_components.User_interface import UI
 from main_components.mapMovement import MapMovementTracker
-from player_actions.Buttons import MenuButton
+from player_actions.Buttons import *
 from player_actions.MoveParser import Parser
 from player_actions.Spawner import Spawner
 from player_actions.mover import Mover
 from main_components.Player import Player
 from collections import deque
+from main_components.game import OnlineGame
 #
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
 pygame.init()
@@ -47,6 +49,7 @@ def offline_game():
 
     run = True
     while run:
+
         if not player.player.cur_turn:
 
             for key in commands.keys():
@@ -101,14 +104,14 @@ def offline_game():
     pygame.quit()
 
 
-def online_game():
+def online_game(game_id: int, network: Network):
     run = True
     clock = pygame.time.Clock()
-    n = Network()
 
-    player_id = int(n.getP())
-    seed = n.getSeed()
-    playrs_amount = int(n.getPlayersAmount())
+    network.send("join_game"+" "+ str(game_id))
+    player_id = int(network.getP())
+    seed = network.getSeed()
+    playrs_amount = int(network.getPlayersAmount())
     print("players amount in main ", playrs_amount)
 
 
@@ -185,7 +188,7 @@ def online_game():
         for event in events_list:
             if event.type == QUIT:
                 print("Quitting")
-                n.close()
+                network.close()
                 run = False
                 global running
                 running = False
@@ -197,6 +200,62 @@ def online_game():
 
     pygame.quit()
 
+def choose_game():
+    print("choose game")
+
+    network = Network()
+    server_id = int(network.get_server_id())
+
+    open_games=  network.send("get_open_games")
+    games = json.loads(open_games)
+
+    game_list = ButtonList()
+    for game_id in games:
+
+        game = games[game_id]
+
+
+        onlin_game = OnlineGame(game_id, game["players"], game["max_players"])
+        game_list.add_element(onlin_game)
+
+
+    screen.fill((255, 255, 255))
+
+    is_run = True
+
+    def enter_room(game_list):
+        game_id = game_list.selected_game.id
+        online_game(game_id, network)
+
+
+
+    backwards_button = MenuButton("Back", 100, 600, 200, 50,  color=(0, 0, 255), font_size=24,)
+    create_room_button = MenuButton("Create Room", 300, 600, 200, 50,  color=(0, 0, 255), font_size=24, )
+    enter_room_button = MenuButton("Enter Room", 500, 600, 200, 50,  enter_room, [game_list, network],color=(0, 0, 255), font_size=24,)
+    backwards_button.draw(screen)
+    screen.blit(game_list.surf, (0, 0))
+
+    while is_run:
+
+        if backwards_button.check_click():
+            is_run = False
+        game_list.check_selection()
+
+        # print("before bliting")
+        events_list = pygame.event.get()
+
+
+        pygame.display.flip()
+    game_menu()
+
+
+def test_menu():
+    is_run = True
+    while is_run:
+
+        events_list = pygame.event.get()
+
+        pygame.display.flip()
 
 def game_menu():
     global running
@@ -204,20 +263,23 @@ def game_menu():
         global running
         running = False
 
-    while running:
-        screen.fill((255, 255, 255))
-        offline_game_button = MenuButton("Offline Game", 100, 100, 200, 50, offline_game, color=(0, 0, 255),
-                                         font_size=24, font_name="Arial")
-        online_game_button = MenuButton("Online Game", 300, 400, 200, 50, online_game, color=(0, 0, 255), font_size=24,
-                                        font_name="Arial")
-        exit_button = MenuButton("Exit", 100, 400, 200, 50, stop_menue, color=(0, 0, 255), font_size=24,
-                                 font_name="Arial")
+    screen.fill((255, 255, 255))
+    offline_game_button = MenuButton("Offline Game", 100, 100, 200, 50, offline_game, color=(0, 0, 255),
+                                     font_size=24, font_name="Arial")
+    online_game_button = MenuButton("Online Game", 300, 400, 200, 50, choose_game, color=(0, 0, 255), font_size=24,
+                                    font_name="Arial")
+    exit_button = MenuButton("Exit", 100, 400, 200, 50, stop_menue, color=(0, 0, 255), font_size=24,
+                             font_name="Arial")
 
-        buttons = [offline_game_button, online_game_button, exit_button]
+    buttons = [offline_game_button, online_game_button, exit_button]
+    for button in buttons:
+        button.draw(screen)
+    while running:
+
 
         for button in buttons:
             try:
-                button.draw(screen)
+
                 button.check_click()
             except Exception as e:
                 print(e)
@@ -230,6 +292,7 @@ def game_menu():
                     running = False
 
             if not running:
+                print("quitting")
                 pygame.quit()
                 sys.exit()
 

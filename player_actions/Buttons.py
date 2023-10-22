@@ -37,10 +37,51 @@ class MenuButton(Button):
 
     def check_click(self,) -> bool:
         mouse_pos = pygame.mouse.get_pos()
+        # print(mouse_pos)
+        # print(self.rect)
         if self.rect.collidepoint(mouse_pos):
             if pygame.mouse.get_pressed()[0]:
-
+                # print("click")
                 self.action(*self.action_args)
                 return True
         return False
+
+
+
+class ButtonList():
+    def __init__(self):
+        self.surf = pygame.Surface((200,300), pygame.SRCALPHA)
+        self.surf.fill((255, 255,0))
+        self.elements_count = 0
+        self.x_pos = 10
+        self.button_width = 180
+        self.button_height = 35
+        self.elements = {}
+        self.selected_game = None
+
+
+
+
+
+    def add_element(self,game):
+        text = str(game.id) +" "*10 + str(game.players_amount) + "/ "+ str(game.max_players)
+        self.y_pos = 10+ self.elements_count * 40
+
+
+        game_button = MenuButton(text, self.x_pos, self.y_pos, self.button_width, self.button_height)
+        game_button.draw(self.surf)
+        self.elements[game_button] = game
+        self.elements_count += 1
+
+    def check_selection(self):
+
+        for element in self.elements:
+
+
+            if element.check_click():
+                self.selected_game = self.elements[element]
+                print(self.selected_game.id)
+
+
+
 

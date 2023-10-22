@@ -5,10 +5,15 @@ class Network:
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # self.client.setblocking(False)
-        self.server = "5.42.78.110"
+        self.server = "localhost"
         self.port = 5555
         self.addr = (self.server, self.port)
-        self.p, self.seed, self.players_amount = self.connect()
+        self.server_id = self.connect()
+
+        # self.p, self.seed, self.players_amount = self.connect_to_game()
+
+    def get_server_id(self):
+        return self.server_id
 
     def getP(self):
         return self.p
@@ -25,9 +30,8 @@ class Network:
             print("i connected")
             first_result = self.client.recv(2048).decode()
             print(first_result, " this I got ros")
-            player_id, seed, players_amount = map(int, first_result.split())
-            print(player_id,seed, "first result")
-            return player_id, seed, players_amount
+            server_id= int(first_result)
+            return server_id
 
         except:
             pass
