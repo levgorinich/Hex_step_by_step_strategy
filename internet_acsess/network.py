@@ -10,7 +10,9 @@ class Network:
         self.addr = (self.server, self.port)
         self.server_id = self.connect()
 
-        # self.p, self.seed, self.players_amount = self.connect_to_game()
+        self.p =None
+        self.seed = None
+        self.players_amount = None
 
     def get_server_id(self):
         return self.server_id
@@ -29,15 +31,19 @@ class Network:
             self.client.connect(self.addr)
             print("i connected")
             first_result = self.client.recv(2048).decode()
-            print(first_result, " this I got ros")
+
             server_id= int(first_result)
             return server_id
 
         except:
             pass
 
-    def send(self, data):
+    def connect_to_game(self):
+        data = self.send("join game")
+        self.p, self.seed, self.players_amount = map(int, data.split(" "))
 
+    def send(self, data):
+        print("this is data to send", data)
         try:
             # print("tried to send from network")
 

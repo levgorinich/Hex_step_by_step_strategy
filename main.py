@@ -108,7 +108,7 @@ def online_game(game_id: int, network: Network):
     run = True
     clock = pygame.time.Clock()
 
-    network.send("join_game"+" "+ str(game_id))
+    network.connect_to_game()
     player_id = int(network.getP())
     seed = network.getSeed()
     playrs_amount = int(network.getPlayersAmount())
@@ -144,11 +144,11 @@ def online_game(game_id: int, network: Network):
                 moves += move
             if moves != "":
                 print("sending", moves)
-                update = n.send(moves)
+                update = network.send(moves)
 
             else:
                 # print("send no_moves")
-                update = n.send("no_moves")
+                update = network.send("no_moves")
             counter+=1
             # if counter == 10:
                 # sleep(2)
@@ -200,6 +200,9 @@ def online_game(game_id: int, network: Network):
 
     pygame.quit()
 
+
+
+
 def choose_game():
     print("choose game")
 
@@ -216,46 +219,114 @@ def choose_game():
 
 
         onlin_game = OnlineGame(game_id, game["players"], game["max_players"])
-        game_list.add_element(onlin_game)
+        text = str(game.id) +" "*10 + str(game.players_amount) + "/ "+ str(game.max_players)
+        game_list.add_element(text, onlin_game)
 
 
     screen.fill((255, 255, 255))
 
     is_run = True
 
-    def enter_room(game_list):
+    def enter_room(game_list, network: Network):
+        print("tried to enter room")
         game_id = game_list.selected_game.id
+        network.send("enter room"+" "+str(game_id))
         online_game(game_id, network)
+
+
+    # def create_room(network: Network):
+    #     print("tried to create room")
+    #     game_id = network.send("create_room")
+    #     print("not here")
+    #     game_id = int(game_id)
+    #     print("create room")
+    #     online_game(game_id, network)
 
 
 
     backwards_button = MenuButton("Back", 100, 600, 200, 50,  color=(0, 0, 255), font_size=24,)
-    create_room_button = MenuButton("Create Room", 300, 600, 200, 50,  color=(0, 0, 255), font_size=24, )
+    create_room_button = MenuButton("Create Room", 300, 600, 200, 50, game_settings,[network],  color=(0, 0, 255), font_size=24, )
     enter_room_button = MenuButton("Enter Room", 500, 600, 200, 50,  enter_room, [game_list, network],color=(0, 0, 255), font_size=24,)
     backwards_button.draw(screen)
+    create_room_button.draw(screen)
+    enter_room_button.draw(screen)
+
     screen.blit(game_list.surf, (0, 0))
 
     while is_run:
 
-        if backwards_button.check_click():
-            is_run = False
+        create_room_button.check_click()
+        enter_room_button.check_click()
+
         game_list.check_selection()
 
         # print("before bliting")
         events_list = pygame.event.get()
+        for event in events_list:
+            if event.type == QUIT:
+                is_run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                create_room_button.check_click()
+                enter_room_button.check_click()
+
+            if backwards_button.check_click():
+                is_run = False
+
 
 
         pygame.display.flip()
     game_menu()
 
 
-def test_menu():
+def game_settings(network: Network):
+    screen.fill((255, 255, 255))
+
+    def create_room(network: Network):
+        print("tried to create room")
+        game_id = network.send("create_room"+" "+ str(players_amount_list.selected_element))
+        print("not here")
+        game_id = int(game_id)
+        print("create room")
+        online_game(game_id, network)
+    start_game = MenuButton("Start Game", 400, 600, 200, 50,create_room, [network],  color=(0, 0, 255), font_size=24,)
+    backwards_button = MenuButton("Back", 100, 600, 200, 50,  color=(0, 0, 255), font_size=24,)
+    start_game.draw(screen)
+    backwards_button.draw(screen)
+
+    map_sizes_list = ButtonList()
+    players_amount_list = ButtonList(10,10)
+    for amount in [2,3,4,5,6]:
+        players_amount_list.add_element(str(amount), amount)
+    for size in [(10,10), (20,20), (30,30), (40,40), (50,50)]:
+        map_sizes_list.add_element(str(size), size)
+
+    screen.blit(map_sizes_list.surf, (0, 0))
+    screen.blit(players_amount_list.surf, (400, 0))
+
+
     is_run = True
     while is_run:
 
-        events_list = pygame.event.get()
+        # start_game.check_click()
 
+
+        events_list = pygame.event.get()
+        for event in events_list:
+            print("event")
+            if event.type == QUIT:
+                is_run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                start_game.check_click()
+                map_sizes_list.check_selection()
+                players_amount_list.check_selection()
+
+                if backwards_button.check_click():
+                    is_run = False
+                    choose_game()
         pygame.display.flip()
+
+
+
 
 def game_menu():
     global running
@@ -272,17 +343,14 @@ def game_menu():
                              font_name="Arial")
 
     buttons = [offline_game_button, online_game_button, exit_button]
+    # [button.reset_clickability() for button in buttons]
     for button in buttons:
         button.draw(screen)
     while running:
 
 
-        for button in buttons:
-            try:
 
-                button.check_click()
-            except Exception as e:
-                print(e)
+
         if running:
             events_list = pygame.event.get()
 
@@ -290,6 +358,11 @@ def game_menu():
             for event in events_list:
                 if event.type == QUIT:
                     running = False
+                elif event.type == MOUSEBUTTONDOWN:
+                    [button.check_click() for button in buttons]
+
+                # elif event.type == MOUSEBUTTONUP:
+                #     [button.reset_clickability() for button in buttons]
 
             if not running:
                 print("quitting")

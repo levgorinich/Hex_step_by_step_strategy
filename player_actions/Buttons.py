@@ -17,6 +17,10 @@ class Button:
         font = pygame.font.SysFont(font_name, font_size)
         self.text_surf = font.render(text, True, '#FFFFFF')
         self.text_rect = self.text_surf.get_rect(center=self.rect.center)
+        # self.is_clickable = False
+
+    # def reset_clickability(self):
+    #     self.is_clickable = True
 
     def draw(self, display_surface: pygame.Surface) -> None:
         pygame.draw.rect(display_surface, self.color, self.rect)
@@ -37,11 +41,12 @@ class MenuButton(Button):
 
     def check_click(self,) -> bool:
         mouse_pos = pygame.mouse.get_pos()
+        mouse_pos = (mouse_pos[0]-offset_x,mouse_pos[1])
         # print(mouse_pos)
         # print(self.rect)
-        if self.rect.collidepoint(mouse_pos):
+        if  self.rect.collidepoint(mouse_pos):
             if pygame.mouse.get_pressed()[0]:
-                # print("click")
+                # self.is_clickable = False
                 self.action(*self.action_args)
                 return True
         return False
@@ -49,28 +54,29 @@ class MenuButton(Button):
 
 
 class ButtonList():
-    def __init__(self):
+    def __init__(self, offset_x, y_pos = 10):
         self.surf = pygame.Surface((200,300), pygame.SRCALPHA)
         self.surf.fill((255, 255,0))
         self.elements_count = 0
-        self.x_pos = 10
+        self.x_pos =x_pos
+        self.y_pos = y_pos
         self.button_width = 180
         self.button_height = 35
         self.elements = {}
-        self.selected_game = None
+        self.selected_element = None
+        self.offset_x = offset_x
 
 
 
 
 
-    def add_element(self,game):
-        text = str(game.id) +" "*10 + str(game.players_amount) + "/ "+ str(game.max_players)
-        self.y_pos = 10+ self.elements_count * 40
+    def add_element(self,button_text,element_to_choose):
+        self.y_pos += 40
 
 
-        game_button = MenuButton(text, self.x_pos, self.y_pos, self.button_width, self.button_height)
+        game_button = MenuButton(button_text, self.x_pos, self.y_pos, self.button_width, self.button_height)
         game_button.draw(self.surf)
-        self.elements[game_button] = game
+        self.elements[game_button] = element_to_choose
         self.elements_count += 1
 
     def check_selection(self):
@@ -78,9 +84,9 @@ class ButtonList():
         for element in self.elements:
 
 
-            if element.check_click():
-                self.selected_game = self.elements[element]
-                print(self.selected_game.id)
+            if element.check_click(self.offset_x):
+                self.selected_element = self.elements[element]
+
 
 
 

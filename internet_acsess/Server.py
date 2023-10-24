@@ -13,18 +13,20 @@ logging.basicConfig(filename="server.log", level=logging.DEBUG)
 
 
 
-games = {}
+games_open = {}
 ta = 0 # game id count
 
 
-def create_game(ta):
+def create_game(players_amount):
+    global ta
     game_id = ta
     ta += 1
 
     seed = random.randint(0,4000)
-    game= Game(game_id, seed, 3)
+    game= Game(game_id, seed, players_amount)
     p = game.add_player()
-    games[game_id] = game
+    games_open[game_id] = game
+    return p
 
 
 
@@ -49,14 +51,20 @@ async def main():
     await listening_for_connection(main_socket, asyncio.get_event_loop())
 
 connected = set()
-games = {}
+games_open = {}
 idCount = 0
 
-async def get_client_move(p: int, gameID: int, conn: socket.socket, loop: AbstractEventLoop, open_games = None):
+async def get_client_move(p: int, gameID: int, conn: socket.socket, loop: AbstractEventLoop,):
 
     global idCount
-    game = games[gameID]
-    conn.send(str.encode(str(p)+ " "+ str(game.seed) + " " + str(game.max_players)))
+    game = games_open[gameID]
+    run = True
+    while run:
+        client_connect = await loop.sock_recv(conn, 4096)
+        client_connect = client_connect.decode()
+        if client_connect == "join game":
+            conn.send(str.encode(str(p)+ " "+ str(game.seed) + " " + str(game.max_players)))
+            run = False
     print("send starting data ")
     reply = ""
     while True:
@@ -69,22 +77,21 @@ async def get_client_move(p: int, gameID: int, conn: socket.socket, loop: Abstra
         except asyncio.exceptions.TimeoutError:
             conn.close()
             game.remove_player(p)
-            games.pop(gameID)
-            if game == open_games[0]:
-                open_games.pop()
+            print("Timeout")
+            games_open.pop(gameID)
+
             # print("Timeout")
 
 
         # print(data)
-        if gameID in games:
-            game = games[gameID]
+        if gameID in games_open:
+            game = games_open[gameID]
             if not data:
                 print("Lost connection")
                 conn.close()
                 game.remove_player(p)
-                games.pop(gameID)
-                if game == open_games[0]:
-                    open_games.pop()
+                games_open.pop(gameID)
+
                 break
 
             else:
@@ -109,63 +116,59 @@ async def client_room_selection(conn: socket.socket, loop: AbstractEventLoop, pl
 
     conn.send(str.encode(str(player_id)))
 
-
-    while True:
+    run = True
+    while run:
         data = await loop.sock_recv(conn, 4096)
-
         data = data.decode()
+        if data !=  "":
+            print("recieving ", data)
+
+
+
+
 
         if data == "get_open_games":
 
-            games_created  = {game_id : games[game_id].get_dict() for game_id in games}
+            games_created  = {game_id : games_open[game_id].get_dict() for game_id in games_open}
             print(games_created)
+            print(games_open)
             await loop.sock_sendall(conn, str.encode(json.dumps(games_created)))
-        if data.startswith("join_game"):
-            game_id = int(data.split(" ")[1])
-            game = games[game_id]
-            game.add_player(player_id)
-        if data == "create_game":
+        if data.startswith("enter room"):
+            print(games_open)
+            print("get in join game")
+            data = data.replace("enter room ", "")
+            print(data, games_open)
+            game_id = int(data)
+            print(game_id)
+            game = games_open[game_id]
+            print("opened a game", game)
+            await loop.sock_sendall(conn, str.encode("ok"))
+            print("sended ok")
+            player_id = game.add_player()
+            run = False
+            print("will start clietn task")
+            asyncio.create_task(get_client_move(player_id, game_id, conn, loop))
+        if data == "create_room":
+            players_amount = int(data.replace("create_room ", ""))
+
+            player_id = create_game(players_amount)
+            await loop.sock_sendall(conn, str.encode(str(ta-1)))
+            run = False
+            asyncio.create_task(get_client_move(player_id, ta-1, conn, loop))
 
 
 
 async def listening_for_connection(main_socket, loop: AbstractEventLoop):
 
     global game_with
-    connected = set()
-    open_games = []
+
     idCount = 0
-    gameIDCount = 0
+
     while True:
         conn, addr = await loop.sock_accept(main_socket)
         conn.setblocking(False)
         print("Connected to: " + addr[0] + ":" + str(addr[1]))
         idCount +=1
-
-
-
-
-        print(open_games)
-        if not open_games:
-            print("createing player 0")
-            p= 0
-            gameIDCount+=1
-
-            gameID = gameIDCount
-            seed = random.randint(0,4000)
-            game= Game(gameID, seed, 3)
-            game.add_player(p)
-            games[gameID] = game
-            open_games.append(games[gameID])
-            print("Created Game ID: ", gameID)
-        else :
-
-            p= len(open_games[0].players)
-            print("Created player 1", p)
-            open_games[0].add_player(p)
-            if p == open_games[0].max_players -1:
-                open_games.pop()
-        print(open_games)
-
 
         # asyncio.create_task(get_client_move(p, gameIDCount, conn, loop, open_games))
         p = idCount
