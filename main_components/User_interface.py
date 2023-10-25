@@ -46,7 +46,7 @@ class UI:
             button = MenuButton(titles[i], display_size[0]-100, display_size[1]-100-100*i, 100, 100,
                                            action=self.spawn_function, action_args =(self.spawner, titles[i],self.game_map.spawn_point))
             buttons.append(button)
-        finish_move = MenuButton("Finish Move", display_size[0]-100, display_size[1]-100-100*len(titles), 100, 100, self.end_turn,
+        finish_move = MenuButton("Finish Move", display_size[0]-100, display_size[1]-100-100*len(titles), 100, 100, action=self.end_turn,
                                                 color=(255, 0, 0), font_size=24, font_name="Arial")
         buttons.append(finish_move)
         return buttons

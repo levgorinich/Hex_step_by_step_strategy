@@ -209,7 +209,8 @@ def choose_game():
     network = Network()
     server_id = int(network.get_server_id())
 
-    open_games=  network.send("get_open_games")
+    open_games=  network.send(json.dumps({"get_open_games": ""}))
+
     games = json.loads(open_games)
 
     game_list = ButtonList()
@@ -217,9 +218,9 @@ def choose_game():
 
         game = games[game_id]
 
-
+        print(game)
         onlin_game = OnlineGame(game_id, game["players"], game["max_players"])
-        text = str(game.id) +" "*10 + str(game.players_amount) + "/ "+ str(game.max_players)
+        text = str(game["id"]) +" "*10 + str(len(game["players"])) + "/ "+ str(game["max_players"])
         game_list.add_element(text, onlin_game)
 
 
@@ -229,8 +230,8 @@ def choose_game():
 
     def enter_room(game_list, network: Network):
         print("tried to enter room")
-        game_id = game_list.selected_game.id
-        network.send("enter room"+" "+str(game_id))
+        game_id = game_list.selected_element.id
+        network.send(json.dumps({"enter_room": game_id}))
         online_game(game_id, network)
 
 
@@ -245,8 +246,8 @@ def choose_game():
 
 
     backwards_button = MenuButton("Back", 100, 600, 200, 50,  color=(0, 0, 255), font_size=24,)
-    create_room_button = MenuButton("Create Room", 300, 600, 200, 50, game_settings,[network],  color=(0, 0, 255), font_size=24, )
-    enter_room_button = MenuButton("Enter Room", 500, 600, 200, 50,  enter_room, [game_list, network],color=(0, 0, 255), font_size=24,)
+    create_room_button = MenuButton("Create Room", 300, 600, 200, 50, action=game_settings,action_args =  [network],  color=(0, 0, 255), font_size=24, )
+    enter_room_button = MenuButton("Enter Room", 500, 600, 200, 50,  action = enter_room, action_args = [game_list, network],color=(0, 0, 255), font_size=24,)
     backwards_button.draw(screen)
     create_room_button.draw(screen)
     enter_room_button.draw(screen)
@@ -283,18 +284,19 @@ def game_settings(network: Network):
 
     def create_room(network: Network):
         print("tried to create room")
-        game_id = network.send("create_room"+" "+ str(players_amount_list.selected_element))
+        game_dict = {"create_room": {"players_amount": players_amount_list.selected_element, "map_size": map_sizes_list.selected_element}}
+        game_id = network.send(json.dumps(game_dict))
         print("not here")
         game_id = int(game_id)
         print("create room")
         online_game(game_id, network)
-    start_game = MenuButton("Start Game", 400, 600, 200, 50,create_room, [network],  color=(0, 0, 255), font_size=24,)
+    start_game = MenuButton("Start Game", 400, 600, 200, 50,action=create_room, action_args = [network],  color=(0, 0, 255), font_size=24,)
     backwards_button = MenuButton("Back", 100, 600, 200, 50,  color=(0, 0, 255), font_size=24,)
     start_game.draw(screen)
     backwards_button.draw(screen)
 
     map_sizes_list = ButtonList()
-    players_amount_list = ButtonList(10,10)
+    players_amount_list = ButtonList(x_offset=400)
     for amount in [2,3,4,5,6]:
         players_amount_list.add_element(str(amount), amount)
     for size in [(10,10), (20,20), (30,30), (40,40), (50,50)]:
@@ -335,11 +337,11 @@ def game_menu():
         running = False
 
     screen.fill((255, 255, 255))
-    offline_game_button = MenuButton("Offline Game", 100, 100, 200, 50, offline_game, color=(0, 0, 255),
+    offline_game_button = MenuButton("Offline Game", 100, 100, 200, 50, action=offline_game, color=(0, 0, 255),
                                      font_size=24, font_name="Arial")
-    online_game_button = MenuButton("Online Game", 300, 400, 200, 50, choose_game, color=(0, 0, 255), font_size=24,
+    online_game_button = MenuButton("Online Game", 300, 400, 200, 50, action=choose_game, color=(0, 0, 255), font_size=24,
                                     font_name="Arial")
-    exit_button = MenuButton("Exit", 100, 400, 200, 50, stop_menue, color=(0, 0, 255), font_size=24,
+    exit_button = MenuButton("Exit", 100, 400, 200, 50, action=stop_menue, color=(0, 0, 255), font_size=24,
                              font_name="Arial")
 
     buttons = [offline_game_button, online_game_button, exit_button]

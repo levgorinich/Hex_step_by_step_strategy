@@ -9,8 +9,12 @@ def empty_funciton():
     print("")
 
 class Button:
-    def __init__(self, text, x, y, width, height, action = empty_funciton, color=(0, 255, 0), font_size=24, font_name="Arial",):
+    def __init__(self, text, x, y, width, height,x_offset = 0, y_offset = 0, action = empty_funciton, color=(0, 255, 0), font_size=24, font_name="Arial",):
         self.rect = pygame.Rect(x, y, width, height)
+        print(x, x_offset)
+        self.abs_x = x + x_offset
+        self.abs_y = y + y_offset
+        self.absolute_rect = pygame.Rect(self.abs_x, self.abs_y, width, height)
         self.text = text
         self.color = color
         self.action = action
@@ -33,18 +37,18 @@ class Button:
 
 
 class MenuButton(Button):
-    def __init__(self, text, x, y, width, height,action = empty_funciton,action_args= (), color=(0, 255, 0), font_size=24, font_name="Arial",  ):
-
-        super().__init__(text, x, y, width, height, action, color, font_size, font_name)
+    def __init__(self, text, x, y, width, height,x_offset =0, y_offset = 0, action = empty_funciton,action_args= (), color=(0, 255, 0), font_size=24, font_name="Arial",  ):
+        print(x_offset)
+        super().__init__(text, x, y, width, height,x_offset=x_offset, y_offset= y_offset, action= action, color=color, font_size = font_size, font_name = font_name)
         self.action = action
         self.action_args = action_args
 
     def check_click(self,) -> bool:
         mouse_pos = pygame.mouse.get_pos()
-        mouse_pos = (mouse_pos[0]-offset_x,mouse_pos[1])
+        # mouse_pos = (mouse_pos[0],mouse_pos[1])
         # print(mouse_pos)
         # print(self.rect)
-        if  self.rect.collidepoint(mouse_pos):
+        if  self.absolute_rect.collidepoint(mouse_pos):
             if pygame.mouse.get_pressed()[0]:
                 # self.is_clickable = False
                 self.action(*self.action_args)
@@ -54,27 +58,28 @@ class MenuButton(Button):
 
 
 class ButtonList():
-    def __init__(self, offset_x, y_pos = 10):
+    def __init__(self,x_offset = 0, y_offset = 0):
         self.surf = pygame.Surface((200,300), pygame.SRCALPHA)
         self.surf.fill((255, 255,0))
         self.elements_count = 0
-        self.x_pos =x_pos
-        self.y_pos = y_pos
+        self.x_offset = x_offset
+        self.y_offset = y_offset
+        self.x_pos = 10
+        self.y_pos = 10
         self.button_width = 180
         self.button_height = 35
         self.elements = {}
         self.selected_element = None
-        self.offset_x = offset_x
+        # self.offset_x = offset_x
 
 
 
 
 
     def add_element(self,button_text,element_to_choose):
+
         self.y_pos += 40
-
-
-        game_button = MenuButton(button_text, self.x_pos, self.y_pos, self.button_width, self.button_height)
+        game_button = MenuButton(button_text, self.x_pos, self.y_pos, self.button_width, self.button_height, x_offset=self.x_offset, y_offset=self.y_offset,)
         game_button.draw(self.surf)
         self.elements[game_button] = element_to_choose
         self.elements_count += 1
@@ -82,9 +87,7 @@ class ButtonList():
     def check_selection(self):
 
         for element in self.elements:
-
-
-            if element.check_click(self.offset_x):
+            if element.check_click():
                 self.selected_element = self.elements[element]
 
 
