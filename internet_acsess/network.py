@@ -5,7 +5,7 @@ class Network:
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # self.client.setblocking(False)
-        self.server = "5.42.78.110"
+        self.server = "localhost"
         self.port = 5555
         self.addr = (self.server, self.port)
         self.p, self.seed, self.players_amount = self.connect()
