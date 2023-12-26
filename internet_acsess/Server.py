@@ -46,7 +46,8 @@ async def main():
         str(e)
 
 # main_socket.setblocking(False)
-    main_socket.listen()
+
+    main_socket.listen(5)
     print("Waiting for a connection, Server Started")
     await listening_for_connection(main_socket, asyncio.get_event_loop())
 
@@ -63,10 +64,10 @@ async def get_client_move(p: int, gameID: int, conn: socket.socket, loop: Abstra
         client_connect = await loop.sock_recv(conn, 4096)
         client_connect = client_connect.decode()
         if client_connect == "join game":
-            conn.send(str.encode(str(p)+ " "+ str(game.seed) + " " + str(game.max_players)))
+            data_to_client = {"player_number": p, "game_info": game.get_dict_for_client()}
+            conn.send(str.encode(json.dumps(data_to_client)))
             run = False
     print("send starting data ")
-    reply = ""
     while True:
         try:
             data=  await asyncio.wait_for(loop.sock_recv(conn,4096), 1)
@@ -80,10 +81,6 @@ async def get_client_move(p: int, gameID: int, conn: socket.socket, loop: Abstra
             print("Timeout")
             games_open.pop(gameID)
 
-            # print("Timeout")
-
-
-        # print(data)
         if gameID in games_open:
             game = games_open[gameID]
             if not data:
@@ -91,14 +88,9 @@ async def get_client_move(p: int, gameID: int, conn: socket.socket, loop: Abstra
                 conn.close()
                 game.remove_player(p)
                 games_open.pop(gameID)
-
                 break
-
             else:
-                # print(comands)
                 if data != "no_moves":
-                    # print(data)
-
                     for key in game.comands:
                         if key != p:
                             game.comands[key] += data
@@ -118,46 +110,39 @@ async def client_room_selection(conn: socket.socket, loop: AbstractEventLoop, pl
 
     run = True
     while run:
-        data = await loop.sock_recv(conn, 4096)
+        data_from_client = await loop.sock_recv(conn, 4096)
 
-        data = data.decode()
-        print(data)
-        data = json.loads(data)
-        print(data)
-        if data !=  "":
-            print("recieving ", data)
-        print(type(data))
-        moves = data.keys()
+        data_from_client = data_from_client.decode()
+        data_from_client = json.loads(data_from_client)
 
-        [action := move for move in moves]
-        data = data[action]
-        print(action)
+        print("recieving ", data_from_client)
+        action = list(data_from_client.keys())[0]
+        print("this is action")
+        data_from_client = data_from_client[action]
         if  action == "get_open_games":
+            print("In get open games ")
 
-            games_created  = {game_id : games_open[game_id].get_dict() for game_id in games_open}
+            games_created  = {game_id : games_open[game_id].get_dict_for_room_selection() for game_id in games_open}
             print(games_created)
-            print(games_open)
             await loop.sock_sendall(conn, str.encode(json.dumps(games_created)))
+
         if action == "enter_room":
-            print(games_open)
             print("get in join game")
 
-            print(data, games_open)
-            game_id = data["game_id"]
-            print(game_id)
+            game_id = int(data_from_client["game_id"])
             game = games_open[game_id]
-            print("opened a game", game)
+
             await loop.sock_sendall(conn, str.encode("ok"))
-            print("sended ok")
+
             player_id = game.add_player()
             run = False
-            print("will start clietn task")
             asyncio.create_task(get_client_move(player_id, game_id, conn, loop))
-        if action == "create_room":
-            players_amount = data["players_amount"]
-            map_size = data["map_size"]
 
-            player_id = create_game(players_amount, map_size)
+        if action == "create_room":
+            players_amount = data_from_client["players_amount"]
+            map_size = data_from_client["map_size"]
+
+            player_id = create_game(players_amount = players_amount, size= map_size)
             await loop.sock_sendall(conn, str.encode(str(ta-1)))
             run = False
             asyncio.create_task(get_client_move(player_id, ta-1, conn, loop))

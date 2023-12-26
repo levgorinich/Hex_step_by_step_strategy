@@ -42,12 +42,14 @@ class UI:
         buttons = []
         titles = ["Triangular","Square","Circle"]
         display_size = pygame.display.get_surface().get_size()
+        button_size = (100, 100)
         for i in range(len(titles)):
-            button = MenuButton(titles[i], display_size[0]-100, display_size[1]-100-100*i, 100, 100,
+            button = MenuButton(titles[i], display_size[0]-100, display_size[1]-100-100*i, button_size,
                                            action=self.spawn_function, action_args =(self.spawner, titles[i],self.game_map.spawn_point))
             buttons.append(button)
-        finish_move = MenuButton("Finish Move", display_size[0]-100, display_size[1]-100-100*len(titles), 100, 100, action=self.end_turn,
-                                                color=(255, 0, 0), font_size=24, font_name="Arial")
+        finish_move = MenuButton("Finish Move", display_size[0]-100, display_size[1]-100-100*len(titles),
+                                 button_dimensions=button_size, action=self.end_turn,color=(255, 0, 0),
+                                 font_size=24, font_name="Arial")
         buttons.append(finish_move)
         return buttons
 
@@ -59,9 +61,9 @@ class UI:
     def fill_UI_surface(self):
         self.display_buttons(self.UI_surface)
 
-    def check_click(self, ):
+    def check_click(self, mouse_pos: tuple[int, int]) -> bool:
         for button in self.buttons:
-            if button.check_click():
+            if button.check_click(mouse_pos):
                 return True
         return False
 

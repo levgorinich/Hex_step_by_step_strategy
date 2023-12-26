@@ -17,15 +17,15 @@ class MouseClickHandler:
         self.player = User_interface.player
 
     def handle_click(self, event):
-
+        mouse_pos = event.dict["pos"]
         self.was_clicked =False
-        self.check_UI_click()
+        self.check_UI_click(mouse_pos)
 
         # need to decide what ot do if I click with the right button on a ui, i can move unit behind ui
         if not self.was_clicked:
             self.check_hex_click(event)
-    def check_UI_click(self):
-        result = self.user_interface.check_click()
+    def check_UI_click(self, mouse_pos: tuple[int, int]):
+        result = self.user_interface.check_click(mouse_pos)
         if result:
             self.was_clicked = True
 

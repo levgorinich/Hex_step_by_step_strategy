@@ -1,3 +1,4 @@
+import json
 import socket
 import pickle
 
@@ -21,6 +22,8 @@ class Network:
         return self.p
     def getSeed(self):
         return self.seed
+    def getSize(self):
+        return self.size
 
     def getPlayersAmount(self):
         return self.players_amount
@@ -40,7 +43,12 @@ class Network:
 
     def connect_to_game(self):
         data = self.send("join game")
-        self.p, self.seed, self.players_amount = map(int, data.split(" "))
+        data = json.loads(data)
+        self.p = data["player_number"]
+        game_data = data["game_info"]
+        self.seed = game_data["seed"]
+        self.size = game_data["size"]
+        self.players_amount = game_data["max_players"]
 
     def send(self, data):
         print("this is data to send", data)

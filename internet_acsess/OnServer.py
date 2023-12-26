@@ -22,6 +22,8 @@ class Game:
         self.players.remove(player)
         self.places.append(player)
 
+    def get_dict_for_client(self):
+        return {"seed": self.seed, "max_players": self.max_players, "size":self.size}
 
-    def get_dict(self):
+    def get_dict_for_room_selection(self):
         return {"id":self.id, "max_players": self.max_players, "players":self.players,}
