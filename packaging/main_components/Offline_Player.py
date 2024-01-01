@@ -15,7 +15,7 @@ from main_components.Player import Player
 class OfflinePlayer:
     def __init__(self, window_size, internal_surface_size, id):
 
-        self.game_map = Map(25, 25, id, 11,3, True)
+        self.game_map = Map(6, 6, id, 10,3, True)
         self.player = Player(id,self.game_map )
         self.player.max_moves = 100
         self.player.moves = 100
