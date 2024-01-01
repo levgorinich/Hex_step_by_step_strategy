@@ -1,3 +1,4 @@
+import json
 import socket
 import pickle
 
@@ -8,12 +9,21 @@ class Network:
         self.server = "localhost"
         self.port = 5555
         self.addr = (self.server, self.port)
-        self.p, self.seed, self.players_amount = self.connect()
+        self.server_id = self.connect()
+
+        self.p =None
+        self.seed = None
+        self.players_amount = None
+
+    def get_server_id(self):
+        return self.server_id
 
     def getP(self):
         return self.p
     def getSeed(self):
         return self.seed
+    def getSize(self):
+        return self.size
 
     def getPlayersAmount(self):
         return self.players_amount
@@ -24,16 +34,24 @@ class Network:
             self.client.connect(self.addr)
             print("i connected")
             first_result = self.client.recv(2048).decode()
-            print(first_result, " this I got ros")
-            player_id, seed, players_amount = map(int, first_result.split())
-            print(player_id,seed, "first result")
-            return player_id, seed, players_amount
+
+            server_id= int(first_result)
+            return server_id
 
         except:
             pass
 
-    def send(self, data):
+    def connect_to_game(self):
+        data = self.send("join game")
+        data = json.loads(data)
+        self.p = data["player_number"]
+        game_data = data["game_info"]
+        self.seed = game_data["seed"]
+        self.size = game_data["size"]
+        self.players_amount = game_data["max_players"]
 
+    def send(self, data):
+        print("this is data to send", data)
         try:
             # print("tried to send from network")
 
