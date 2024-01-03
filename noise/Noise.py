@@ -69,5 +69,7 @@ class Noise():
                     hex = Hexagon_mountain(grid_pos)
                     hexes.add(hex)
 
+        print(hexes.hexes_dict.key_to_value )
+
 
         return hexes

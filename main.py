@@ -62,7 +62,6 @@ def offline_game():
             player.player.start_turn()
             update = str(commands[player.player.id])
             commands[player.player.id] = []
-            print(update)
             if update:
 
                 start, end = 0, 0
@@ -95,6 +94,7 @@ def offline_game():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 print("detected click")
                 player.click_handler.handle_click(event)
+                print(list(filter(lambda x: len(x[0]) == 2, player.game_map.hexes.hexes_dict.key_to_value.items())))
                 # if click_handler.pos is not None:
                 #     renderer.cells(click_handler.pos, game_map.hexes.hexes_dict)
                 # print("yeagsdf")
@@ -379,7 +379,7 @@ def game_menu(testing):
             pygame.display.flip()
             for event in events_list:
 
-                print("event", event, event.dict)
+
                 if event.type == QUIT:
                     running = False
                 elif event.type == MOUSEBUTTONDOWN:

@@ -66,6 +66,8 @@ class Hexagon(MapObject):
         self.unit_on_hex = None
         self.building_on_hex = None
 
+    def __repr__(self):
+        return f"{self.type}, {self.unit_on_hex}, {self.building_on_hex}"
     def calculate_points_for_hexagon(self):
         points = []
         v = 0
@@ -220,6 +222,9 @@ class MilitaryUnit(Unit):
         self.draw()
         self.discovery_range = 2
 
+    def __repr__(self):
+        return f"{self.__class__}, {self.player_id}, {self.hp}"
+
     def draw_shape(self):
         pass
     def draw(self):
@@ -257,7 +262,7 @@ class TriangularUnit(MilitaryUnit):
                                                 (self.width - 1, self.height / 4 + 2)])
 
     def __repr__(self):
-        return f" unit {self.name} on hex {self.grid_pos[0]}, {self.grid_pos[1]} player {self.player_id}"
+        return f" unit {self.__class__} on hex {self.grid_pos[0]}, {self.grid_pos[1]} player {self.player_id}"
 
 
 class SquareUnit(MilitaryUnit):
@@ -313,8 +318,8 @@ class CircleUnit(MilitaryUnit):
 
     def draw_shape(self):
         pygame.draw.circle(self.image, self.color, (self.width / 2, self.height / 2), 10)
-
-    def __repr__(self):
-        return f"CircleUnit o hex {self.grid_pos[0]}, {self.grid_pos[1]} player {self.player_id}"
+    #
+    # def __repr__(self):
+    #     return f"CircleUnit o hex {self.grid_pos[0]}, {self.grid_pos[1]} player {self.player_id}"
 
 
