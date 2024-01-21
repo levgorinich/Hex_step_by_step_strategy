@@ -1,9 +1,11 @@
+import json
+
 import pygame
 
 from math import *
 
 from game_content.Groups import HexesGroup
-from game_content.Sprites import Hexagon, Hexagon_mountain, Hexagon_sea, Hexagon_land
+from game_content.Sprites import Hexagon, Hexagon_mountain, Hexagon_sea, Hexagon_land, Town
 from player_actions.Spawner import Spawner
 from noise.Noise import Noise
 import random
@@ -27,15 +29,57 @@ class Map:
 
         self.hex_width = 30* sqrt(3)
         self.hex_height = self.hex_width*sqrt(3)/2
-        self.hexes   = self.create_tiles()
-
         self.units =  pygame.sprite.Group()
         self.buildings = pygame.sprite.Group()
+        # self.hexes   = self.create_tiles()
+
+        self.hexes = self.load_from_json("game_map.json")
         self.Spawner = Spawner(self)
-        self.create_mines()
+        # self.create_mines()
 
 
         # self.spawner = Spawner(self)
+
+    def load_from_json(self, name):
+        hexes_json = {(0,0):{"type": "Hexagon_land", "building_on_hex": "town", "Unit_on_hex":None},
+                      (0,1):{"type": "Hexagon_sea", "building_on_hex": None, "Unit_on_hex":None},
+                      (0,2):{"type": "Hexagon_mountain", "building_on_hex": None, "Unit_on_hex":None}}
+        with open(name, "r") as f:
+            hexes_json = json.load(f)
+        hexes = HexesGroup()
+        for grid_pos, hex_params in hexes_json.items():
+            hex = None
+            print(hex_params)
+            match hex_params["type"]:
+                case "Hexagon_land":
+                    hex = (Hexagon_land(grid_pos))
+                case "Hexagon_sea":
+                    hex = (Hexagon_sea(grid_pos))
+                case "Hexagon_mountain":
+                    hex = (Hexagon_mountain(grid_pos))
+            if hex_params["building_on_hex"]:
+                match hex_params["building_on_hex"]:
+                    case "town":
+                        town = Town(grid_pos)
+                        hex.building_on_hex = town
+                        self.buildings.add(town)
+                        hexes.add(hex)
+                    case _:
+                        hexes.add(hex)
+
+        return hexes
+
+    def save_to_json(self, file_name):
+        map_dict= {}
+        for hex in self.hexes:
+            grid_pos, d = hex.save_to_json()
+            map_dict[grid_pos] = d
+        print(map_dict)
+        with open(file_name, "w") as f:
+            json.dump(map_dict, f)
+
+
+
 
     def get_hex_by_coord(self, grid_pos):
         if grid_pos[0] in range(0, self.columns + 1) and grid_pos[0] in range(0, self.rows + 1):

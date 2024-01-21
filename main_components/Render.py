@@ -24,15 +24,15 @@ class Render:
 
         for sprite in sprite_group.sprites():
             unit_hex = hexes[sprite.grid_pos]
-            if unit_hex.is_discovered and unit_hex.is_viewed:
 
-                if isinstance(sprite, Mine):
 
-                    position = (unit_hex.map_coords[0]-5, unit_hex.map_coords[1]+3)
-                    self.internal_surface.blit(sprite.image, offset + position)
-                else:
-                    unit_center=  (unit_hex.map_coords[0]-sprite.width//2, unit_hex.map_coords[1]-sprite.height//2)
-                    self.internal_surface.blit(sprite.image, offset + unit_center)
+            if isinstance(sprite, Mine):
+
+                position = (unit_hex.map_coords[0]-5, unit_hex.map_coords[1]+3)
+                self.internal_surface.blit(sprite.image, offset + position)
+            else:
+                unit_center=  (unit_hex.map_coords[0]-sprite.width//2, unit_hex.map_coords[1]-sprite.height//2)
+                self.internal_surface.blit(sprite.image, offset + unit_center)
 
     def pre_display(self, events_list):
 

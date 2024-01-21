@@ -1,3 +1,4 @@
+from abc import ABC
 from math import cos, sin, pi, sqrt
 import pygame
 import random
@@ -66,8 +67,18 @@ class Hexagon(MapObject):
         self.unit_on_hex = None
         self.building_on_hex = None
 
+    def save_to_json(self):
+        hex_dict = {"type":str(self.__class__.__name__)}
+
+        if self.building_on_hex:
+            hex_dict["building_on_hex"] = self.building_on_hex.save_to_json()
+        else:
+            hex_dict["building_on_hex"] = None
+
+        return str(self.grid_pos) , hex_dict
+
     def __repr__(self):
-        return f"{self.type}, {self.unit_on_hex}, {self.building_on_hex}"
+        return f"{self.__class__.__name__}, {self.unit_on_hex}, {self.building_on_hex}"
     def calculate_points_for_hexagon(self):
         points = []
         v = 0
@@ -99,12 +110,9 @@ class Hexagon(MapObject):
     def update(self):
         pass
     def draw(self):
-        if self.is_discovered and self.is_viewed:
-            pygame.draw.polygon(self.image, self.color, self.points)
-        elif self.is_discovered and not self.is_viewed:
-            pygame.draw.polygon(self.image, self.color_not_viewed, self.points)
-        else:
-            pygame.draw.polygon(self.image, (0, 0, 0), self.points)
+
+        pygame.draw.polygon(self.image, self.color, self.points)
+
 
     def draw_in_unit_range(self):
         print("Do nothing")
@@ -169,12 +177,13 @@ class Hexagon_sea(Hexagon):
     def draw_in_unit_range(self):
         color_selected = (53,186, 186)
         pygame.draw.polygon(self.image, color_selected, self.points)
-
-
 class Building(MapObject):
     def __init__(self, grid_pos):
         super().__init__(grid_pos)
         self.image = pygame.Surface((hex_width, hex_height), pygame.SRCALPHA)
+
+    def save_to_json(self):
+        return {"name":str(self.__class__.__name__), "data" : {}}
 
 class Mine(Building):
     def __init__(self, grid_pos):
@@ -323,3 +332,18 @@ class CircleUnit(MilitaryUnit):
     #     return f"CircleUnit o hex {self.grid_pos[0]}, {self.grid_pos[1]} player {self.player_id}"
 
 
+
+
+class Town(Building):
+    def __init__(self, grid_pos):
+        super().__init__(grid_pos)
+        type = "town"
+        town_image = pygame.image.load("Resources/town.png")
+        self.image.blit(town_image, (0,0))
+
+class Village(Building):
+    def __init__(self, grid_pos):
+        super().__init__(grid_pos)
+        type = "village"
+        village_image = pygame.image.load("Resources/village.png")
+        self.image.blit(village_image, (0,0))

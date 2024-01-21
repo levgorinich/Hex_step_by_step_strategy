@@ -11,20 +11,20 @@ class Player:
         self.next_ofline_player = None
 
     def start_turn(self):
-
-        self.cur_turn = True
-        self.moves = self.max_moves
-        self.income = 10
-
-        for building in self.map.buildings:
-            grid_pos = building.grid_pos
-            unit_on_hex = self.map.hexes.hexes_dict[grid_pos].unit_on_hex
-            if unit_on_hex and unit_on_hex.player_id == self.id:
-                self.income += 10
-
-
-
-        self.coins += self.income
+        pass
+        # self.cur_turn = True
+        # self.moves = self.max_moves
+        # self.income = 10
+        #
+        # for building in self.map.buildings:
+        #     grid_pos = building.grid_pos
+        #     unit_on_hex = self.map.hexes.hexes_dict[grid_pos].unit_on_hex
+        #     if unit_on_hex and unit_on_hex.player_id == self.id:
+        #         self.income += 10
+        #
+        #
+        #
+        # self.coins += self.income
 
 
 
