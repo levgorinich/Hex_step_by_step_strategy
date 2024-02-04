@@ -99,7 +99,6 @@ class Hexagon(MapObject):
 
     def kill_unit(self):
         if self.unit_on_hex:
-            print("kill unit")
             self.unit_on_hex.hide_hexes()
             self.unit_on_hex.kill()
         self.remove_unit()
@@ -115,7 +114,6 @@ class Hexagon(MapObject):
 
 
     def draw_in_unit_range(self):
-        print("Do nothing")
         pass
 
     def reveal_hex(self):

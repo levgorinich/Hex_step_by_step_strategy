@@ -13,7 +13,6 @@ class Button:
                  action = empty_funciton, color:tuple[int, int, int]=(0, 255, 0),
                  font_size:int = 24, font_name:str ="Arial",):
         self.rect = pygame.Rect(x, y, button_dimensions[0], button_dimensions[1])
-        print(x, x_offset)
 
         self.text = text
         self.color = color
@@ -40,7 +39,6 @@ class MenuButton(Button):
     def __init__(self, text, x, y,button_dimensions: tuple[int, int],x_offset =0, y_offset = 0,
                  action = empty_funciton,action_args= (),
                  color=(0, 255, 0), font_size=24, font_name="Arial",  ):
-        print(x_offset)
         super().__init__(text, x, y,button_dimensions , x_offset=x_offset, y_offset= y_offset, action= action, color=color, font_size = font_size, font_name = font_name)
         self.x_offset = x_offset
         self.y_offset = y_offset

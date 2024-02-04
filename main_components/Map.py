@@ -41,32 +41,36 @@ class Map:
         # self.spawner = Spawner(self)
 
     def load_from_json(self, name):
-        hexes_json = {(0,0):{"type": "Hexagon_land", "building_on_hex": "town", "Unit_on_hex":None},
-                      (0,1):{"type": "Hexagon_sea", "building_on_hex": None, "Unit_on_hex":None},
-                      (0,2):{"type": "Hexagon_mountain", "building_on_hex": None, "Unit_on_hex":None}}
+        hexes = HexesGroup()
+        # hexes_json = {(0,0):{"type": "Hexagon_land", "building_on_hex": "town", "Unit_on_hex":None},
+        #               (0,1):{"type": "Hexagon_sea", "building_on_hex": None, "Unit_on_hex":None},
+        #               (0,2):{"type": "Hexagon_mountain", "building_on_hex": None, "Unit_on_hex":None}}
         with open(name, "r") as f:
             hexes_json = json.load(f)
-        hexes = HexesGroup()
         for grid_pos, hex_params in hexes_json.items():
-            hex = None
-            print(hex_params)
+            grid_pos = tuple(map(int, grid_pos[1:-1].split(",")))
+            print(grid_pos, hex_params)
+
+            hex_created = None
             match hex_params["type"]:
                 case "Hexagon_land":
-                    hex = (Hexagon_land(grid_pos))
+                    hex_created = (Hexagon_land(grid_pos))
                 case "Hexagon_sea":
-                    hex = (Hexagon_sea(grid_pos))
+                    hex_created = (Hexagon_sea(grid_pos))
                 case "Hexagon_mountain":
-                    hex = (Hexagon_mountain(grid_pos))
-            if hex_params["building_on_hex"]:
-                match hex_params["building_on_hex"]:
-                    case "town":
-                        town = Town(grid_pos)
-                        hex.building_on_hex = town
-                        self.buildings.add(town)
-                        hexes.add(hex)
-                    case _:
-                        hexes.add(hex)
+                    hex_created = (Hexagon_mountain(grid_pos))
 
+            match hex_params["building_on_hex"]:
+                case "town":
+                    town = Town(grid_pos)
+                    hex_created.building_on_hex = town
+                    self.buildings.add(town)
+                case _:
+                    pass
+            hexes.add(hex_created)
+                        # print("hexes in second case", hexes )
+            # print("hexes in the end of for ", hexes)
+        # print(hexes)
         return hexes
 
     def save_to_json(self, file_name):
