@@ -15,8 +15,11 @@ class Render:
 
     def display_hexes(self,sprite_group: pygame.sprite.Group)->None:
         offset = self.map_movement_tracker.get_total_offset()
-
+        # print(id(sprite_group))
+        # print(len(sprite_group.sprites()))
         for sprite in sprite_group.sprites():
+            # print("rendering", sprite)
+
             self.internal_surface.blit(sprite.image, offset + sprite.rect.topleft)
 
     def display_map_objects(self,sprite_group: pygame.sprite.Group, hexes):
@@ -54,8 +57,8 @@ class Render:
         scaled_rect = scaled_surface.get_rect(center = self.internal_surface_rect.center)
         # print(scaled_rect, "size")
         self.display_surface.blit(scaled_surface,(scaled_rect[0],scaled_rect[1]))
-        text , text_rect = self.user_interface.draw_coins()
-        self.display_surface.blit(text, text_rect)
+        # text , text_rect = self.user_interface.draw_coins()
+        # self.display_surface.blit(text, text_rect)
         self.display_surface.blit(self.user_interface.UI_surface, (0,0))
 
 

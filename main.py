@@ -35,6 +35,51 @@ running = True
 # creating main game classes
 
 
+def map_editor():
+
+    class MapEditor:
+        def __init__(self, window_size, internal_surface_size, id):
+
+            self.game_map = Map(6, 6, id, 10,3, True)
+            self.mover = Mover(self.game_map)
+            self.spawner = Spawner(self.game_map,)
+            self.move_parser = Parser(self.mover, self.spawner,)
+            self.user_interface = UI(window_size, self.game_map, self.spawner)
+            self.tracker = MapMovementTracker(internal_surface_size, window_size, )
+            self.renderer = Render(internal_surface_size, map_movement_tracker=self.tracker, user_interface=self.user_interface)
+            self.click_handler = MouseClickHandler(self.game_map, self.user_interface, self.tracker, self.mover)
+    print("in map editor")
+    map_drawing = MapEditor(window_size, internal_surface_size, 0)
+
+
+    run = True
+    while run:
+        print("in while ")
+
+
+
+        events_list = pygame.event.get()
+        map_drawing.game_map.hexes.update()
+        map_drawing.renderer.display(events_list, map_drawing.game_map)
+        pygame.display.flip()
+
+        for event in events_list:
+            if event.type == QUIT:
+                run = False
+                global running
+                running = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                print("detected click")
+                map_drawing.click_handler.handle_click(event)
+                print(list(filter(lambda x: len(x[0]) == 2, map_drawing.game_map.hexes.hexes_dict.key_to_value.items())))
+                # if click_handler.pos is not None:
+                #     renderer.cells(click_handler.pos, game_map.hexes.hexes_dict)
+                # print("yeagsdf")
+
+        clock.tick(60)
+
+    pygame.quit()
 # main loop
 def offline_game():
     players = deque()
@@ -201,7 +246,10 @@ def game_menu(testing):
     exit_button = MenuButton("Exit", 100, 400, button_dimensions= button_dimensions,
                              action=stop_menue, color=(0, 0, 255), font_size=24,font_name="Arial")
 
-    buttons = [offline_game_button, online_game_button, exit_button]
+    map_editor_button = MenuButton("Map Editor", 300, 100, button_dimensions= button_dimensions,
+                             action=map_editor, color=(0, 0, 255), font_size=24,font_name="Arial")
+
+    buttons = [offline_game_button, online_game_button, exit_button, map_editor_button]
     # [button.reset_clickability() for button in buttons]
     for button in buttons:
         button.draw(screen)

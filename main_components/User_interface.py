@@ -1,42 +1,26 @@
 import pygame
-from pygame import font
 
 from player_actions.Buttons import MenuButton
-from player_actions.Spawner import Spawner
-from main_components.Player import Player
 
 
 class UI:
-    def __init__(self, window_size, game_map, player, spawner):
+    def __init__(self, window_size, game_map, spawner):
         self.UI_surface = pygame.Surface(window_size, pygame.SRCALPHA)
         self.game_map = game_map
         self.spawner = spawner
         print(self.spawner)
         self.buttons = self.add_buttons("Square")
         self.display_buttons(self.UI_surface)
-        self.player = player
 
 
     def draw_coins(self):
-        font = pygame.font.Font('freesansbold.ttf', 24)
-
-        text = font.render('Coins '+ str(self.player.coins), True,(0,0,0))
-        text_rect = text.get_rect()
-        text_rect.topleft = (10, 10)
-        return  text, text_rect
+        pass
     def spawn_function(self, spawner,type,coords):
-        if self.player.coins >= 30:
-            self.player.coins -= 30
-            print(self.player.coins)
-            spawner.spawn_unit(type, coords)
-            string = "<spawn"+type+"("+str(coords[0])+","+str(coords[1])+")>"
-            return string
-
+        pass
     def end_turn(self, ):
-        if self.player.cur_turn:
-            self.player.cur_turn = False
-            self.player.moves = 0
-            self.game_map.end_turn()
+        pass
+    def save_game(self):
+        self.game_map.save_to_json("json_save")
 
     def add_buttons(self, text):
         buttons = []
@@ -50,7 +34,12 @@ class UI:
         finish_move = MenuButton("Finish Move", display_size[0]-100, display_size[1]-100-100*len(titles),
                                  button_dimensions=button_size, action=self.end_turn,color=(255, 0, 0),
                                  font_size=24, font_name="Arial")
+
+        load_to_json = MenuButton("Save Game", display_size[0]-100, display_size[1]-100-100*4,
+                                 button_dimensions=button_size, action=self.save_game,color=(255, 0, 0),
+                                 font_size=24, font_name="Arial")
         buttons.append(finish_move)
+        buttons.append(load_to_json)
         return buttons
 
     def display_buttons(self, surface):

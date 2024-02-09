@@ -19,6 +19,11 @@ class HexesGroup(pygame.sprite.Group):
     def __getitem__(self, item):
         return self.hexes_dict[item]
 
+    def __setitem__(self, key, value):
+        self.hexes_dict[key].kill()
+        self.hexes_dict.pop(self.hexes_dict[key])
+        self.add(value)
+
     def get_hex_offset_coord (self, hex):
 
         cube_pos = self.hexes_dict.get_keys(hex)[0]
@@ -62,7 +67,15 @@ class Grid(dict):
     def __iter__(self):
         return iter(self.key_to_value)
 
+    def pop(self, value):
+        keys=  self.value_to_keys.get(value, set())
+        for key in keys:
+            self.key_to_value.pop(key)
+        self.value_to_keys.pop(value)
+
     def get_keys(self, value):
+        print("this is value in values to keys", value)
+        print("this is values to keys", self.value_to_keys)
         return self.value_to_keys.get(value, set())
 
 

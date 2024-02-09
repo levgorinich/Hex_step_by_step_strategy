@@ -68,9 +68,11 @@ class Hexagon(MapObject):
         self.building_on_hex = None
 
     def save_to_json(self):
+        print("Call buildings save to json ", self.building_on_hex)
         hex_dict = {"type":str(self.__class__.__name__)}
 
         if self.building_on_hex:
+            print("in building on hex ")
             hex_dict["building_on_hex"] = self.building_on_hex.save_to_json()
         else:
             hex_dict["building_on_hex"] = None
@@ -132,7 +134,6 @@ class Hexagon_land(Hexagon):
     def __init__(self, grid_pos, color=(30, 70, 50), width=hex_width, height=hex_height):
         super().__init__(grid_pos, color, width=hex_width, height=hex_height)
         self.color = color
-        self.color_not_viewed = (20,50,40)
         self.type = "land Hexagon"
 
         self.draw()
@@ -148,7 +149,6 @@ class Hexagon_mountain(Hexagon):
     def __init__(self, grid_pos, color=(255,255, 255), width=hex_width, height=hex_height):
         super().__init__(grid_pos, color, width=hex_width, height=hex_height)
         self.color = color
-        self.color_not_viewed = (240,230,240)
         self.type = "mountain Hexagon"
         self.draw()
 
@@ -164,9 +164,14 @@ class Hexagon_sea(Hexagon):
 
         super().__init__(grid_pos, color, width=hex_width, height=hex_height)
         self.color = color
-        self.color_not_viewed = (70,210,220)
-
         self.type = "sea Hexagon"
+
+        self.draw()
+class Hexagon_empty(Hexagon):
+    def __init__(self, grid_pos, color=(255,255, 255), width=hex_width, height=hex_height):
+        super().__init__(grid_pos, color, width=hex_width, height=hex_height)
+        self.color = color
+        self.type = "empty Hexagon"
 
         self.draw()
 
@@ -181,6 +186,7 @@ class Building(MapObject):
         self.image = pygame.Surface((hex_width, hex_height), pygame.SRCALPHA)
 
     def save_to_json(self):
+        print("in buildings save to json")
         return {"name":str(self.__class__.__name__), "data" : {}}
 
 class Mine(Building):

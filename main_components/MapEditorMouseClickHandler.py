@@ -9,10 +9,9 @@ class MouseClickHandler:
         self.mover = mover
         self.selected_sprite = None
         self.sprite_clicked = None
-        self.unit_selected = None
+
 
         self.was_clicked = False
-        self.hexes_available_move_selected_unit = []
 
 
     def handle_click(self, event):
@@ -41,8 +40,8 @@ class MouseClickHandler:
 
             if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
                 self.selected_sprite = selected_sprite_clicked
-                self.game_map.change_hex("Hexagon_land", self.selected_sprite.grid_pos)
-                print("this is printing object in hexes", self.game_map.hexes[self.selected_sprite.grid_pos])
+                print(self.game_map.hexes[self.selected_sprite])
+
 
 
         if event.button == 3:
@@ -53,7 +52,7 @@ class MouseClickHandler:
                 ending_sprite = self.sprite_clicked.grid_pos
 
                 available_pos= self.game_map.reachable_hexes(
-                        self.selected_sprite.grid_pos, self.unit_selected.stamina)
+                    self.selected_sprite.grid_pos, self.unit_selected.stamina)
 
                 if ending_sprite in available_pos and self.player.moves > 0:
                     self.mover.move(starting_sprite, ending_sprite)
