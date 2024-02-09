@@ -106,12 +106,13 @@ class ButtonList():
                 self.upper_surf.fill(self.upper_surf_color)
                 self.upper_surf.blit(self.bottom_surf,(0,self.scroll))
                 [element.move_button(y*10) for element in self.elements]
-    def check_selection(self, mouse_pos: tuple[int, int]):
+    def check_click(self, mouse_pos: tuple[int, int]):
 
 
         for element in self.elements:
             if element.check_click(mouse_pos):
                 self.selected_element = self.elements[element]
+                return True
 
 
 

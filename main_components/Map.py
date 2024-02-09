@@ -66,6 +66,7 @@ class Map:
 
 
     def create_hex(self, type:str, grid_pos: tuple[int, int]) -> Hexagon:
+        print("type in create hex ")
         match type:
             case "Hexagon_land":
                 hex_created = (Hexagon_land(grid_pos))

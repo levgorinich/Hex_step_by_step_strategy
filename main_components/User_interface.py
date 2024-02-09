@@ -1,6 +1,6 @@
 import pygame
 
-from player_actions.Buttons import MenuButton
+from player_actions.Buttons import MenuButton, ButtonList
 
 
 class UI:
@@ -9,8 +9,10 @@ class UI:
         self.game_map = game_map
         self.spawner = spawner
         print(self.spawner)
-        self.buttons = self.add_buttons("Square")
-        self.display_buttons(self.UI_surface)
+        self.buttons = self.add_buttons()
+        self.button_list = self.add_button_list()
+        self.UI_surface.blit(self.button_list.upper_surf, (200, 200))
+        self.display_buttons()
 
 
     def draw_coins(self):
@@ -22,7 +24,13 @@ class UI:
     def save_game(self):
         self.game_map.save_to_json("json_save")
 
-    def add_buttons(self, text):
+    def add_button_list(self):
+        button_list = ButtonList()
+        hexes_types = ["Hexagon_land", "Hexagon_mountain", "Hexagon_sea", "Hexagon_empty"]
+        for hex_type in hexes_types:
+            button_list.add_element(hex_type, hex_type)
+        return button_list
+    def add_buttons(self,):
         buttons = []
         titles = ["Triangular","Square","Circle"]
         display_size = pygame.display.get_surface().get_size()
@@ -42,17 +50,18 @@ class UI:
         buttons.append(load_to_json)
         return buttons
 
-    def display_buttons(self, surface):
+    def display_buttons(self,):
         for button in self.buttons:
             button.draw(self.UI_surface)
 
 
-    def fill_UI_surface(self):
-        self.display_buttons(self.UI_surface)
+
 
     def check_click(self, mouse_pos: tuple[int, int]) -> bool:
         for button in self.buttons:
             if button.check_click(mouse_pos):
+                return True
+            if self.button_list.check_click(mouse_pos):
                 return True
         return False
 

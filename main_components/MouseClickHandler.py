@@ -27,6 +27,7 @@ class MouseClickHandler:
         result = self.user_interface.check_click(mouse_pos)
         if result:
             self.was_clicked = True
+            print("UI was clicked")
 
         else:
             self.was_clicked = False
@@ -38,10 +39,14 @@ class MouseClickHandler:
         mouse -= self.tracker.get_dragging_offset()
 
         if event.button == 1:
+            print("got ivent from mouse")
 
             if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
+                print("Sprite was selected")
                 self.selected_sprite = selected_sprite_clicked
-                self.game_map.change_hex("Hexagon_land", self.selected_sprite.grid_pos)
+                hex_selected = self.user_interface.button_list.selected_element
+                self.game_map.change_hex(hex_selected, self.selected_sprite.grid_pos)
+
                 print("this is printing object in hexes", self.game_map.hexes[self.selected_sprite.grid_pos])
 
 
@@ -95,7 +100,7 @@ class MouseClickHandler:
                 local_y = int(mouse.y) - new_rec.y
 
                 if sprite.mask.get_at((local_x, local_y)):
-                    print(sprite)
+
 
                     return sprite
         return None

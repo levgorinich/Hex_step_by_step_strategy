@@ -48,13 +48,12 @@ def map_editor():
             self.tracker = MapMovementTracker(internal_surface_size, window_size, )
             self.renderer = Render(internal_surface_size, map_movement_tracker=self.tracker, user_interface=self.user_interface)
             self.click_handler = MouseClickHandler(self.game_map, self.user_interface, self.tracker, self.mover)
-    print("in map editor")
+
     map_drawing = MapEditor(window_size, internal_surface_size, 0)
 
 
     run = True
     while run:
-        print("in while ")
 
 
 
@@ -70,9 +69,7 @@ def map_editor():
                 running = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                print("detected click")
                 map_drawing.click_handler.handle_click(event)
-                print(list(filter(lambda x: len(x[0]) == 2, map_drawing.game_map.hexes.hexes_dict.key_to_value.items())))
                 # if click_handler.pos is not None:
                 #     renderer.cells(click_handler.pos, game_map.hexes.hexes_dict)
                 # print("yeagsdf")
@@ -167,9 +164,9 @@ def choose_game(testing:bool = False):
         game = games[game_id]
 
         print(game)
-        onlin_game = OnlineGame(game_id, game["players"], game["max_players"])
+        online_game = OnlineGame(game_id, game["players"], game["max_players"])
         text = str(game["id"]) +" "*10 + str(len(game["players"])) + "/ "+ str(game["max_players"])
-        game_list.add_element(text, onlin_game)
+        game_list.add_element(text, online_game)
 
 
     screen.fill((255, 255, 255))
