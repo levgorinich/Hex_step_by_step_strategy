@@ -11,6 +11,8 @@ class UI:
         print(self.spawner)
         self.buttons = self.add_buttons()
         self.button_list = self.add_button_list()
+        self.editor_mods_list =  self.add_editor_mods_list()
+        self.UI_surface.blit(self.editor_mods_list.upper_surf, (0, 0))
         self.UI_surface.blit(self.button_list.upper_surf, (200, 200))
         self.display_buttons()
 
@@ -25,11 +27,17 @@ class UI:
         self.game_map.save_to_json("json_save")
 
     def add_button_list(self):
-        button_list = ButtonList()
+        button_list = ButtonList(offset=(200,200))
         hexes_types = ["Hexagon_land", "Hexagon_mountain", "Hexagon_sea", "Hexagon_empty"]
-        for hex_type in hexes_types:
-            button_list.add_element(hex_type, hex_type)
+        [button_list.add_element(hex_type, hex_type) for hex_type in hexes_types]
         return button_list
+
+    def add_editor_mods_list(self):
+        button_list = ButtonList(offset=(0,0))
+        modes = ["Hexes", "Rivers", "Roads"]
+        [button_list.add_element(mode, mode) for mode in modes]
+        return button_list
+
     def add_buttons(self,):
         buttons = []
         titles = ["Triangular","Square","Circle"]
@@ -62,6 +70,8 @@ class UI:
             if button.check_click(mouse_pos):
                 return True
             if self.button_list.check_click(mouse_pos):
+                return True
+            if self.editor_mods_list.check_click(mouse_pos):
                 return True
         return False
 

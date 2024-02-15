@@ -1,5 +1,8 @@
+import math
 from abc import ABC
 from math import cos, sin, pi, sqrt
+import numpy
+import numpy as np
 import pygame
 import random
 from game_content.Health_bar import Health_bar
@@ -20,6 +23,7 @@ class MapObject(pygame.sprite.Sprite):
         self.image = self.surf
         self.map_coords = self.calculate_coordinate_by_hex_position(self.grid_pos)
         self.rect = self.image.get_rect(center=self.map_coords)
+
 
     def __str__(self):
         return f"{self.name} {self.grid_pos[0]}, {self.grid_pos[1]}"
@@ -48,11 +52,11 @@ class MapObject(pygame.sprite.Sprite):
 
 
 class Hexagon(MapObject):
-    def __init__(self, grid_pos, color=(30, 70, 50), color_not_viewed = (0,0,0), width=hex_width, height=hex_height):
+    def __init__(self, grid_pos, color=(30, 70, 50), width=hex_width, height=hex_height):
         super().__init__(grid_pos)
         self.grid_pos = grid_pos
         self.color = color
-        self.color_not_viewed = color_not_viewed
+
         self.width = width
         self.height = height
         self.type = "hexagon"
@@ -60,9 +64,10 @@ class Hexagon(MapObject):
         self.image = pygame.Surface((width, height), pygame.SRCALPHA)  # Create a blank surface with transparency
         self.rect = self.image.get_rect(center=(self.map_coords[0], self.map_coords[1]))
         pygame.draw.polygon(self.image, self.color, self.points)
+        self.image.set_at(list(map(int,self.points[0])), (225,0,0))
         self.mask = pygame.mask.from_surface(self.image)
-        self.is_discovered = False
-        self.is_viewed = 0
+
+        self.rivers = [False,False,False,False,False,False]
 
         self.unit_on_hex = None
         self.building_on_hex = None
@@ -85,9 +90,10 @@ class Hexagon(MapObject):
         points = []
         v = 0
         for i in range(6):
-            points.append((cos(v) * ((self.width // 2) - 1) + self.width / 2,
-                           sin(v) * ((self.width // 2) - 1) + self.width / 2 - (self.width - self.height) / 2))
+            points.append((round(cos(v) * ((self.width // 2) ) + self.width / 2, 2),
+                           round(sin(v) * ((self.width // 2) ) + self.width / 2 - (self.width - self.height) / 2, 2)))
             v += (pi * 2) / 6
+        print(points, self.grid_pos)
         return points
 
     def add_unit(self, unit):
@@ -113,6 +119,56 @@ class Hexagon(MapObject):
     def draw(self):
 
         pygame.draw.polygon(self.image, self.color, self.points)
+
+        # pygame.draw.circle(self.image, (0, 255, 255), self.points[1], 5)
+
+    def draw_a_river(self, triangle):
+        try:
+            self.rivers[triangle] = False
+        except IndexError as e:
+            print("Invalid triangle number")
+
+        pygame.draw.polygon(self.image, (0, 255, 255), self.draw_river(triangle))
+
+
+    def draw_river(self,triangle_number: int, river_thickness: int = 3, ):
+
+        river_thickness = river_thickness
+        another_side = math.sqrt(3)
+        point_0_left = (self.points[0][0] - another_side, self.points[0][1] + river_thickness)
+        point_0_right = (self.points[0][0] - another_side, self.points[0][1] - river_thickness)
+        point_1_left = (self.points[1][0] - river_thickness, self.points[1][1] )
+        point_1_right = (self.points[1][0] + another_side, self.points[1][1] - river_thickness)
+        point_2_left = (self.points[2][0] - another_side, self.points[2][1] - river_thickness)
+        point_2_right= (self.points[2][0] + river_thickness, self.points[2][1] )
+        point_3_left = (self.points[3][0] + another_side, self.points[3][1] - river_thickness)
+        point_3_right = (self.points[3][0] + another_side, self.points[3][1] + river_thickness)
+        point_4_left = (self.points[4][0] + river_thickness, self.points[4][1] )
+        point_4_right = (self.points[4][0] - another_side, self.points[4][1] + river_thickness)
+        point_5_left = (self.points[5][0] + another_side, self.points[5][1] + river_thickness)
+        point_5_right = (self.points[5][0] - river_thickness, self.points[5][1])
+
+        points_for_triangle = {0:[self.points[0], point_0_right, point_1_left, self.points[1]],
+                               1:[self.points[1], point_1_right, point_2_left, self.points[2]],
+                               2:[self.points[2], point_2_right, point_3_left, self.points[3]],
+                               3:[self.points[3], point_3_right, point_4_left, self.points[4]],
+                               4:[self.points[4], point_4_right, point_5_left, self.points[5]],
+                               5:[self.points[5], point_5_right, point_0_left, self.points[0]]}
+
+
+        return points_for_triangle[triangle_number]
+
+    def compse_another(self ):
+        draw_river = self.draw_river()
+        vect1 = (draw_river[1][0] - draw_river[0][0], draw_river[1][1] - draw_river[0][1])
+        vect2 = (draw_river[2][0] - draw_river[3][0], draw_river[2][1] - draw_river[3][1])
+        vect1_rot = self.rotate_vector_by_an_ange(pi/6, vect1)
+        vect2_rot = self.rotate_vector_by_an_ange(pi/6, vect2)
+        return [self.points[1], np.array(self.points[1])+np.array(vect1_rot), np.array(self.points[0])+np.array(vect2_rot), self.points[0]]
+
+    def rotate_vector_by_an_ange(self, angle, vector):
+        rotation_matrix = numpy.array([[cos(angle), -sin(angle)], [sin(angle), cos(angle)]])
+        return numpy.dot(rotation_matrix, vector)
 
 
     def draw_in_unit_range(self):
@@ -168,18 +224,15 @@ class Hexagon_sea(Hexagon):
 
         self.draw()
 class Hexagon_empty(Hexagon):
-    def __init__(self, grid_pos, color=(255,255, 255), width=hex_width, height=hex_height):
+    def __init__(self, grid_pos, color=(0,0, 0), width=hex_width, height=hex_height):
         super().__init__(grid_pos, color, width=hex_width, height=hex_height)
         self.color = color
         self.type = "empty Hexagon"
 
         self.draw()
 
-    # def draw(self):
-    #     pygame.draw.polygon(self.image, self.color, self.points)
-    def draw_in_unit_range(self):
-        color_selected = (53,186, 186)
-        pygame.draw.polygon(self.image, color_selected, self.points)
+
+
 class Building(MapObject):
     def __init__(self, grid_pos):
         super().__init__(grid_pos)

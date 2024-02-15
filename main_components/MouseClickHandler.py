@@ -1,3 +1,5 @@
+from math import sqrt
+
 import pygame
 
 
@@ -39,15 +41,35 @@ class MouseClickHandler:
         mouse -= self.tracker.get_dragging_offset()
 
         if event.button == 1:
-            print("got ivent from mouse")
 
-            if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
-                print("Sprite was selected")
-                self.selected_sprite = selected_sprite_clicked
-                hex_selected = self.user_interface.button_list.selected_element
-                self.game_map.change_hex(hex_selected, self.selected_sprite.grid_pos)
+            print(self.user_interface.editor_mods_list.selected_element)
+            match self.user_interface.editor_mods_list.selected_element:
+                case "Hexes":
+                    print("in add hex_case")
+                    self.add_hex(event)
+                case "Rivers":
+                    self.add_river(event)
+                case "Roads":
+                    self.add_road(event)
 
-                print("this is printing object in hexes", self.game_map.hexes[self.selected_sprite.grid_pos])
+    def add_hex(self, event):
+        if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
+            self.selected_sprite = selected_sprite_clicked
+            hex_selected = self.user_interface.button_list.selected_element
+            print("changing game hex ")
+            self.game_map.change_hex(hex_selected, self.selected_sprite.grid_pos)
+
+    def add_road(self, event):
+        pass
+
+    def add_river(self, event):
+        pass
+
+        # if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
+        #     self.selected_sprite = selected_sprite_clicked
+        # triangle = self.check_which_triangle_was_clicked(event)
+
+
 
 
         if event.button == 3:
@@ -82,6 +104,34 @@ class MouseClickHandler:
             cell_hex = self.game_map.get_hex_by_coord(pos)
             if cell_hex:
                 cell_hex.draw_in_unit_range()
+
+    def check_if_rectangle_for_hex_was_clicked(self, sprite,  mouse_pos, offset):
+        new_rec = pygame.Rect(offset.x + sprite.rect.x, offset.y + sprite.rect.y, sprite.rect.width, sprite.rect.height)
+        if new_rec.collidepoint(mouse_pos.x, mouse_pos.y):
+            return new_rec
+        return False
+    def check_which_triangle_was_clicked(self, local_x, local_y):
+        if local_y > 0 and local_x > 0 and local_y <= sqrt(3)* local_x:
+            return 5
+        if local_y > 0 and local_y >= sqrt(3) * local_x and local_y >= -sqrt(3) * local_x:
+            return 4
+        if local_y > 0 and local_x < 0 and local_y <= -sqrt(3) * local_x:
+            return 3
+        if local_y < 0 and local_x > 0 and local_y >= -sqrt(3) * local_x:
+            return 0
+        if local_y < 0 and local_y <= sqrt(3) * local_x and local_y <= -sqrt(3) * local_x:
+            return 1
+        if local_y < 0 and local_x < 0 and local_y >= sqrt(3) * local_x:
+            return 2
+
+    def get_real_mouse_pos(self, event):
+
+        mouse = pygame.math.Vector2(event.pos)
+        zoom=self.tracker.get_zoom()
+        mouse *= 1 / zoom
+        mouse += self.tracker.get_internal_offset()
+        return  pygame.math.Vector2(int(mouse.x), int(mouse.y))
+
     def check_if_hex_is_clicked(self, event):
         mouse = pygame.math.Vector2(event.pos)
 
@@ -100,7 +150,12 @@ class MouseClickHandler:
                 local_y = int(mouse.y) - new_rec.y
 
                 if sprite.mask.get_at((local_x, local_y)):
+                    local_x, local_y = local_x - sprite.width / 2, sprite.height - local_y - sprite.height / 2
 
+                    print(self.check_which_triangle_was_clicked(local_x, local_y))
 
                     return sprite
         return None
+
+
+

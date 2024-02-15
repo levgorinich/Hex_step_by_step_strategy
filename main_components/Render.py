@@ -41,7 +41,7 @@ class Render:
 
         self.internal_surface.fill((0, 0, 0, 0))
         self.map_movement_tracker.screen_movement_with_mouse_dragging(events_list)
-        self.display_surface.fill('#71deee')
+        self.display_surface.fill((255,255,255)) # #71deee initial background color
 
 
     def display(self, events_list, game_map,):

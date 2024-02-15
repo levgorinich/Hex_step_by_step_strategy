@@ -5,7 +5,7 @@ import pygame
 from math import *
 
 from game_content.Groups import HexesGroup
-from game_content.Sprites import Hexagon, Hexagon_mountain, Hexagon_sea, Hexagon_land, Town
+from game_content.Sprites import Hexagon, Hexagon_mountain, Hexagon_sea, Hexagon_land, Town, Hexagon_empty
 from player_actions.Spawner import Spawner
 from noise.Noise import Noise
 import random
@@ -33,7 +33,8 @@ class Map:
         self.buildings = pygame.sprite.Group()
         # self.hexes   = self.create_tiles()
 
-        self.hexes = self.load_from_json("json_save")
+        # self.hexes = self.load_from_json("json_save")
+        self.hexes = self.create_empty_map()
         self.Spawner = Spawner(self)
         # self.create_mines()
 
@@ -74,6 +75,8 @@ class Map:
                 hex_created = (Hexagon_sea(grid_pos))
             case "Hexagon_mountain":
                 hex_created = (Hexagon_mountain(grid_pos))
+            case "Hexagon_empty":
+                hex_created = (Hexagon_empty(grid_pos))
         return hex_created
 
     def add_building(self, hex_created: Hexagon, building: dict, grid_pos: tuple[int, int]) -> None:
@@ -120,6 +123,12 @@ class Map:
     def create_tiles(self):
         noise = Noise(self.rows, self.columns, seed=self.seed)
         hexes = noise.create_tiles()
+        return hexes
+    def create_empty_map(self):
+        hexes = HexesGroup()
+        for i in range(self.rows):
+            for j in range(self.columns):
+                hexes.add(Hexagon_empty((i, j)))
         return hexes
 
     def create_mines(self, ):
