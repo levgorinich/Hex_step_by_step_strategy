@@ -40,7 +40,7 @@ def map_editor():
     class MapEditor:
         def __init__(self, window_size, internal_surface_size, id):
 
-            self.game_map = Map(6, 6, id, 10,3, True)
+            self.game_map = Map(3, 3, id, 10,3, True)
             self.mover = Mover(self.game_map)
             self.spawner = Spawner(self.game_map,)
             self.move_parser = Parser(self.mover, self.spawner,)

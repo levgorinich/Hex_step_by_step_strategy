@@ -17,6 +17,7 @@ class HexesGroup(pygame.sprite.Group):
 
 
     def __getitem__(self, item):
+        print("this is key ", item)
         return self.hexes_dict[item]
 
     def __setitem__(self, key, value):
@@ -61,6 +62,9 @@ class Grid(dict):
                 raise KeyAlreadyExistsError(f"Key '{key}' already exists in the dictionary.")
 
     def __getitem__(self, key):
+        print(self.key_to_value)
+        print(key)
+        # print("this is value in values to keys", value)
         return self.key_to_value.get(key)
     def __len__(self):
         return len(self.key_to_value)

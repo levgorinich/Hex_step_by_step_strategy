@@ -70,13 +70,13 @@ class Map:
         print("type in create hex ")
         match type:
             case "Hexagon_land":
-                hex_created = (Hexagon_land(grid_pos))
+                hex_created = (Hexagon_land(grid_pos, self))
             case "Hexagon_sea":
-                hex_created = (Hexagon_sea(grid_pos))
+                hex_created = (Hexagon_sea(grid_pos, self))
             case "Hexagon_mountain":
-                hex_created = (Hexagon_mountain(grid_pos))
+                hex_created = (Hexagon_mountain(grid_pos, self))
             case "Hexagon_empty":
-                hex_created = (Hexagon_empty(grid_pos))
+                hex_created = (Hexagon_empty(grid_pos, self))
         return hex_created
 
     def add_building(self, hex_created: Hexagon, building: dict, grid_pos: tuple[int, int]) -> None:
@@ -128,32 +128,9 @@ class Map:
         hexes = HexesGroup()
         for i in range(self.rows):
             for j in range(self.columns):
-                hexes.add(Hexagon_empty((i, j)))
+                hexes.add(Hexagon_empty((i, j), self))
         return hexes
 
-    def create_mines(self, ):
-        land_hexes = []
-        for hex in self.hexes:
-            if isinstance(hex, Hexagon_land):
-                land_hexes.append(hex.grid_pos)
-
-        for hex in land_hexes:
-
-            a = random.random()
-            if a < 0.03:
-                self.Spawner.spawn_building("Mine", hex)
-
-        for i in range(self.players_amount):
-            print("amount of players in this game ", self.players_amount)
-            base1 = random.choice(land_hexes)
-            print("base1 ", base1)
-
-            if self.player_id == i:
-                self.spawn_point = base1[0], base1[1] + 1
-
-            print("spawn point in map ", self.spawn_point, i, self.player_id)
-
-            self.Spawner.spawn_unit("WarBase", base1, player_id=i)
 
     def check_coord_validity(self, cords):
         return cords[0] >= 0 and cords[1] >= 0 and cords[0] < self.rows and cords[1] < self.columns
@@ -239,16 +216,28 @@ class Map:
                             hexes.append(hex)
         return hexes
 
-    def qoffset_from_cube(self, q, r, s, offset):
-        col = q
-        if offset == -1:
-            row = -col - s + (col - (col & 1)) / 2 + 1
-        else:
-            row = -col - s + (col - (col & 1)) / 2
-        return (col, row)
 
-    def end_turn(self):
-        for unit in self.units:
-            unit.restore_stamina()
-        string = "<end_turn" + str(self.player_id) + ">"
-        self.actions.append(string)
+
+  # def create_mines(self, ):
+  #       land_hexes = []
+  #       for hex in self.hexes:
+  #           if isinstance(hex, Hexagon_land):
+  #               land_hexes.append(hex.grid_pos)
+  #
+  #       for hex in land_hexes:
+  #
+  #           a = random.random()
+  #           if a < 0.03:
+  #               self.Spawner.spawn_building("Mine", hex)
+  #
+  #       for i in range(self.players_amount):
+  #           print("amount of players in this game ", self.players_amount)
+  #           base1 = random.choice(land_hexes)
+  #           print("base1 ", base1)
+  #
+  #           if self.player_id == i:
+  #               self.spawn_point = base1[0], base1[1] + 1
+  #
+  #           print("spawn point in map ", self.spawn_point, i, self.player_id)
+  #
+  #           self.Spawner.spawn_unit("WarBase", base1, player_id=i)

@@ -29,45 +29,46 @@ class MouseClickHandler:
         result = self.user_interface.check_click(mouse_pos)
         if result:
             self.was_clicked = True
-            print("UI was clicked")
+            # print("UI was clicked")
 
         else:
             self.was_clicked = False
 
+    def add_hex(self, event):
+        if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
+            hex_selected = self.user_interface.button_list.selected_element
+            self.game_map.change_hex(hex_selected, selected_sprite_clicked.grid_pos)
+
+    def add_road(self, event):
+        pass
+
+    def add_river(self, event):
+
+        if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
+            mouse = self.get_real_mouse_pos(event)
+            rect = self.get_hex_rectangle_with_offset(selected_sprite_clicked)
+            local_x, local_y = self.calculate_mouse_pos_in_hex_rectangle(rect, mouse)
+
+            triangle = self.check_which_triangle_was_clicked(local_x, local_y, selected_sprite_clicked)
+            selected_sprite_clicked.draw_a_river(triangle)
     def check_hex_click(self, event):
 
         self.clear_selected_hexes()
         mouse = pygame.math.Vector2(pygame.mouse.get_pos())
         mouse -= self.tracker.get_dragging_offset()
 
+
+
         if event.button == 1:
 
-            print(self.user_interface.editor_mods_list.selected_element)
             match self.user_interface.editor_mods_list.selected_element:
                 case "Hexes":
-                    print("in add hex_case")
                     self.add_hex(event)
                 case "Rivers":
                     self.add_river(event)
                 case "Roads":
                     self.add_road(event)
 
-    def add_hex(self, event):
-        if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
-            self.selected_sprite = selected_sprite_clicked
-            hex_selected = self.user_interface.button_list.selected_element
-            print("changing game hex ")
-            self.game_map.change_hex(hex_selected, self.selected_sprite.grid_pos)
-
-    def add_road(self, event):
-        pass
-
-    def add_river(self, event):
-        pass
-
-        # if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
-        #     self.selected_sprite = selected_sprite_clicked
-        # triangle = self.check_which_triangle_was_clicked(event)
 
 
 
@@ -110,7 +111,11 @@ class MouseClickHandler:
         if new_rec.collidepoint(mouse_pos.x, mouse_pos.y):
             return new_rec
         return False
-    def check_which_triangle_was_clicked(self, local_x, local_y):
+    def check_which_triangle_was_clicked(self, local_x, local_y, sprite):
+
+        local_x, local_y = local_x - sprite.width / 2, sprite.height - local_y - sprite.height / 2
+
+
         if local_y > 0 and local_x > 0 and local_y <= sqrt(3)* local_x:
             return 5
         if local_y > 0 and local_y >= sqrt(3) * local_x and local_y >= -sqrt(3) * local_x:
@@ -132,30 +137,24 @@ class MouseClickHandler:
         mouse += self.tracker.get_internal_offset()
         return  pygame.math.Vector2(int(mouse.x), int(mouse.y))
 
+    def get_hex_rectangle_with_offset(self, sprite, ):
+
+        offset = self.tracker.get_total_offset()
+        return  pygame.Rect(offset.x + sprite.rect.x, offset.y + sprite.rect.y, sprite.rect.width, sprite.rect.height)
+
+    def calculate_mouse_pos_in_hex_rectangle(self,rectangle, global_mouse_pos):
+        local_x = int(global_mouse_pos.x) - rectangle.x
+        local_y = int(global_mouse_pos.y) - rectangle.y
+        return local_x, local_y
     def check_if_hex_is_clicked(self, event):
-        mouse = pygame.math.Vector2(event.pos)
-
-        zoom=self.tracker.get_zoom()
-        mouse *= 1 / zoom
-
-        mouse += self.tracker.get_internal_offset()
-        mouse = pygame.math.Vector2(int(mouse.x), int(mouse.y))
-        # print(mouse, "real  mouse pos")
+        mouse = self.get_real_mouse_pos(event)
 
         for sprite in self.game_map.hexes:
-            offset = self.tracker.get_total_offset()
-            new_rec = pygame.Rect(offset.x + sprite.rect.x, offset.y + sprite.rect.y, sprite.rect.width, sprite.rect.height)
+            new_rec = self.get_hex_rectangle_with_offset(sprite)
             if new_rec.collidepoint(mouse.x, mouse.y):
-                local_x = int(mouse.x) - new_rec.x
-                local_y = int(mouse.y) - new_rec.y
-
+                local_x, local_y = self.calculate_mouse_pos_in_hex_rectangle(new_rec, mouse)
                 if sprite.mask.get_at((local_x, local_y)):
-                    local_x, local_y = local_x - sprite.width / 2, sprite.height - local_y - sprite.height / 2
-
-                    print(self.check_which_triangle_was_clicked(local_x, local_y))
-
                     return sprite
-        return None
 
 
 
