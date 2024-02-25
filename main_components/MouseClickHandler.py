@@ -2,6 +2,8 @@ from math import sqrt
 
 import pygame
 
+from game_content.Sprites import Town
+
 
 class MouseClickHandler:
     def __init__(self,game_map,  User_interface, tracker, mover):
@@ -43,6 +45,20 @@ class MouseClickHandler:
 
             triangle = self.check_which_triangle_was_clicked(local_x, local_y, selected_sprite_clicked)
             selected_sprite_clicked.discover_rivers_to_draw(triangle)
+
+    def add_building(self, event):
+        if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
+            print("Adding town")
+            selected_sprite_clicked.add_building(Town(selected_sprite_clicked.grid_pos))
+
+    def handle_click_in_none_mod(self, event):
+
+        if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
+            if selected_sprite_clicked.building_on_hex:
+                city_surface = self.user_interface.find_element("city_surface")
+                self.user_interface.hide_element(city_surface)
+
+
     def check_hex_click(self, event):
 
         self.clear_selected_hexes()
@@ -60,6 +76,11 @@ class MouseClickHandler:
                     self.add_river(event)
                 case "Roads":
                     self.add_road(event)
+                case "Buildings":
+                    self.add_building(event)
+                case "None":
+                    self.handle_click_in_none_mod(event)
+
 
 
         if event.button == 3:

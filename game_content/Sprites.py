@@ -103,8 +103,6 @@ class Hexagon(MapObject):
     def add_unit(self, unit):
         self.unit_on_hex = unit
 
-    def add_building(self, building):
-        self.building_on_hex = building
 
     def remove_unit(self):
         self.unit_on_hex = False
@@ -126,13 +124,15 @@ class Hexagon(MapObject):
         pygame.draw.polygon(self.image, self.color, self.points)
         for idx, river in enumerate(self.rivers):
             if river:
-                print("draw a river", idx)
                 self.draw_a_river(idx)
 
         for idx, road in enumerate(self.roads):
             if road:
-                print("draw a road", idx)
                 self.draw_a_road(idx)
+
+        if self.building_on_hex:
+
+            self.image.blit(self.building_on_hex.image, (11,4))
 
         # pygame.draw.circle(self.image, (0, 255, 255), self.points[1], 5)
     def discover_rivers_to_draw(self, triangle):
@@ -143,6 +143,10 @@ class Hexagon(MapObject):
         new = tuple(coords + self.directions[triangle])
         new_tirangle = (triangle + 3) % 6
         self.game_map.hexes[new].add_a_river(new_tirangle)
+
+    def add_building(self, building):
+        self.building_on_hex = building
+        self.draw()
 
     def add_a_river(self, triangle):
         try:

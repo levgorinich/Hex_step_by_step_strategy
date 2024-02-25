@@ -62,6 +62,7 @@ class Map:
         print(old_hex.rivers, "this is old hex")
         hex_created.rivers = old_hex.rivers
         hex_created.roads = old_hex.roads
+        hex_created.building_on_hex = old_hex.building_on_hex
         hex_created.draw()
         self.hexes[grid_pos] = hex_created
 

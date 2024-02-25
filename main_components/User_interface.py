@@ -1,6 +1,6 @@
 import pygame
 
-from player_actions.UI_Elements import MenuButton, ButtonList, TextInput
+from player_actions.UI_Elements import *
 
 pygame.font.init()
 font_size = 20
@@ -20,8 +20,12 @@ class UI:
  #        text_surface = font.render(self.text, True, color)
  #        self.UI_surface.blit(text_surface, (x, y))
 
-    def hide_element(self,):
-        self.button_lists["editor_mods"].hide()
+    def find_element(self, name):
+        for element in self.elements:
+            if element.name == name:
+                return element
+    def hide_element(self, element):
+        element.hide()
         self.draw_elemetns()
 
     def end_turn(self, ):
@@ -32,6 +36,7 @@ class UI:
         self.add_buttons()
         self.add_hexes_list()
         self.add_editor_mods_list()
+        self.add_surface()
     def draw_elemetns(self):
         self.UI_surface = pygame.Surface(self.window_size, pygame.SRCALPHA)
         for element in self.elements:
@@ -39,6 +44,10 @@ class UI:
                 element.draw(self.UI_surface)
 
 
+    def add_surface(self):
+        surface = UiSurface(size=(300,800), position=(500,0))
+        surface.name = "city_surface"
+        self.elements.append(surface)
     def add_text (self):
         text_input = TextInput()
         self.elements.append(text_input)
@@ -53,7 +62,7 @@ class UI:
 
     def add_editor_mods_list(self):
         button_list = ButtonList(position=(0, 0))
-        modes = ["Hexes", "Rivers", "Roads"]
+        modes = ["Hexes", "Rivers", "Roads","Buildings","None"]
         [button_list.add_element(mode, mode) for mode in modes]
         self.elements.append(button_list)
         self.button_lists["editor_mods"] = button_list

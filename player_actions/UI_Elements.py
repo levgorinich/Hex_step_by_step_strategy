@@ -154,12 +154,16 @@ class UiSurface(UI_Element):
         super().__init__()
         self.surface = pygame.Surface(size, masks=(0,0,0))
         self.position = position
+        self.rect = self.surface.get_rect(topleft=self.position)
 
 
     def draw(self, display_surface: pygame.Surface):
         if self.visible:
-
             display_surface.blit(self.surface, self.position)
+
+    def check_click(self, mouse_pos: tuple[int, int]):
+        if self.rect.collidepoint(mouse_pos):
+            return self
 
 
 
