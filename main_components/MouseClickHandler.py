@@ -23,6 +23,8 @@ class MouseClickHandler:
         self.clicked_element =self.user_interface.check_click(mouse_pos)
 
         if not self.clicked_element:
+            print("no element clicked")
+            self.user_interface.hide_lvl_2_elements()
             self.check_hex_click(event)
 
 
@@ -55,8 +57,7 @@ class MouseClickHandler:
 
         if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
             if selected_sprite_clicked.building_on_hex:
-                city_surface = self.user_interface.find_element("city_surface")
-                self.user_interface.hide_element(city_surface)
+                self.user_interface.open_element("city_surface")
 
 
     def check_hex_click(self, event):

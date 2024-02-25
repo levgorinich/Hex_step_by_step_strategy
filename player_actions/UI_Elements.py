@@ -8,6 +8,24 @@ from main_components.Map import Map
 def empty_funciton():
     print("")
 
+class Observable:
+    def __init__(self):
+        self.observers = []
+
+    def add_observer(self, observer):
+        pass
+    def remove_observer(self):
+        pass
+    def notify_observers(self):
+        pass
+
+class TextObservable(Observable):
+
+    def __init__(self):
+        super().__init__()
+        self.observers = []
+    pass
+
 class UI_Element(ABC):
     def __init__(self):
         self.visible = True
@@ -125,8 +143,6 @@ class ButtonList(UI_Element):
                 self.upper_surf.blit(self.bottom_surf,(0,self.scroll))
                 [element.move_button(y*10) for element in self.elements]
     def check_click(self, mouse_pos: tuple[int, int]):
-
-
         for element in self.elements:
             if element.check_click(mouse_pos):
                 self.selected_element = self.elements[element]
@@ -136,34 +152,76 @@ class ButtonList(UI_Element):
             display_surface.blit(self.upper_surf, (self.x_offset, self.y_offset))
 
 
-class TextInput(UI_Element):
-    def __init__(self, text = None):
+class TextInput(UI_Element, TextObservable):
+    def __init__(self, text = None, position = (10,10), offset = (0,0), editable = True):
         super().__init__()
         self.text = text
+        self.position = position
+        self.abs_position = (position[0] + offset[0], position[1] + offset[1])
+
         self.font = pygame.font.SysFont("Arial", 24)
         self.text_surf = self.font.render(self.text, True, '#FFFFFF')
         self.surf = pygame.Surface((200, 50))
+        self.input_rect = pygame.Rect(10, 10, 180, 30 )
+        self.abs_rect = pygame.Rect(self.abs_position[0], self.abs_position[1], 200, 50)
+        self.editable = editable
+        self.active = False
+        self.observers = []
+
+
 
     def draw(self, display_surface: pygame.Surface):
         if self.visible:
-            self.surf.blit(self.text_surf, (0,0))
-            display_surface.blit(self.text_surf, (10, 10))
 
-class UiSurface(UI_Element):
+            self.surf = pygame.Surface((200, 50))
+            pygame.draw.rect(self.surf, (0, 255, 0), self.input_rect, 2, 3)
+            self.text_surf = self.font.render(self.text, True, '#FFFFFF')
+            self.surf.blit(self.text_surf, (self.input_rect.x +5, self.input_rect.y +5))
+            display_surface.blit(self.surf, self.position)
+
+    def check_click(self, mouse_pos: tuple[int, int]):
+        if self.abs_rect.collidepoint(mouse_pos):
+            if self.editable:
+                self.active = True
+                self.notify_observers()
+            return self
+
+    def add_observer(self, observer):
+        self.observers.append(observer)
+
+    def remove_observer(self, observer):
+        self.observers.remove(observer)
+
+    def notify_observers(self):
+        for observer in self.observers:
+            observer.update(self)
+
+class UiSurface(UI_Element, TextObservable):
     def __init__(self, size: tuple[int, int], position: tuple[int, int]):
         super().__init__()
         self.surface = pygame.Surface(size, masks=(0,0,0))
         self.position = position
         self.rect = self.surface.get_rect(topleft=self.position)
+        self.text_input = TextInput("tata", position=(10,10), offset=(500,0))
 
 
     def draw(self, display_surface: pygame.Surface):
         if self.visible:
+            self.text_input.draw(self.surface)
             display_surface.blit(self.surface, self.position)
 
     def check_click(self, mouse_pos: tuple[int, int]):
         if self.rect.collidepoint(mouse_pos):
+            if self.text_input.check_click(mouse_pos):
+                return self.text_input
             return self
+
+    def add_observer(self, observer):
+        self.text_input.add_observer(observer)
+
+    def remove_observer(self, observer):
+        self.text_input.remove_observer(observer)
+
 
 
 

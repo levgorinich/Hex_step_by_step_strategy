@@ -10,6 +10,7 @@ from internet_acsess.network import Network
 from main_components.Map import Map
 from main_components.MouseClickHandler import MouseClickHandler
 from main_components.Render import Render
+from main_components.TextInputHandler import TextInputHandler
 from main_components.User_interface import UI
 from main_components.mapMovement import MapMovementTracker
 from player_actions.UI_Elements import *
@@ -50,8 +51,10 @@ def map_editor():
             self.renderer = Render(internal_surface_size, map_movement_tracker=self.tracker,
                                    user_interface=self.user_interface)
             self.click_handler = MouseClickHandler(self.game_map, self.user_interface, self.tracker, self.mover)
+            self.text_input_handler = TextInputHandler(self.user_interface)
 
     map_editor = MapEditor(window_size, internal_surface_size, 0)
+    map_editor.user_interface.subscribe_text_elements(map_editor.text_input_handler)
 
     run = True
     while run:
@@ -69,14 +72,8 @@ def map_editor():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 map_editor.click_handler.handle_click(event)
-            if event.type == pygame.TEXTINPUT:
-                map_editor.user_interface.t
-                map_editor.user_interface.draw_text()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_BACKSPACE:
-                    map_editor.user_interface.text = map_editor.user_interface.text[:-1]
-                    map_editor.user_interface.draw_elemetns()
-                    map_editor.user_interface.draw_text()
+            else:
+                map_editor.text_input_handler.handle_input(event)
 
                 # if click_handler.pos is not None:
                 #     renderer.cells(click_handler.pos, game_map.hexes.hexes_dict)

@@ -324,6 +324,9 @@ class Building(MapObject):
     def __init__(self, grid_pos):
         super().__init__(grid_pos)
         self.image = pygame.Surface((hex_width, hex_height), pygame.SRCALPHA)
+        self.name = "building"
+        self.population = 123
+        self.cattle = 0
 
     def save_to_json(self):
         print("in buildings save to json")
