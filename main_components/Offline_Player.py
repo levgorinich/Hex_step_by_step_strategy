@@ -6,7 +6,7 @@ from main_components.MouseClickHandler import MouseClickHandler
 from main_components.Render import Render
 from main_components.User_interface import UI
 from main_components.mapMovement import MapMovementTracker
-from player_actions.Buttons import MenuButton
+from player_actions.UI_Elements import MenuButton
 from player_actions.MoveParser import Parser
 from player_actions.Spawner import Spawner
 from player_actions.mover import Mover

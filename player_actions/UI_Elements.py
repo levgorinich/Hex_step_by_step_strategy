@@ -8,10 +8,25 @@ from main_components.Map import Map
 def empty_funciton():
     print("")
 
-class Button:
+class UI_Element(ABC):
+    def __init__(self):
+        self.visible = True
+        self.name = ""
+
+    @abstractmethod
+    def draw(self, pygame_surface: pygame.Surface) -> None:
+        pass
+
+    def hide(self):
+        self.visible = False
+
+    def make_visible(self):
+        self.visible = True
+class Button(UI_Element):
     def __init__(self, text, x, y, button_dimensions: tuple[int, int],x_offset = 0, y_offset = 0,
                  action = empty_funciton, color:tuple[int, int, int]=(0, 255, 0),
                  font_size:int = 24, font_name:str ="Arial",):
+        super().__init__()
         self.rect = pygame.Rect(x, y, button_dimensions[0], button_dimensions[1])
 
         self.text = text
@@ -26,9 +41,10 @@ class Button:
     #     self.is_clickable = True
 
     def draw(self, display_surface: pygame.Surface) -> None:
-        pygame.draw.rect(display_surface, self.color, self.rect)
-        pygame.draw.rect(display_surface, "Black", self.rect, 2)
-        display_surface.blit(self.text_surf, self.text_rect)
+        if self.visible == True:
+            pygame.draw.rect(display_surface, self.color, self.rect)
+            pygame.draw.rect(display_surface, "Black", self.rect, 2)
+            display_surface.blit(self.text_surf, self.text_rect)
 
     @abstractmethod
     def check_click(self,pos) -> bool:
@@ -49,11 +65,11 @@ class MenuButton(Button):
         self.abs_y = y + y_offset
         self.absolute_rect = pygame.Rect(self.abs_x, self.abs_y, self.button_dimensions[0], self.button_dimensions[1])
 
-    def check_click(self, pos: tuple[int, int]) -> bool:
+    def check_click(self, pos: tuple[int, int]):
 
         if  self.absolute_rect.collidepoint(pos):
                 self.action(*self.action_args)
-                return True
+                return self
         return False
     def move_button(self, offset):
         self.y_offset += offset
@@ -62,21 +78,22 @@ class MenuButton(Button):
 
 
 
-class ButtonList():
+class ButtonList(UI_Element):
     def __init__(self,bottom_surface_size: tuple[int, int] = (200, 400),
                  upper_surface_size: tuple[int, int]= (200,200),
                  upper_surface_color: tuple[int, int, int] = (255, 255, 0),
-                 offset: tuple[int, int] = (0,0),
+                 position: tuple[int, int] = (0,0),
                  button_dimensions: tuple[int, int] = (180, 35),
                  new_element_top_left_corner: tuple[int, int] = (10,10),):
+        super().__init__()
         self.bottom_surf = pygame.Surface(bottom_surface_size, pygame.SRCALPHA)
         # self.but_rect = self.bottom_surf.get_rect(topleft=(0,0))
         self.upper_surf = pygame.Surface( upper_surface_size, pygame.SRCALPHA)
         self.upper_surf_color = upper_surface_color
         self.upper_surf.blit(self.bottom_surf,(0,0))
         self.upper_surf.fill(self.upper_surf_color)
-        self.x_offset = offset[0]
-        self.y_offset = offset[1]
+        self.x_offset = position[0]
+        self.y_offset = position[1]
         self.new_element_top_left_corner_x = new_element_top_left_corner[0]
         self.new_element_top_left_corner_y = new_element_top_left_corner[1]
         self.absolute_rect = pygame.Rect(self.x_offset, self.y_offset, 200, 300)
@@ -85,6 +102,7 @@ class ButtonList():
         self.selected_element = None
         self.scroll = 0
         # self.offset_x = offset_x
+
 
     def add_element(self,button_text,element_to_choose):
 
@@ -112,7 +130,37 @@ class ButtonList():
         for element in self.elements:
             if element.check_click(mouse_pos):
                 self.selected_element = self.elements[element]
-                return True
+                return self
+    def draw(self, display_surface: pygame.Surface):
+        if self.visible:
+            display_surface.blit(self.upper_surf, (self.x_offset, self.y_offset))
+
+
+class TextInput(UI_Element):
+    def __init__(self, text = None):
+        super().__init__()
+        self.text = text
+        self.font = pygame.font.SysFont("Arial", 24)
+        self.text_surf = self.font.render(self.text, True, '#FFFFFF')
+        self.surf = pygame.Surface((200, 50))
+
+    def draw(self, display_surface: pygame.Surface):
+        if self.visible:
+            self.surf.blit(self.text_surf, (0,0))
+            display_surface.blit(self.text_surf, (10, 10))
+
+class UiSurface(UI_Element):
+    def __init__(self, size: tuple[int, int], position: tuple[int, int]):
+        super().__init__()
+        self.surface = pygame.Surface(size, masks=(0,0,0))
+        self.position = position
+
+
+    def draw(self, display_surface: pygame.Surface):
+        if self.visible:
+
+            display_surface.blit(self.surface, self.position)
+
 
 
 

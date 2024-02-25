@@ -57,12 +57,14 @@ class Map:
         return hexes
 
     def change_hex(self, type, grid_pos):
+        old_hex = self.hexes[grid_pos]
         hex_created = self.create_hex(type, grid_pos)
-
-        print(len(self.hexes))
+        print(old_hex.rivers, "this is old hex")
+        hex_created.rivers = old_hex.rivers
+        hex_created.roads = old_hex.roads
+        hex_created.draw()
         self.hexes[grid_pos] = hex_created
 
-        print(len(self.hexes))
 
 
 

@@ -67,13 +67,14 @@ class Hexagon(MapObject):
         pygame.draw.polygon(self.image, self.color, self.points)
         self.image.set_at(list(map(int, self.points[0])), (225, 0, 0))
         self.mask = pygame.mask.from_surface(self.image)
-
-        self.rivers = [False, False, False, False, False, False]
+        self.rivers = [False] * 6
+        self.roads = [False] * 7
         self.directions = {0:pygame.Vector3(1,0,-1), 1:pygame.Vector3(0, 1, -1), 2:pygame.Vector3(-1, 1,0),
                            3:pygame.Vector3(-1, 0, 1), 4:pygame.Vector3(0, -1, 1), 5:pygame.Vector3(1, -1, -0)}
 
         self.unit_on_hex = None
         self.building_on_hex = None
+
 
     def save_to_json(self):
         print("Call buildings save to json ", self.building_on_hex)
@@ -123,22 +124,36 @@ class Hexagon(MapObject):
     def draw(self):
 
         pygame.draw.polygon(self.image, self.color, self.points)
+        for idx, river in enumerate(self.rivers):
+            if river:
+                print("draw a river", idx)
+                self.draw_a_river(idx)
+
+        for idx, road in enumerate(self.roads):
+            if road:
+                print("draw a road", idx)
+                self.draw_a_road(idx)
 
         # pygame.draw.circle(self.image, (0, 255, 255), self.points[1], 5)
+    def discover_rivers_to_draw(self, triangle):
+        self.add_a_river(triangle)
 
-    def draw_a_river(self, triangle, first = True):
+        coords = pygame.Vector3(self.offset_to_cube_coords(self.grid_pos))
+
+        new = tuple(coords + self.directions[triangle])
+        new_tirangle = (triangle + 3) % 6
+        self.game_map.hexes[new].add_a_river(new_tirangle)
+
+    def add_a_river(self, triangle):
         try:
-            self.rivers[triangle] = False
+            self.rivers[triangle] = True
         except IndexError as e:
             print("Invalid triangle number")
+        self.draw()
 
+
+    def draw_a_river(self, triangle):
         pygame.draw.polygon(self.image, (0, 255, 255), self.draw_river(triangle))
-        if first:
-            coords = pygame.Vector3(self.offset_to_cube_coords(self.grid_pos))
-            print(coords)
-            new = tuple(coords + self.directions[triangle])
-            new_tirangle = (triangle + 3) % 6
-            self.game_map.hexes[new].draw_a_river(new_tirangle, False)
 
     def draw_river(self, triangle_number: int, river_thickness: int = 3, ):
 
@@ -165,6 +180,88 @@ class Hexagon(MapObject):
                                5: [self.points[5], point_5_right, point_0_left, self.points[0]]}
 
         return points_for_triangle[triangle_number]
+
+    def discover_what_roads_to_draw(self,):
+            coords = pygame.Vector3(self.offset_to_cube_coords(self.grid_pos))
+            for triangle, direction in self.directions.items():
+                new = tuple(coords + direction)
+                hex = self.game_map.hexes[new]
+                if hex and any(hex.roads):
+                    hex.add_a_road((triangle + 3) % 6)
+                    self.add_a_road(triangle)
+            if not any(self.roads):
+                self.add_a_road(6)
+
+
+    def draw_a_road(self, triangle_number):
+
+        if triangle_number == 6:
+            pygame.draw.circle(self.image, (0, 30, 170),self.calculate_points_for_road(triangle_number), 5)
+        else:
+            self.roads[6] = False
+            pygame.draw.polygon(self.image, (0, 30, 170), self.calculate_points_for_road(triangle_number))
+
+
+
+    def add_a_road(self, triangle_number):
+        try:
+            self.roads[triangle_number] = True
+            self.draw()
+        except IndexError as e:
+            print("Invalid triangle number")
+
+
+
+
+
+
+
+
+
+    def calculate_points_for_road(self, triangle, line_thickness = 4):
+        p = [pygame.Vector2(point) for point in self.points]
+        side = hex_side / 2 - line_thickness /2
+        big_side = side * math.sqrt(3)/2
+        small_side = side *0.5
+        road_1_p0 = p[2] + (side, 0)
+        road_1_p3 = p[1] + (-side, 0)
+        road_2_p0 = p[3] +(small_side, big_side)
+        road_2_p3 = p[2]+ (-small_side, -big_side)
+        road_3_p0 = p[4]+(-small_side, big_side)
+        road_3_p3 = p[3] + (small_side, -big_side)
+        road_4_p0 = p[5] + (-side, 0)
+        road_4_p3 = p[4] + (side, 0)
+        road_5_p0 = p[0] + (-small_side, -big_side)
+        road_5_p3 = p[5] + (small_side, big_side)
+        road_0_p0 = p[1] + (small_side, -big_side)
+        road_0_p3 = p[0] + (-small_side, big_side)
+        center = (p[2] +(math.floor(hex_side/2), -hex_side/2*math.sqrt(3)))
+        small_center_side = line_thickness/2
+        large_center_side=  small_center_side * math.sqrt(3)
+        center_point_0 =  center + (large_center_side, 0)
+        center_point_1 = center + (small_center_side, large_center_side)
+        center_point_2 = center + (-small_center_side, large_center_side)
+        center_point_3 = center + (-large_center_side, 0)
+        center_point_4 = center + (-small_center_side, -large_center_side)
+        center_point_5 = center + (small_center_side, -large_center_side)
+
+        points_for_river = {0: [road_0_p0, center_point_3, center_point_4, road_0_p3],
+                            1: [road_1_p0, center_point_4, center_point_5, road_1_p3],
+                            2: [road_2_p0, center_point_5, center_point_0, road_2_p3],
+                            3: [road_3_p0, center_point_0, center_point_1, road_3_p3],
+                            4: [road_4_p0, center_point_1, center_point_2, road_4_p3],
+                            5: [road_5_p0, center_point_2, center_point_3, road_5_p3],
+                            6 : center}
+
+        return points_for_river[triangle]
+        # pygame.draw.polygon(self.image, (0, 30, 170), [road_1_p0, center_point_4,  center_point_5, road_1_p3])
+        # pygame.draw.polygon(self.image, (0, 30, 170), [road_2_p0, center_point_5, center_point_0, road_2_p3])
+        # pygame.draw.polygon(self.image, (0, 30, 170), [road_3_p0, center_point_0, center_point_1, road_3_p3])
+        # pygame.draw.polygon(self.image, (0, 30, 170), [road_4_p0, center_point_1, center_point_2, road_4_p3])
+        # pygame.draw.polygon(self.image, (0, 30, 170), [road_5_p0, center_point_2, center_point_3, road_5_p3])
+        # pygame.draw.polygon(self.image, (0, 30, 170), [road_0_p0, center_point_3,  center_point_4, road_0_p3])
+
+
 
 
 

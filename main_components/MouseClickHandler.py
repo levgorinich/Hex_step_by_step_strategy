@@ -12,35 +12,27 @@ class MouseClickHandler:
         self.selected_sprite = None
         self.sprite_clicked = None
         self.unit_selected = None
-
-        self.was_clicked = False
+        self.clicked_element = None
         self.hexes_available_move_selected_unit = []
 
 
     def handle_click(self, event):
         mouse_pos = event.dict["pos"]
-        self.was_clicked =False
-        self.check_UI_click(mouse_pos)
+        self.clicked_element =self.user_interface.check_click(mouse_pos)
 
-        # need to decide what ot do if I click with the right button on a ui, i can move unit behind ui
-        if not self.was_clicked:
+        if not self.clicked_element:
             self.check_hex_click(event)
-    def check_UI_click(self, mouse_pos: tuple[int, int]):
-        result = self.user_interface.check_click(mouse_pos)
-        if result:
-            self.was_clicked = True
-            # print("UI was clicked")
 
-        else:
-            self.was_clicked = False
 
     def add_hex(self, event):
         if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
-            hex_selected = self.user_interface.button_list.selected_element
+            hex_selected = self.user_interface.button_lists["hex_types"].selected_element
             self.game_map.change_hex(hex_selected, selected_sprite_clicked.grid_pos)
 
     def add_road(self, event):
-        pass
+
+        if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
+            selected_sprite_clicked.discover_what_roads_to_draw()
 
     def add_river(self, event):
 
@@ -50,7 +42,7 @@ class MouseClickHandler:
             local_x, local_y = self.calculate_mouse_pos_in_hex_rectangle(rect, mouse)
 
             triangle = self.check_which_triangle_was_clicked(local_x, local_y, selected_sprite_clicked)
-            selected_sprite_clicked.draw_a_river(triangle)
+            selected_sprite_clicked.discover_rivers_to_draw(triangle)
     def check_hex_click(self, event):
 
         self.clear_selected_hexes()
@@ -61,16 +53,13 @@ class MouseClickHandler:
 
         if event.button == 1:
 
-            match self.user_interface.editor_mods_list.selected_element:
+            match self.user_interface.button_lists["editor_mods"].selected_element:
                 case "Hexes":
                     self.add_hex(event)
                 case "Rivers":
                     self.add_river(event)
                 case "Roads":
                     self.add_road(event)
-
-
-
 
 
         if event.button == 3:

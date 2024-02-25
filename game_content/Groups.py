@@ -78,8 +78,6 @@ class Grid(dict):
         self.value_to_keys.pop(value)
 
     def get_keys(self, value):
-        print("this is value in values to keys", value)
-        print("this is values to keys", self.value_to_keys)
         return self.value_to_keys.get(value, set())
 
 
