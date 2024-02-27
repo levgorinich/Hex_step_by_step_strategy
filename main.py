@@ -69,11 +69,11 @@ def map_editor():
                 run = False
                 global running
                 running = False
-
+            map_editor.text_input_handler.handle_input(event)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 map_editor.click_handler.handle_click(event)
-            else:
-                map_editor.text_input_handler.handle_input(event)
+
+
 
                 # if click_handler.pos is not None:
                 #     renderer.cells(click_handler.pos, game_map.hexes.hexes_dict)

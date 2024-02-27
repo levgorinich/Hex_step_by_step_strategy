@@ -54,14 +54,15 @@ class UI:
         for element in self.lvl_1_elements:
             if element.visible:
                 element.draw(self.UI_surface)
-
+        print("Drawing lvl 2 elements", len(self.lvl_2_elements))
         for element in self.lvl_2_elements:
             if element.visible:
                 element.draw(self.UI_surface)
 
 
     def add_surface(self):
-        surface = UiSurface(size=(300,800), position=(500,0))
+        print("Calling add surface")
+        surface = UiSurface(size=(300,800), position=(500,0),visible=False)
         surface.name = "city_surface"
         self.lvl_2_elements.append(surface)
     def add_text (self):
@@ -114,7 +115,6 @@ class UI:
     def check_click(self, mouse_pos: tuple[int, int]) -> bool:
         for element in self.lvl_2_elements:
             if element.visible and element.check_click(mouse_pos):
-                print("Returning")
                 return True
         for element in self.lvl_1_elements:
             if element.visible and element.check_click(mouse_pos):

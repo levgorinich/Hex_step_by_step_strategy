@@ -27,9 +27,9 @@ class TextObservable(Observable):
     pass
 
 class UI_Element(ABC):
-    def __init__(self):
+    def __init__(self, name = ""):
         self.visible = True
-        self.name = ""
+        self.name = name
 
     @abstractmethod
     def draw(self, pygame_surface: pygame.Surface) -> None:
@@ -153,8 +153,8 @@ class ButtonList(UI_Element):
 
 
 class TextInput(UI_Element, TextObservable):
-    def __init__(self, text = None, position = (10,10), offset = (0,0), editable = True):
-        super().__init__()
+    def __init__(self, text = None, position = (10,10), offset = (0,0), editable = True, name = ""):
+        super().__init__(name=name)
         self.text = text
         self.position = position
         self.abs_position = (position[0] + offset[0], position[1] + offset[1])
@@ -168,11 +168,11 @@ class TextInput(UI_Element, TextObservable):
         self.active = False
         self.observers = []
 
-
+    # def add_to_text(self):
 
     def draw(self, display_surface: pygame.Surface):
         if self.visible:
-
+            print("drawing in text", self.text,id(self))
             self.surf = pygame.Surface((200, 50))
             pygame.draw.rect(self.surf, (0, 255, 0), self.input_rect, 2, 3)
             self.text_surf = self.font.render(self.text, True, '#FFFFFF')
@@ -186,41 +186,114 @@ class TextInput(UI_Element, TextObservable):
                 self.notify_observers()
             return self
 
+
+
     def add_observer(self, observer):
         self.observers.append(observer)
 
     def remove_observer(self, observer):
         self.observers.remove(observer)
 
-    def notify_observers(self):
+    def notify_observers(self, message = None):
         for observer in self.observers:
-            observer.update(self)
+            if not message:
+                observer.update(self)
+            else:
+                observer.update(message)
 
 class UiSurface(UI_Element, TextObservable):
-    def __init__(self, size: tuple[int, int], position: tuple[int, int]):
+    def __init__(self, size: tuple[int, int], position: tuple[int, int] , visible= False):
+
         super().__init__()
+        self.visible = visible
+        self.observers = []
         self.surface = pygame.Surface(size, masks=(0,0,0))
         self.position = position
         self.rect = self.surface.get_rect(topleft=self.position)
-        self.text_input = TextInput("tata", position=(10,10), offset=(500,0))
+        self.elements = []
+        # self.text_input = TextInput("tata", position=(10,10), offset=(500,0))
+        # self.elements.append(self.text_input/)
+        self.city = None
+        self.generate_text_phields()
+
+    def generate_text_phields(self):
+
+        population = TextInput("", position=(10,10), offset=(500,0), name="population")
+        cattle = TextInput("", position=(10,60), offset=(500,0), name="cattle")
+
+        self.elements.append(population)
+        self.elements.append(cattle)
+        for observer in self.observers:
+            self.add_observer(observer)
 
 
+    def find_element(self, name):
+        for element in self.elements:
+            if element.name == name:
+                return element
+
+    def set_city(self, city):
+        if self.city:
+            try:
+                self.city.population = int(self.find_element("population").text)
+                self.city.cattle = self.find_element("cattle").text
+            except Exception as e:
+                print(e)
+
+        print("set city", len(self.elements))
+        self.city = city
+        self.find_element("population").text = str(city.population)
+        self.find_element("cattle").text = str(city.cattle)
+
+    def hide(self):
+        self.notify_observers(-1)
+        self.visible = False
+        for element in self.elements:
+            element.visible = False
+
+    def make_visible(self):
+        self.visible = True
+        for element in self.elements:
+            element.visible = True
+
+        # self
     def draw(self, display_surface: pygame.Surface):
         if self.visible:
-            self.text_input.draw(self.surface)
+            print("draw elements", len(self.elements), id(self))
+            for element in self.elements:
+                element.draw(self.surface)
+
             display_surface.blit(self.surface, self.position)
 
     def check_click(self, mouse_pos: tuple[int, int]):
         if self.rect.collidepoint(mouse_pos):
-            if self.text_input.check_click(mouse_pos):
-                return self.text_input
+            self.notify_observers(-1)
+
+            for element in self.elements:
+                print(element.name)
+                if element.check_click(mouse_pos):
+                    return element
             return self
 
+
+    def notify_observers(self, message = None):
+        for observer in self.observers:
+            if not message:
+                observer.update(self)
+            else:
+                observer.update(message)
+
     def add_observer(self, observer):
-        self.text_input.add_observer(observer)
+        if not observer in self.observers:
+            self.observers.append(observer)
+        for element in self.elements:
+            if isinstance(element, TextObservable):
+                element.add_observer(observer)
 
     def remove_observer(self, observer):
-        self.text_input.remove_observer(observer)
+        for element in self.elements:
+            if isinstance(element, TextObservable):
+                element.remove_observer(observer)
 
 
 
