@@ -23,7 +23,7 @@ class MouseClickHandler:
         self.clicked_element =self.user_interface.check_click(mouse_pos)
 
         if not self.clicked_element:
-            print("ment clicked")
+
             self.user_interface.hide_lvl_2_elements()
             self.check_hex_click(event)
 
@@ -167,6 +167,7 @@ class MouseClickHandler:
             if new_rec.collidepoint(mouse.x, mouse.y):
                 local_x, local_y = self.calculate_mouse_pos_in_hex_rectangle(new_rec, mouse)
                 if sprite.mask.get_at((local_x, local_y)):
+                    print("Sprite clicked:", sprite.grid_pos)
                     return sprite
 
 

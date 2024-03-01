@@ -76,15 +76,27 @@ class Hexagon(MapObject):
         self.building_on_hex = None
 
 
+    def get_neighbours(self):
+        coords = self.offset_to_cube_coords(self.grid_pos)
+        return list(filter(None, [self.game_map.hexes[tuple(coords + direction)] for direction in self.directions.values()]))
+
+    def is_road_on_hex(self):
+        return any(self.roads)
+
+    def is_river_on_hex(self):
+        return any(self.rivers)
+
     def save_to_json(self):
         print("Call buildings save to json ", self.building_on_hex)
         hex_dict = {"type": str(self.__class__.__name__)}
 
         if self.building_on_hex:
-            print("in building on hex ")
             hex_dict["building_on_hex"] = self.building_on_hex.save_to_json()
         else:
             hex_dict["building_on_hex"] = None
+        hex_dict["roads"] = self.roads
+        hex_dict["rivers"] = self.rivers
+
 
         return str(self.grid_pos), hex_dict
 
@@ -330,7 +342,7 @@ class Building(MapObject):
 
     def save_to_json(self):
         print("in buildings save to json")
-        return {"name": str(self.__class__.__name__), "data": {}}
+        return {"name": str(self.__class__.__name__), "data": {"population": self.population, "cattle": self.cattle}}
 
 
 class Mine(Building):

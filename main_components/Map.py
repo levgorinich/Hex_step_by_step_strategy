@@ -1,4 +1,5 @@
 import json
+from collections import deque, defaultdict
 
 import pygame
 
@@ -40,6 +41,41 @@ class Map:
 
         # self.spawner = Spawner(self)
 
+    def create_graph(self):
+        queue = deque()
+        graph = defaultdict(list)
+        visited = [[False for _ in range(self.columns)] for _ in range(self.rows)]
+        previous = [[None for _ in range(self.columns)] for _ in range(self.rows)]
+        for hex in self.hexes:
+            if hex.building_on_hex and not visited[hex.grid_pos[0]][hex.grid_pos[1]]:
+                visited[hex.grid_pos[0]][hex.grid_pos[1]] = True
+                queue.append(hex)
+
+                while queue:
+                    cur_hex = queue.popleft()
+                    if cur_hex.building_on_hex:
+                        print("found a city", cur_hex.grid_pos)
+                        prev_hex = self.hexes[previous[cur_hex.grid_pos[0]][cur_hex.grid_pos[1]]]
+                        count = 0
+                        if prev_hex:
+                            while not prev_hex.building_on_hex:
+                                count += 1
+                                prev_hex = self.hexes[previous[prev_hex.grid_pos[0]][prev_hex.grid_pos[1]]]
+                            graph[prev_hex.grid_pos].append((cur_hex.grid_pos, count))
+                            graph[cur_hex.grid_pos].append((prev_hex.grid_pos, count))
+
+
+
+                    for neighbour in cur_hex.get_neighbours():
+                        if neighbour.is_road_on_hex() and not visited[neighbour.grid_pos[0]][neighbour.grid_pos[1]]:
+                            visited[neighbour.grid_pos[0]][neighbour.grid_pos[1]] = True
+                            previous[neighbour.grid_pos[0]][neighbour.grid_pos[1]] = cur_hex.grid_pos
+                            queue.append(neighbour)
+
+        print(graph)
+
+
+
     def load_from_json(self, name: str) -> HexesGroup:
         hexes = HexesGroup()
 
@@ -52,6 +88,12 @@ class Map:
             hex_created = self.create_hex(hex_params["type"], grid_pos)
             if hex_params["building_on_hex"]:
                 self.add_building(hex_created, hex_params["building_on_hex"], grid_pos)
+            if hex_params["roads"]:
+                hex_created.roads = hex_params["roads"]
+            if hex_params["rivers"]:
+                print(hex_params["rivers"])
+                hex_created.rivers = hex_params["rivers"]
+            hex_created.draw()
             hexes.add(hex_created)
 
         return hexes
@@ -85,7 +127,11 @@ class Map:
     def add_building(self, hex_created: Hexagon, building: dict, grid_pos: tuple[int, int]) -> None:
         match building["name"]:
             case "Town":
+                data = building["data"]
+
                 town = Town(grid_pos)
+                town.population = data["population"]
+                town.cattle = data["cattle"]
                 hex_created.building_on_hex = town
                 self.buildings.add(town)
             case _:
@@ -152,40 +198,7 @@ class Map:
         diff = oddq_direction_differences[parity][direction]
         return (hex[0] + diff[0], hex[1] + diff[1])
 
-    def reachable_hexes(self, start, radius):
-        print(start)
-        visited = set()  # set of hexes
-        visited.add(start)
-        star = self.get_hex_by_coord(start)
-        fringes = []  # array of arrays of hexes
-        fringes.append([start])
-        if radius > 0:
-            for dir in range(6):
-                neighbor = self.oddq_offset_neighbor(start, dir)
-                neighbor_hex = self.get_hex_by_coord(neighbor)
-                if neighbor_hex and isinstance(neighbor_hex, Hexagon_sea) and not isinstance(star, Hexagon_sea) or \
-                        not isinstance(neighbor_hex, (Hexagon_mountain, Hexagon_sea)) and isinstance(star, Hexagon_sea):
-                    visited.add(neighbor)
 
-            for mov in range(1, radius + 1):
-
-                for hex in fringes[mov - 1]:
-                    fringes.append([])
-                    for dir in range(0, 6):
-
-                        neighbor = self.oddq_offset_neighbor(hex, dir)
-                        neighbor_hex = self.get_hex_by_coord(neighbor)
-
-                        if not isinstance(star, Hexagon_sea) and not isinstance(neighbor_hex,
-                                                                                (Hexagon_mountain, Hexagon_sea)) or \
-                                isinstance(star, Hexagon_sea) and isinstance(neighbor_hex,
-                                                                             Hexagon_sea) and neighbor_hex:
-
-                            if neighbor not in visited and self.check_coord_validity(neighbor):
-                                visited.add(neighbor)
-                                fringes[mov].append(neighbor)
-
-        return tuple(visited)
 
     def coordinate_range(self, hex, distance):
         hexes = []
@@ -203,44 +216,4 @@ class Map:
                             hexes.append(hex)
         return hexes
 
-    def view_range(self, hex, distance):
-        hexes = []
-        distance = int(distance)
-        qs, rs, ss = map(int, self.get_cube_coords(hex))
 
-        for q in range(qs - distance, qs + distance + 1):
-            for r in range(rs - distance, rs + distance + 1):
-                for s in range(ss - distance, ss + distance + 1):
-
-                    if q + r + s == 0 and q >= 0 and q < self.columns and r > -self.rows and s <= 0:
-                        hex = self.hexes[(q, r, s)]
-                        if hex and hex.is_discovered:
-                            hex.view_hex()
-                            hexes.append(hex)
-        return hexes
-
-
-
-  # def create_mines(self, ):
-  #       land_hexes = []
-  #       for hex in self.hexes:
-  #           if isinstance(hex, Hexagon_land):
-  #               land_hexes.append(hex.grid_pos)
-  #
-  #       for hex in land_hexes:
-  #
-  #           a = random.random()
-  #           if a < 0.03:
-  #               self.Spawner.spawn_building("Mine", hex)
-  #
-  #       for i in range(self.players_amount):
-  #           print("amount of players in this game ", self.players_amount)
-  #           base1 = random.choice(land_hexes)
-  #           print("base1 ", base1)
-  #
-  #           if self.player_id == i:
-  #               self.spawn_point = base1[0], base1[1] + 1
-  #
-  #           print("spawn point in map ", self.spawn_point, i, self.player_id)
-  #
-  #           self.Spawner.spawn_unit("WarBase", base1, player_id=i)

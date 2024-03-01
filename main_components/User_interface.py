@@ -54,7 +54,6 @@ class UI:
         for element in self.lvl_1_elements:
             if element.visible:
                 element.draw(self.UI_surface)
-        print("Drawing lvl 2 elements", len(self.lvl_2_elements))
         for element in self.lvl_2_elements:
             if element.visible:
                 element.draw(self.UI_surface)
@@ -71,7 +70,7 @@ class UI:
         self.text_input = text_input
 
     def add_hexes_list(self):
-        button_list = ButtonList(position=(200, 200))
+        button_list = ButtonList(position=(200, 0))
         hexes_types = ["Hexagon_land", "Hexagon_mountain", "Hexagon_sea", "Hexagon_empty"]
         [button_list.add_element(hex_type, hex_type) for hex_type in hexes_types]
         self.lvl_1_elements.append(button_list)
@@ -93,8 +92,8 @@ class UI:
             button = MenuButton(titles[i], display_size[0]-100, display_size[1]-100-100*i, button_size,
                                            action=self.hide_element,)
             self.lvl_1_elements.append(button)
-        finish_move = MenuButton("Finish Move", display_size[0]-100, display_size[1]-100-100*len(titles),
-                                 button_dimensions=button_size, action=self.end_turn,color=(255, 0, 0),
+        finish_move = MenuButton("Create graph", display_size[0]-100, display_size[1]-100-100*len(titles),
+                                 button_dimensions=button_size, action=self.game_map.create_graph,color=(255, 0, 0),
                                  font_size=24, font_name="Arial")
 
         load_to_json = MenuButton("Save Game", display_size[0]-100, display_size[1]-100-100*4,
