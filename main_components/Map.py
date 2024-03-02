@@ -6,7 +6,8 @@ import pygame
 from math import *
 
 from game_content.Groups import HexesGroup
-from game_content.Sprites import Hexagon, HexagonMountain, HexagonSea, HexagonLand, Town, HexagonEmpty
+from game_content.Sprites import Hexagon, HexagonMountain, HexagonSea, HexagonLand, Town, HexagonEmpty, \
+    OffsetCoordinates
 from game_content.sprites_factory import HexesFactory
 from player_actions.Spawner import Spawner
 from noise.Noise import Noise
@@ -47,7 +48,6 @@ class Map:
                 while queue:
                     cur_hex = queue.popleft()
                     if cur_hex.building_on_hex:
-                        print("found a city", cur_hex.grid_pos)
                         prev_hex = self.hexes[previous[cur_hex.grid_pos[0]][cur_hex.grid_pos[1]]]
                         count = 0
                         if prev_hex:
@@ -57,8 +57,6 @@ class Map:
                             graph[prev_hex.grid_pos].append((cur_hex.grid_pos, count))
                             graph[cur_hex.grid_pos].append((prev_hex.grid_pos, count))
 
-
-
                     for neighbour in cur_hex.get_neighbours():
                         if neighbour.is_road_on_hex() and not visited[neighbour.grid_pos[0]][neighbour.grid_pos[1]]:
                             visited[neighbour.grid_pos[0]][neighbour.grid_pos[1]] = True
@@ -67,8 +65,6 @@ class Map:
 
         print(graph)
 
-
-
     def load_from_json(self, name: str) -> HexesGroup:
         hexes = HexesGroup()
 
@@ -76,7 +72,7 @@ class Map:
             hexes_json = json.load(f)
 
         for grid_pos, hex_params in hexes_json.items():
-            grid_pos = tuple(map(int, grid_pos[1:-1].split(",")))
+            grid_pos = OffsetCoordinates(*list(map(int, grid_pos[1:-1].split(","))))
 
             hex_created = self.create_hex(hex_params["type"], grid_pos)
             hex_created.draw()
@@ -92,27 +88,24 @@ class Map:
         with open(file_name, "w") as f:
             json.dump(map_dict, f)
 
-
-
-    def create_hex(self, type:str, grid_pos: tuple[int, int]) -> Hexagon:
+    def create_hex(self, type: str, grid_pos: OffsetCoordinates) -> Hexagon:
         hex_created = self.hexes_factory.create_hex(type, grid_pos)
         return hex_created
 
-    def change_hex(self, type, grid_pos):
+    def change_hex(self, hex_type: str, grid_pos: OffsetCoordinates) -> None:
         old_hex = self.hexes[grid_pos]
-        hex_created = self.hexes_factory.replace_hex(type, grid_pos, old_hex)
+        hex_created = self.hexes_factory.replace_hex(hex_type, grid_pos, old_hex)
 
         self.hexes[grid_pos] = hex_created
 
-    def find_neighbours(self,):
+    def find_neighbours(self, ):
         for hex in self.hexes:
             coords = hex.offset_to_cube_coords(hex.grid_pos)
-            hex.neighbours = list(filter(None, [self.hexes[tuple(coords + direction)] for direction in hex.directions.values()]))
+            hex.neighbours = list(
+                filter(None, [self.hexes[tuple(coords + direction)] for direction in hex.directions.values()]))
 
-
-
-    def get_hex_by_coord(self, grid_pos):
-        if grid_pos[0] in range(0, self.columns + 1) and grid_pos[0] in range(0, self.rows + 1):
+    def get_hex_by_coord(self, grid_pos: OffsetCoordinates):
+        if grid_pos.column in range(0, self.columns + 1) and grid_pos.row in range(0, self.rows + 1):
             return self.hexes[grid_pos]
         return False
 
@@ -127,22 +120,20 @@ class Map:
         return int((abs(cube_coords1[0] - cube_coords2[0]) + abs(cube_coords1[1] - cube_coords2[1]) + abs(
             cube_coords1[2] - cube_coords2[2])) // 2)
 
-
     def create_tiles(self):
         noise = Noise(self.rows, self.columns, seed=self.seed)
         hexes = noise.create_tiles()
         return hexes
+
     def create_empty_map(self):
         hexes = HexesGroup()
         for i in range(self.rows):
             for j in range(self.columns):
-
-                hexes.add(self.hexes_factory.create_hex("HexagonEmpty", (i, j)))
+                hexes.add(self.hexes_factory.create_hex("HexagonEmpty", OffsetCoordinates(i, j)))
         return hexes
 
-
-    def check_coord_validity(self, cords):
-        return cords[0] >= 0 and cords[1] >= 0 and cords[0] < self.rows and cords[1] < self.columns
+    def check_coord_validity(self, cords: OffsetCoordinates):
+        return 0 <= cords.row < self.rows and 0 <= cords.column < self.columns
 
     def coordinate_range(self, hex, distance):
         hexes = []
@@ -160,7 +151,5 @@ class Map:
                             hexes.append(hex)
         return hexes
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"map with {self.rows} rows and {self.columns} columns"
-
-

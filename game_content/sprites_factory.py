@@ -2,7 +2,8 @@ from math import sin, cos, sqrt, pi, floor
 
 import pygame
 
-from game_content.Sprites import HexagonLand, HexagonSea, HexagonMountain, HexagonEmpty, Hexagon, Town
+from game_content.Sprites import HexagonLand, HexagonSea, HexagonMountain, HexagonEmpty, Hexagon, Town, \
+    OffsetCoordinates
 
 
 class HexPointsStorage():
@@ -100,7 +101,7 @@ class HexesFactory():
     def __init__(self, ):
         self.storage = HexPointsStorage()
 
-    def create_hex(self, hex_params, grid_pos):
+    def create_hex(self, hex_params: str | dict, grid_pos: OffsetCoordinates) -> Hexagon:
         if isinstance(hex_params, dict):
             hex_type = hex_params["type"]
         else:
@@ -115,12 +116,15 @@ class HexesFactory():
                 hex_created = (HexagonMountain(grid_pos, self.storage))
             case "HexagonEmpty":
                 hex_created = (HexagonEmpty(grid_pos, self.storage))
+            case _:
+
+                hex_created = (HexagonLand(grid_pos, self.storage))
 
         if isinstance(hex_params, dict):
             self.add_items_on_hex(hex_created, hex_params)
         return hex_created
 
-    def add_items_on_hex(self, hex_created, hex_params):
+    def add_items_on_hex(self, hex_created: Hexagon, hex_params: dict) -> None:
         if hex_params["building_on_hex"]:
             self.add_building(hex_created, hex_params["building_on_hex"])
         if hex_params["roads"]:
@@ -142,8 +146,8 @@ class HexesFactory():
             case _:
                 pass
 
-    def replace_hex(self, hex_name, grid_pos, old_hex):
-        hex_created = self.create_hex(hex_name, grid_pos)
+    def replace_hex(self, hex_type: str, grid_pos: OffsetCoordinates, old_hex: Hexagon) -> Hexagon:
+        hex_created = self.create_hex(hex_type, grid_pos)
         hex_created.rivers = old_hex.rivers
         hex_created.roads = old_hex.roads
         hex_created.building_on_hex = old_hex.building_on_hex

@@ -47,7 +47,6 @@ class MouseClickHandler:
 
     def add_building(self, event):
         if selected_sprite_clicked := self.check_if_hex_is_clicked(event):
-            print("ng town")
             selected_sprite_clicked.add_building(Town(selected_sprite_clicked.grid_pos))
 
     def handle_click_in_none_mod(self, event):

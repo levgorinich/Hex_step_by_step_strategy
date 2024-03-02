@@ -32,23 +32,24 @@ internal_surface_size = (2500, 2500)
 
 running = True
 
+class MapEditor:
+    def __init__(self, window_size, internal_surface_size, id):
+        self.game_map = Map(10, 10, id, 10, 3, True)
+        self.mover = Mover(self.game_map)
+        self.spawner = Spawner(self.game_map, )
+        self.move_parser = Parser(self.mover, self.spawner, )
+        self.user_interface = UI(window_size, self.game_map, self.spawner)
+        self.tracker = MapMovementTracker(internal_surface_size, window_size, )
+        self.renderer = Render(internal_surface_size, map_movement_tracker=self.tracker,
+                               user_interface=self.user_interface)
+        self.click_handler = MouseClickHandler(self.game_map, self.user_interface, self.tracker, self.mover)
+        self.text_input_handler = TextInputHandler(self.user_interface)
 
 # creating main game classes
 
 
 def map_editor():
-    class MapEditor:
-        def __init__(self, window_size, internal_surface_size, id):
-            self.game_map = Map(10, 10, id, 10, 3, True)
-            self.mover = Mover(self.game_map)
-            self.spawner = Spawner(self.game_map, )
-            self.move_parser = Parser(self.mover, self.spawner, )
-            self.user_interface = UI(window_size, self.game_map, self.spawner)
-            self.tracker = MapMovementTracker(internal_surface_size, window_size, )
-            self.renderer = Render(internal_surface_size, map_movement_tracker=self.tracker,
-                                   user_interface=self.user_interface)
-            self.click_handler = MouseClickHandler(self.game_map, self.user_interface, self.tracker, self.mover)
-            self.text_input_handler = TextInputHandler(self.user_interface)
+
 
     map_editor = MapEditor(window_size, internal_surface_size, 0)
     map_editor.user_interface.subscribe_text_elements(map_editor.text_input_handler)
@@ -71,11 +72,6 @@ def map_editor():
                 map_editor.click_handler.handle_click(event)
 
 
-
-                # if click_handler.pos is not None:
-                #     renderer.cells(click_handler.pos, game_map.hexes.hexes_dict)
-                # print("yeagsdf")
-
         clock.tick(60)
 
     pygame.quit()
@@ -83,48 +79,16 @@ def map_editor():
 
 # main loop
 def offline_game():
-    players = deque()
-    for id in range(3):
-        players.append(OfflinePlayer(window_size, internal_surface_size, id))
 
-    player = players.popleft()
-    players.append(player)
-    player.player.start_turn()
-    commands = {i: [] for i in range(3)}
+    map_editor = MapEditor(window_size, internal_surface_size, 0)
+    map_editor.user_interface.subscribe_text_elements(map_editor.text_input_handler)
 
     run = True
     while run:
 
-        if not player.player.cur_turn:
-
-            for key in commands.keys():
-                if key != player.player.id:
-                    commands[key].append(player.game_map.actions)
-            player.game_map.actions = []
-
-            player = players.popleft()
-            players.append(player)
-            player.player.start_turn()
-            update = str(commands[player.player.id])
-            commands[player.player.id] = []
-            if update:
-
-                start, end = 0, 0
-                for idx, symbol in enumerate(update):
-
-                    if symbol == "<":
-                        start = idx
-                    if symbol == ">":
-                        end = idx
-
-                        player.move_parser.parse_moves(update[start + 1:end])
-                        # print("parsed moves")
-                        start, end = 0, 0
-
         events_list = pygame.event.get()
-        player.game_map.hexes.update()
-
-        player.renderer.display(events_list, player.game_map)
+        map_editor.game_map.hexes.update()
+        map_editor.renderer.display(events_list, map_editor.game_map)
         pygame.display.flip()
 
         for event in events_list:
@@ -132,18 +96,14 @@ def offline_game():
                 run = False
                 global running
                 running = False
-
+            map_editor.text_input_handler.handle_input(event)
             if event.type == pygame.MOUSEBUTTONDOWN:
-                print("detected click")
-                player.click_handler.handle_click(event)
-                print(list(filter(lambda x: len(x[0]) == 2, player.game_map.hexes.hexes_dict.key_to_value.items())))
-                # if click_handler.pos is not None:
-                #     renderer.cells(click_handler.pos, game_map.hexes.hexes_dict)
-                # print("yeagsdf")
+                map_editor.click_handler.handle_click(event)
+
 
         clock.tick(60)
 
-    pygame.quit()
+
 
 
 def choose_game(testing: bool = False):
@@ -228,7 +188,7 @@ def game_menu(testing):
 
     screen.fill((255, 255, 255))
     button_dimensions = (200, 50)
-    offline_game_button = MenuButton("Offline Game", 100, 100, button_dimensions=button_dimensions,
+    offline_game_button = MenuButton("Start Simulation", 100, 100, button_dimensions=button_dimensions,
                                      action=offline_game, color=(0, 0, 255), font_size=24, font_name="Arial")
     online_game_button = MenuButton("Online Game", 300, 400, button_dimensions=button_dimensions,
                                     action=choose_game, color=(0, 0, 255), font_size=24, font_name="Arial")

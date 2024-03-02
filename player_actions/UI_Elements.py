@@ -1,13 +1,10 @@
-from typing import NoReturn
 from abc import ABC, abstractmethod
 import pygame, sys
 
-from main_components.Map import Map
 
 
 def empty_funciton():
-    print("")
-
+    pass
 class Observable:
     def __init__(self):
         self.observers = []
@@ -172,7 +169,6 @@ class TextInput(UI_Element, TextObservable):
 
     def draw(self, display_surface: pygame.Surface):
         if self.visible:
-            print("drawing in text", self.text,id(self))
             self.surf = pygame.Surface((200, 50))
             pygame.draw.rect(self.surf, (0, 255, 0), self.input_rect, 2, 3)
             self.text_surf = self.font.render(self.text, True, '#FFFFFF')
@@ -240,7 +236,6 @@ class UiSurface(UI_Element, TextObservable):
             except Exception as e:
                 print(e)
 
-        print("set city", len(self.elements))
         self.city = city
         self.find_element("population").text = str(city.population)
         self.find_element("cattle").text = str(city.cattle)
@@ -259,7 +254,6 @@ class UiSurface(UI_Element, TextObservable):
         # self
     def draw(self, display_surface: pygame.Surface):
         if self.visible:
-            print("draw elements", len(self.elements), id(self))
             for element in self.elements:
                 element.draw(self.surface)
 
@@ -270,7 +264,6 @@ class UiSurface(UI_Element, TextObservable):
             self.notify_observers(-1)
 
             for element in self.elements:
-                print(element.name)
                 if element.check_click(mouse_pos):
                     return element
             return self

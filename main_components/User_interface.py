@@ -101,8 +101,6 @@ class UI:
                                  font_size=24, font_name="Arial")
         self.lvl_1_elements.append(finish_move)
         self.lvl_1_elements.append(load_to_json)
-        return buttons
-
 
 
     def subscribe_text_elements(self, observer, ):

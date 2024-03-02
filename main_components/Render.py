@@ -38,5 +38,5 @@ class Render:
 
         self.pre_display(events_list)
         self.display_hexes(game_map.hexes)
-        self.display_surface()
+        self.display_surfaces()
 

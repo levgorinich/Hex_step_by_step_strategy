@@ -1,11 +1,19 @@
 import math
 from abc import ABC
 from math import cos, sin, pi, sqrt
+from typing import NamedTuple
+
 import pygame
+
+from main_components.Errors import InvalidTriangleError
 
 hex_side = 15 * sqrt(3)
 hex_width = 30 * sqrt(3)
 hex_height = hex_width / 2 * sqrt(3)
+
+class OffsetCoordinates(NamedTuple):
+    row: int
+    column: int
 
 
 class MapObject(pygame.sprite.Sprite):
@@ -23,7 +31,7 @@ class MapObject(pygame.sprite.Sprite):
     def __str__(self):
         return f"{self.name} {self.grid_pos[0]}, {self.grid_pos[1]}"
 
-    def offset_to_cube_coords(self, grid_pos):
+    def offset_to_cube_coords(self, grid_pos: OffsetCoordinates):
         q = grid_pos[0]
         r = grid_pos[1] - (grid_pos[0] - (grid_pos[0] & 1)) / 2
         return q, r, -q - r
@@ -78,7 +86,6 @@ class Hexagon(MapObject):
         return any(self.rivers)
 
     def save_to_json(self):
-        print("Call buildings save to json ", self.building_on_hex)
         hex_dict = {"type": str(self.__class__.__name__)}
 
         if self.building_on_hex:
@@ -154,7 +161,7 @@ class Hexagon(MapObject):
         try:
             self.rivers[triangle] = True
         except IndexError as e:
-            print("Invalid triangle number")
+            raise InvalidTriangleError()
         self.draw()
 
 
@@ -171,7 +178,8 @@ class Hexagon(MapObject):
             self.roads[triangle_number] = True
             self.draw()
         except IndexError as e:
-            print("Invalid triangle number")
+            raise InvalidTriangleError()
+
 
 
 class HexagonLand(Hexagon):

@@ -51,7 +51,6 @@ class Grid(dict):
 
         for key in keys:
             if key not in self.key_to_value.keys():
-                # print(key, value)
                 self.key_to_value[key] = value
                 if value in self.value_to_keys:
                     self.value_to_keys[value].append(key)
@@ -61,7 +60,6 @@ class Grid(dict):
                 raise KeyAlreadyExistsError(f"Key '{key}' already exists in the dictionary.")
 
     def __getitem__(self, key):
-        # print("this is value in values to keys", value)
         return self.key_to_value.get(key)
     def __len__(self):
         return len(self.key_to_value)
