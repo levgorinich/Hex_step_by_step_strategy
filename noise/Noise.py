@@ -4,7 +4,7 @@ from perlin_noise import PerlinNoise
 import random
 
 from game_content.Groups import HexesGroup
-from game_content.Sprites import Hexagon, Hexagon_sea, Hexagon_mountain, Hexagon_land
+from game_content.Sprites import Hexagon, HexagonSea, HexagonMountain, HexagonLand
 
 
 class Noise():
@@ -53,20 +53,20 @@ class Noise():
                 if self.mountain_bound > landscape[col][row] > self.water_bound:
                     grid_pos = col, row
                     # print(current_y,current_x)
-                    hex = Hexagon_land(grid_pos)
+                    hex = HexagonLand(grid_pos)
                     hexes.add(hex)
 
                 elif landscape[col][row] <= self.water_bound:
                     grid_pos = col, row
                     # print(current_y,current_x)
-                    hex = Hexagon_sea(grid_pos)
+                    hex = HexagonSea(grid_pos)
                     hexes.add(hex)
 
                     # self.empty_hexes.append((col,row))
                 elif landscape[col][row] > self.mountain_bound:
                     grid_pos = col, row
                     # print(current_y,current_x)
-                    hex = Hexagon_mountain(grid_pos)
+                    hex = HexagonMountain(grid_pos)
                     hexes.add(hex)
 
         print(hexes.hexes_dict.key_to_value )

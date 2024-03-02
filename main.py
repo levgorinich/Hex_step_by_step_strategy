@@ -5,8 +5,6 @@ from pygame.locals import *
 import logging
 import json
 
-from main_components.Offline_Player import OfflinePlayer
-from internet_acsess.network import Network
 from main_components.Map import Map
 from main_components.MouseClickHandler import MouseClickHandler
 from main_components.Render import Render
@@ -17,7 +15,6 @@ from player_actions.UI_Elements import *
 from player_actions.MoveParser import Parser
 from player_actions.Spawner import Spawner
 from player_actions.mover import Mover
-from main_components.Player import Player
 from collections import deque
 from main_components.game import OnlineGame
 

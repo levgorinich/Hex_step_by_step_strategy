@@ -6,7 +6,8 @@ import pygame
 from math import *
 
 from game_content.Groups import HexesGroup
-from game_content.Sprites import Hexagon, Hexagon_mountain, Hexagon_sea, Hexagon_land, Town, Hexagon_empty
+from game_content.Sprites import Hexagon, HexagonMountain, HexagonSea, HexagonLand, Town, HexagonEmpty
+from game_content.sprites_factory import HexesFactory
 from player_actions.Spawner import Spawner
 from noise.Noise import Noise
 import random
@@ -20,22 +21,14 @@ class Map:
 
         self.rows = rows
         self.columns = columns
-        self.players_amount = players_amount
-
-        self.player_id = player_id
-        self.actions = []
-        self.spawn_point = None
-        self.offline = Offline
-        self.offline_spawn_point = {0: (2, 3), 1: (4, 4)}
+        self.hexes_factory = HexesFactory()
 
         self.hex_width = 30 * sqrt(3)
-        self.hex_height = self.hex_width * sqrt(3) / 2
-        self.units = pygame.sprite.Group()
-        self.buildings = pygame.sprite.Group()
         # self.hexes   = self.create_tiles()
 
         # self.hexes = self.load_from_json("json_save")
         self.hexes = self.create_empty_map()
+        self.find_neighbours()
         self.Spawner = Spawner(self)
         # self.create_mines()
 
@@ -86,56 +79,9 @@ class Map:
             grid_pos = tuple(map(int, grid_pos[1:-1].split(",")))
 
             hex_created = self.create_hex(hex_params["type"], grid_pos)
-            if hex_params["building_on_hex"]:
-                self.add_building(hex_created, hex_params["building_on_hex"], grid_pos)
-            if hex_params["roads"]:
-                hex_created.roads = hex_params["roads"]
-            if hex_params["rivers"]:
-                print(hex_params["rivers"])
-                hex_created.rivers = hex_params["rivers"]
             hex_created.draw()
             hexes.add(hex_created)
-
         return hexes
-
-    def change_hex(self, type, grid_pos):
-        old_hex = self.hexes[grid_pos]
-        hex_created = self.create_hex(type, grid_pos)
-        print(old_hex.rivers, "this is old hex")
-        hex_created.rivers = old_hex.rivers
-        hex_created.roads = old_hex.roads
-        hex_created.building_on_hex = old_hex.building_on_hex
-        hex_created.draw()
-        self.hexes[grid_pos] = hex_created
-
-
-
-
-    def create_hex(self, type:str, grid_pos: tuple[int, int]) -> Hexagon:
-        print("type in create hex ")
-        match type:
-            case "Hexagon_land":
-                hex_created = (Hexagon_land(grid_pos, self))
-            case "Hexagon_sea":
-                hex_created = (Hexagon_sea(grid_pos, self))
-            case "Hexagon_mountain":
-                hex_created = (Hexagon_mountain(grid_pos, self))
-            case "Hexagon_empty":
-                hex_created = (Hexagon_empty(grid_pos, self))
-        return hex_created
-
-    def add_building(self, hex_created: Hexagon, building: dict, grid_pos: tuple[int, int]) -> None:
-        match building["name"]:
-            case "Town":
-                data = building["data"]
-
-                town = Town(grid_pos)
-                town.population = data["population"]
-                town.cattle = data["cattle"]
-                hex_created.building_on_hex = town
-                self.buildings.add(town)
-            case _:
-                pass
 
     def save_to_json(self, file_name):
 
@@ -143,12 +89,27 @@ class Map:
         for hex in self.hexes:
             grid_pos, d = hex.save_to_json()
             map_dict[grid_pos] = d
-        print(map_dict)
-        print("opening a file ")
         with open(file_name, "w") as f:
-            print("started dumpint")
             json.dump(map_dict, f)
-            print("dump complete")
+
+
+
+    def create_hex(self, type:str, grid_pos: tuple[int, int]) -> Hexagon:
+        hex_created = self.hexes_factory.create_hex(type, grid_pos)
+        return hex_created
+
+    def change_hex(self, type, grid_pos):
+        old_hex = self.hexes[grid_pos]
+        hex_created = self.hexes_factory.replace_hex(type, grid_pos, old_hex)
+
+        self.hexes[grid_pos] = hex_created
+
+    def find_neighbours(self,):
+        for hex in self.hexes:
+            coords = hex.offset_to_cube_coords(hex.grid_pos)
+            hex.neighbours = list(filter(None, [self.hexes[tuple(coords + direction)] for direction in hex.directions.values()]))
+
+
 
     def get_hex_by_coord(self, grid_pos):
         if grid_pos[0] in range(0, self.columns + 1) and grid_pos[0] in range(0, self.rows + 1):
@@ -166,8 +127,6 @@ class Map:
         return int((abs(cube_coords1[0] - cube_coords2[0]) + abs(cube_coords1[1] - cube_coords2[1]) + abs(
             cube_coords1[2] - cube_coords2[2])) // 2)
 
-    def __str__(self):
-        return f"map with {self.rows} rows and {self.columns} columns"
 
     def create_tiles(self):
         noise = Noise(self.rows, self.columns, seed=self.seed)
@@ -177,28 +136,13 @@ class Map:
         hexes = HexesGroup()
         for i in range(self.rows):
             for j in range(self.columns):
-                hexes.add(Hexagon_empty((i, j), self))
+
+                hexes.add(self.hexes_factory.create_hex("HexagonEmpty", (i, j)))
         return hexes
 
 
     def check_coord_validity(self, cords):
         return cords[0] >= 0 and cords[1] >= 0 and cords[0] < self.rows and cords[1] < self.columns
-
-    def oddq_offset_neighbor(self, hex, direction):
-        oddq_direction_differences = [
-            # even cols
-            [[+1, 0], [+1, -1], [0, -1],
-             [-1, -1], [-1, 0], [0, +1]],
-            # odd cols
-            [[+1, +1], [+1, 0], [0, -1],
-             [-1, 0], [-1, +1], [0, +1]],
-        ]
-
-        parity = hex[0] & 1
-        diff = oddq_direction_differences[parity][direction]
-        return (hex[0] + diff[0], hex[1] + diff[1])
-
-
 
     def coordinate_range(self, hex, distance):
         hexes = []
@@ -215,5 +159,8 @@ class Map:
                         if hex:
                             hexes.append(hex)
         return hexes
+
+    def __str__(self):
+        return f"map with {self.rows} rows and {self.columns} columns"
 
 

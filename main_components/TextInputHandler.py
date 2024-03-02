@@ -25,7 +25,6 @@ class TextInputHandler:
         if self.active_element:
             if event.type == pygame.TEXTINPUT:
                 self.active_element.text += event.text
-                print(self.active_element.text, "new text")
                 self.user_interface.draw_elements()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE:
